@@ -681,6 +681,38 @@ SQL;
             [$this, 'displayViewEntityTags']
         );
 
+        // Filter the search filters for the advanced search pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Item',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\ItemSet',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Media',
+            'view.search.filters',
+            [$this, 'filterSearchFilters']
+        );
+
         // Add the tags to the resource show public pages.
         $sharedEventManager->attach(
             'Omeka\Controller\Site\Item',
@@ -1045,6 +1077,26 @@ SQL;
 
         echo $event->getTarget()
             ->partial('folksonomy/common/advanced-search.phtml');
+    }
+
+    public function filterSearchFilters(Event $event)
+    {
+        $translate = $event->getTarget()->plugin('translate');
+        $filters = $event->getParam('filters');
+        $query = $event->getParam('query');
+        if (!empty($query['has_tags'])) {
+            $filterLabel = $translate('Has tags');
+            $filterValue = $translate('true');
+            $filters[$filterLabel][] = $filterValue;
+        }
+        if (!empty($query['tag'])) {
+            $tags = is_array($query['tag']) ? $query['tag'] : explode(',', $query['tag']);
+            $filterLabel = $translate('Tag');
+            foreach ($tags as $tag) {
+                $filters[$filterLabel][] = trim($tag);
+            }
+        }
+        $event->setParam('filters', $filters);
     }
 
     /**
