@@ -14,7 +14,7 @@ class BrowseTags implements LinkInterface
 
     public function getFormTemplate()
     {
-        return 'common/navigation-link-form/browse-tags';
+        return 'folksonomy/common/navigation-link-form/browse-tags';
     }
 
     public function isValid(array $data, ErrorStore $errorStore)

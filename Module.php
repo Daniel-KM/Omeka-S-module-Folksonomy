@@ -14,6 +14,7 @@ namespace Folksonomy;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
+use Folksonomy\Form\Search as SearchForm;
 use Folksonomy\Form\Tagging as TaggingForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Api\Request;
@@ -152,7 +153,6 @@ SQL;
             [
                 'Folksonomy\Controller\Admin\Tagging',
                 'Folksonomy\Controller\Site\Tagging',
-                'Folksonomy\Controller\Tagging',
             ]
         );
         $acl->allow(
@@ -296,7 +296,6 @@ SQL;
             [
                 'Folksonomy\Controller\Admin\Tag',
                 'Folksonomy\Controller\Site\Tag',
-                'Folksonomy\Controller\Tag',
             ]
         );
         $acl->allow(
@@ -467,6 +466,13 @@ SQL;
             [$this, 'filterResourceJsonLd']
         );
 
+        // Add the tag field to the admin and public advanced search page.
+        $sharedEventManager->attach(
+            '*',
+            'view.advanced_search',
+            [$this, 'displayAdvancedSearch']
+        );
+
         // Add the tagging and tag filters to resource search.
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\ItemAdapter',
@@ -484,6 +490,7 @@ SQL;
             [$this, 'searchQuery']
         );
 
+        // Cache some resources after a search.
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\ItemAdapter',
             'api.search.post',
@@ -709,15 +716,6 @@ SQL;
                 [$this, 'displayTaggingFormPublic']
             );
         }
-
-        // Add the tag field to the site's browse page.
-        $sharedEventManager->attach(
-            'Folksonomy\Controller\Site\Index',
-            'view.advanced_search',
-            function (Event $event) {
-                echo $event->getTarget()->partial('common/site/advanced-search.phtml');
-            }
-        );
     }
 
     public function getConfigForm(PhpRenderer $renderer)
@@ -749,7 +747,7 @@ SQL;
         // Allow to display fieldsets in config form.
         $vars = [];
         $vars['form'] = $form;
-        return $renderer->render('module/config.phtml', $vars);
+        return $renderer->render('folksonomy/module/config.phtml', $vars);
     }
 
     public function handleConfigForm(AbstractController $controller)
@@ -847,7 +845,7 @@ SQL;
         }
 
         echo $event->getTarget()->partial(
-            'common/admin/tagging-form.phtml'
+            'folksonomy/common/admin/tagging-form.phtml'
         );
     }
 
@@ -875,7 +873,7 @@ SQL;
         ]);
         $form->init();
         $view->vars()->offsetSet('taggingForm', $form);
-        echo $view->partial('common/site/tagging-form.phtml');
+        echo $view->partial('folksonomy/common/site/tagging-form.phtml');
     }
 
     /**
@@ -900,7 +898,7 @@ SQL;
         $tags = $this->listResourceTags($resource);
         $taggings = $this->listResourceTaggings($resource);
         echo $event->getTarget()->partial(
-            'common/site/tags-resource.phtml',
+            'folksonomy/common/site/tags-resource.phtml',
             [
                 'resource' => $resource,
                 'tags' => $tags,
@@ -932,8 +930,8 @@ SQL;
         $tags = $this->listResourceTagsByName($resource);
         $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $isViewDetails
-            ? 'common/admin/tags-resource.phtml'
-            : 'common/admin/tags-resource-list.phtml';
+            ? 'folksonomy/common/admin/tags-resource.phtml'
+            : 'folksonomy/common/admin/tags-resource-list.phtml';
         echo $event->getTarget()->partial(
             $partial,
             [
@@ -1021,6 +1019,34 @@ SQL;
         return $result;
     }
 
+    public function displayAdvancedSearch(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $formElementManager = $services->get('FormElementManager');
+        $form = $formElementManager->get(SearchForm::class);
+        $form->init();
+
+        $view = $event->getTarget();
+        $query = $event->getParam('query');
+        $resourceType = $event->getParam('resourceType');
+
+        $hasTags = !empty($query['has_tags']);
+        $tags = array_key_exists('tag', $query)
+            ? (is_array($query['tag']) ? implode(', ', $query['tag']) : $query['tag'])
+            : '';
+
+        $formData = [];
+        $formData['has_tags'] = $hasTags;
+        $formData['tag'] = $tags;
+        $form->setData($formData);
+
+        $vars = $event->getTarget()->vars();
+        $vars->offsetSet('searchTagForm', $form);
+
+        echo $event->getTarget()
+            ->partial('folksonomy/common/advanced-search.phtml');
+    }
+
     /**
      * Helper to filter search queries.
      *
@@ -1034,7 +1060,7 @@ SQL;
         // TODO Add option for context (admin/public) tagging status (all or allowed/approved).
 
         $query = $event->getParam('request')->getContent();
-        if (array_key_exists('has_tags', $query)) {
+        if (!empty($query['has_tags'])) {
             $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
             $taggingAlias = $adapter->createAlias();

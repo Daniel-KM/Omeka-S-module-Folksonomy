@@ -33,11 +33,17 @@
     .tags.browse table.batch-edit td:nth-child(1n+3) {
         text-align: right;
     }
-    .taggings.browse table:not(.batch-edit) th:first-child,
-    .taggings.browse table:not(.batch-edit) td:first-child,
+    .taggings.browse table:not(.batch-edit) th:nth-child(1),
+    .taggings.browse table:not(.batch-edit) td:nth-child(1),
     .taggings.browse table.batch-edit th:nth-child(2),
     .taggings.browse table.batch-edit td:nth-child(2) {
         max-width: 40%;
+    }
+    .taggings.browse table:not(.batch-edit) th:nth-child(2),
+    .taggings.browse table:not(.batch-edit) td:nth-child(2),
+    .taggings.browse table.batch-edit th:nth-child(3),
+    .taggings.browse table.batch-edit td:nth-child(3) {
+        min-width: 120px;
     }
 
     .folksonomy table .resource-name {
@@ -126,9 +132,9 @@
     .folksonomy .tag-name[contenteditable="true"] {
         background: inherit;
         border: hidden;
-        display:inline;
+        display: inline-block;
         min-height: unset;
-        max-height: 2em;
+        max-height: 3em;
         padding: inherit;
         width: 84%;
     }

@@ -66,7 +66,7 @@ class TagCloud extends AbstractBlockLayout
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
         return $view->partial(
-            'common/block-layout/tag-cloud',
+            'folksonomy/common/block-layout/tag-cloud',
             ['block' => $block]
         );
     }

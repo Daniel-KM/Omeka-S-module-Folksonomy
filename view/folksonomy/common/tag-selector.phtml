@@ -3,9 +3,16 @@ $escape = $this->plugin('escapeHtml');
 
 // Tags are already sorted.
 $tagsByInitial = [];
-foreach ($tags as $tag) {
-    $initial = mb_substr($tag->name(), 0, 1);
-    $tagsByInitial[$initial][] = $tag;
+if (extension_loaded('mbstring')) {
+    foreach ($tags as $tag) {
+        $initial = mb_substr($tag->name(), 0, 1);
+        $tagsByInitial[mb_strtolower($initial)][] = $tag;
+    }
+} else {
+    foreach ($tags as $tag) {
+        $initial = substr($tag->name(), 0, 1);
+        $tagsByInitial[strtolower($initial)][] = $tag;
+    }
 }
 ?>
 <div id="tag-selector" class='selector sidebar active'>

@@ -7,7 +7,7 @@
 </div>
 <?php else: ?>
 <?php $this->trigger('view.browse.before'); ?>
-<?php echo $this->partial('common/tag-cloud', [
+<?php echo $this->partial('folksonomy/common/tag-cloud', [
     'tags' => $tags,
     'resourceName' => '',
     'statuses' => ['allowed', 'approved'],

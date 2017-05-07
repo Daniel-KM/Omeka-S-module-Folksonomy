@@ -44,6 +44,7 @@ return [
         'invokables' => [
             'Folksonomy\Form\Config' => Form\Config::class,
             'Folksonomy\Form\Element\TagSelect' => Service\Form\Element\TagSelectFactory::class,
+            'Folksonomy\Form\Search' => Form\Search::class,
             'Folksonomy\Form\TagCloudBlock' => Form\TagCloudBlock::class,
         ],
         'factories' => [
@@ -79,8 +80,6 @@ return [
             'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
             'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
             'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
-            'Folksonomy\Controller\Tagging' => Controller\TaggingController::class,
-            'Folksonomy\Controller\Tag' => Controller\TagController::class,
         ],
         'factories' => [
             'Folksonomy\Controller\Site\Tagging' => Service\Controller\Site\TaggingControllerFactory::class,
