@@ -82,9 +82,9 @@ return [
         'invokables' => [
             'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
             'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
+            'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
         ],
         'factories' => [
-            'Folksonomy\Controller\Site\Tag' => Service\Controller\Site\TagControllerFactory::class,
             'Folksonomy\Controller\Site\Tagging' => Service\Controller\Site\TaggingControllerFactory::class,
         ],
     ],

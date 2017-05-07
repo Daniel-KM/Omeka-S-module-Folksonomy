@@ -13,11 +13,13 @@ class AddTagsFactory implements FactoryInterface
         $acl = $services->get('Omeka\Acl');
         $settings = $services->get('Omeka\Settings');
         $apiAdapterManager = $services->get('Omeka\ApiAdapterManager');
+        $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
         $plugin = new AddTags(
             $api,
             $acl,
             $settings,
-            $apiAdapterManager
+            $apiAdapterManager,
+            $entityManagerFilters
         );
         return $plugin;
     }

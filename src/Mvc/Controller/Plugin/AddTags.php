@@ -1,6 +1,7 @@
 <?php
 namespace Folksonomy\Mvc\Controller\Plugin;
 
+use Doctrine\ORM\Query\FilterCollection;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\Manager as ApiAdapterManager;
@@ -33,12 +34,23 @@ class AddTags extends AbstractPlugin
      */
     protected $apiAdapterManager;
 
-    public function __construct(Api $api, Acl $acl, Settings $settings, ApiAdapterManager  $apiAdapterManager)
-    {
+    /**
+     * @var FilterCollection
+     */
+    protected $entityManagerFilters;
+
+    public function __construct(
+        Api $api,
+        Acl $acl,
+        Settings $settings,
+        ApiAdapterManager  $apiAdapterManager,
+        FilterCollection $entityManagerFilters
+    ) {
         $this->api = $api;
         $this->acl = $acl;
         $this->settings = $settings;
         $this->apiAdapterManager = $apiAdapterManager;
+        $this->entityManagerFilters = $entityManagerFilters;
     }
 
     /**
@@ -49,6 +61,16 @@ class AddTags extends AbstractPlugin
      * @return array|null List of tag names that were added to the resource.
      */
     public function __invoke(Resource $resource, array $tags)
+    {
+        // The filter is disabled to check if tags and tagging already exist.
+        $this->entityManagerFilters->disable('tagging_visibility');
+        $result = $this->addTagsToResource($resource, $tags);
+        $this->entityManagerFilters->enable('tagging_visibility');
+        $this->entityManagerFilters->getFilter('tagging_visibility')->setAcl($this->acl);
+        return $result;
+    }
+
+    protected function addTagsToResource(Resource $resource, array $tags)
     {
         // A quick cleaning (and "0" may be a valid tag).
         $tags = array_filter(

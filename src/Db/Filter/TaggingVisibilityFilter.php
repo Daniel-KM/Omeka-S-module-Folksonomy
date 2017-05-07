@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetaData;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Omeka\Permissions\Acl;
 
 /**
  * Filter tagging by visibility (status "allowed" and "approved" are public).
@@ -17,9 +17,9 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class TaggingVisibilityFilter extends SQLFilter
 {
     /**
-     * @var ServiceLocatorInterface
+     * @var Acl
      */
-    protected $serviceLocator;
+    protected $acl;
 
     public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
     {
@@ -48,8 +48,7 @@ class TaggingVisibilityFilter extends SQLFilter
      */
     protected function getTaggingConstraint($alias)
     {
-        $acl = $this->serviceLocator->get('Omeka\Acl');
-        if ($acl->userIsAllowed('Folksonomy\Entity\Tagging', 'view-all')) {
+        if ($this->acl->userIsAllowed('Folksonomy\Entity\Tagging', 'view-all')) {
             return '';
         }
 
@@ -61,7 +60,7 @@ class TaggingVisibilityFilter extends SQLFilter
             . Tagging::STATUS_APPROVED . '")';
 
         // Users can view all resources they own.
-        $identity = $this->serviceLocator->get('Omeka\AuthenticationService')->getIdentity();
+        $identity = $this->acl->getAuthenticationService()->getIdentity();
         if ($identity) {
             $constraints[] = 'OR';
             $constraints[] = sprintf(
@@ -73,8 +72,8 @@ class TaggingVisibilityFilter extends SQLFilter
         return implode(' ', $constraints);
     }
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    public function setAcl(Acl $acl)
     {
-        $this->serviceLocator = $serviceLocator;
+        $this->acl = $acl;
     }
 }

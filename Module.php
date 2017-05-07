@@ -19,6 +19,7 @@ use Folksonomy\Form\Tagging as TaggingForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
+use Omeka\Permissions\Assertion\OwnsEntityAssertion;
 use Omeka\Stdlib\ErrorStore;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
@@ -65,6 +66,7 @@ class Module extends AbstractModule
     public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
+        $this->addEntityManagerFilters();
         $this->addAclRules();
     }
 
@@ -131,6 +133,17 @@ SQL;
     }
 
     /**
+     * Add tag and tagging visibility filters to the entity manager.
+     */
+    protected function addEntityManagerFilters()
+    {
+        $services = $this->getServiceLocator();
+        $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
+        $entityManagerFilters->enable('tagging_visibility');
+        $entityManagerFilters->getFilter('tagging_visibility')->setAcl($services->get('Omeka\Acl'));
+    }
+
+    /**
      * Add ACL rules for this module.
      */
     protected function addAclRules()
@@ -193,6 +206,14 @@ SQL;
                 'create',
             ]
         );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Entity\Tagging',
+            [
+                'read',
+            ],
+            new OwnsEntityAssertion
+        );
 
         $acl->allow(
             'author',
@@ -220,6 +241,14 @@ SQL;
             [
                 'create',
             ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Entity\Tagging',
+            [
+                'read',
+            ],
+            new OwnsEntityAssertion
         );
 
         $acl->allow(
@@ -338,6 +367,14 @@ SQL;
                 'create',
             ]
         );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Entity\Tag',
+            [
+                'read',
+            ],
+            new OwnsEntityAssertion
+        );
 
         $acl->allow(
             'author',
@@ -365,6 +402,14 @@ SQL;
             [
                 'create',
             ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Entity\Tag',
+            [
+                'read',
+            ],
+            new OwnsEntityAssertion
         );
 
         $acl->allow(
@@ -1215,16 +1260,10 @@ SQL;
             return;
         }
 
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
-
-        $entityManagerFilters->enable('tagging_visibility');
-        $entityManagerFilters->getFilter('tagging_visibility')->setServiceLocator($services);
+        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $taggings = $api
             ->search('taggings', ['resource_id' => $resourceIds])
             ->getContent();
-        $entityManagerFilters->disable('tagging_visibility');
         foreach ($taggings as $tagging) {
             $resourceId = $tagging->resource()->id();
             // Cache tags.
