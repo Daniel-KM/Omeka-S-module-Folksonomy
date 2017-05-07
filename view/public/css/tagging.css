@@ -1,0 +1,42 @@
+#tagging-form {
+    background-color: #FFFFFF;
+    border-radius: 0.7em 0.7em 0.7em 0.7em;
+    border-style: solid;
+    border-width: 0 1px 1px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+    clear: both;
+    display: none;
+    right: 0;
+    margin-top: 35px;
+    overflow: auto;
+    padding: 1.5em 16px;
+    /* position: absolute; */
+    text-align: left;
+    z-index: 1010;
+}
+#tagging-form input#submit {
+    float: right;
+}
+#tagging-form ul.errors li {
+    color: red;
+    list-style: none outside none;
+}
+#display-tagging-form {
+    background-color: #000000;
+    border: 0 none;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: "Times",serif;
+    font-size: 16px;
+    line-height: 24px;
+    outline: 0 none;
+    overflow: visible;
+    padding: 3px 10px;
+    text-decoration: none;
+    width: auto;
+}
+#display-tagging-form:hover,
+#display-tagging-form:active,
+#display-tagging-form:focus {
+    background-color: #888888;
+}
