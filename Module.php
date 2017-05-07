@@ -14,6 +14,7 @@ namespace Folksonomy;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
+use Folksonomy\Form\Tagging as TaggingForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
@@ -820,7 +821,24 @@ SQL;
      */
     public function displayTaggingFormPublic(Event $event)
     {
-        echo $event->getTarget()->partial('folksonomy/site/tagging-form.phtml');
+        $view = $event->getTarget();
+        $services = $this->getServiceLocator();
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $viewHelperManager = $services->get('ViewHelperManager');
+
+        //$form = $services->get('FormElementManager')->get(TaggingForm::class);
+        $form = new TaggingForm;
+        $form->setSettingHelper($viewHelperManager->get('setting'));
+        $form->setUrlHelper($viewHelperManager->get('Url'));
+        $form->setFormElementManager($services->get('FormElementManager'));
+        $form->setOptions([
+            'site-slug' => $view->params()->fromRoute('site-slug'),
+            'resource_id' => $view->vars()->resource->id(),
+            'is_identified' => !empty($user),
+        ]);
+        $form->init();
+        $view->vars()->offsetSet('taggingForm', $form);
+        echo $view->partial('folksonomy/site/tagging-form.phtml');
     }
 
     /**

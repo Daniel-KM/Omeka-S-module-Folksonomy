@@ -1,116 +1,196 @@
 <?php
+namespace Folksonomy\Form;
 
-class Tagging_Form_Tagging extends Omeka_Form
+use Omeka\View\Helper\Setting;
+use Zend\Form\Form;
+use Zend\Http\PhpEnvironment\RemoteAddress;
+use Zend\Validator\StringLength;
+use Zend\View\Helper\Url;
+
+class Tagging extends Form
 {
-    protected $_record;
+    /**
+     * @var Setting
+     */
+    protected $settingHelper;
 
     /**
-     * Constructor
-     *
-     * Registers form view helper as decorator
-     *
-     * @param mixed $options
+     * @var Url
      */
-    public function __construct($record = null)
-    {
-        $this->_record = $record;
+    protected $urlHelper;
 
-        parent::__construct();
-    }
+    /**
+     * @var FormElementManager
+     */
+    protected $formElementManager;
+
+    protected $options = [
+        'site-slug' => null,
+        'resource_id' => null,
+        'is_identified' => false,
+    ];
 
     public function init()
     {
-        parent::init();
+        $settingHelper = $this->getSettingHelper();
+        $urlHelper = $this->getUrlHelper();
+        $resourceId = $this->getOption('resource_id');
+        $action = $urlHelper(
+            'site/tagging-id',
+            [
+                'site-slug' => $this->getOption('site-slug'),
+                'controller' => 'tagging',
+                'resource-id' => $resourceId,
+                'action' => 'add',
+            ]
+        );
+        $this->setAttribute('id', 'tagging-form-' . $resourceId);
+        $this->setAttribute('data-resource-id', $resourceId);
 
-        $this->setAction(WEB_ROOT . '/tagging/index/add');
-        $this->setAttrib('id', 'tagging-form');
-        $user = current_user();
+        $this->add([
+            'type' => 'hidden',
+            'name' => 'resource_id',
+            'attributes' => [
+                'value' => $resourceId,
+                'required' => true,
+            ],
+        ]);
 
-        $this->addElement('text', 'tagging', [
-            'label' => __('Add Tags'),
-            'description' => __('Separate multiple tags with a "%s".', get_option('tag_delimiter')),
-            'required' => true,
-            'size' => 60,
-            // An internal validator is used after (allow some non alnum
-            // characters).
-            // TODO Use the regex validator here?
+        $this->add([
+            'type' => 'Text',
+            'name' => 'o-module-folksonomy:tag-new',
+            'options' => [
+                'label' => 'Add tags', // @translate
+            ],
+            'attributes' => [
+                'placeholder' => 'Add one or multiple comma-separated new tags', // @translate
+                'required' => true,
+            ],
             'validators' => [
                 ['validator' => 'StringLength', 'options' => [
                     'min' => 1,
-                    'max' => get_option('tagging_max_length_total'),
+                    'max' => $settingHelper('folksonomy_max_length_total'),
                     'messages' => [
-                        Zend_Validate_StringLength::TOO_SHORT =>
-                            __('Proposed tag cannot be empty.'),
-                        Zend_Validate_StringLength::TOO_LONG =>
-                            __('Proposed tags cannot be longer than %d characters.', get_option('tagging_max_length_total')),
+                        StringLength::TOO_SHORT =>
+                            'Proposed tag cannot be empty.', // @translate
+                        StringLength::TOO_LONG =>
+                        sprintf('Proposed tags cannot be longer than %d characters.', // @translate
+                            $settingHelper('folksonomy_max_length_total')),
                     ],
                 ]],
             ],
-            'decorators' => [],
         ]);
 
         // Assume registered users are trusted and don't make them play recaptcha.
-        if (!$user && get_option('recaptcha_public_key') && get_option('recaptcha_private_key')) {
-            $this->addElement('captcha', 'captcha', [
-                'class' => 'hidden',
-                'label' => __("Please verify you're a human"),
-                'captcha' => [
-                    'captcha' => 'ReCaptcha',
-                    'pubkey' => get_option('recaptcha_public_key'),
-                    'privkey' => get_option('recaptcha_private_key'),
-                    // Make the connection secure so IE8 doesn't complain. if
-                    // works, should branch around http: vs https:
-                    'ssl' => true,
-                ],
-                'decorators' => [],
-            ]);
+        if (!$this->getOption('is_identified')) {
+            $siteKey = $settingHelper('recaptcha_site_key');
+            $secretKey = $settingHelper('recaptcha_secret_key');
+            if ($siteKey && $secretKey) {
+                $element = $this->getFormElementManager()
+                    ->get('Omeka\Form\Element\Recaptcha', [
+                        'site_key' => $siteKey,
+                        'secret_key' => $secretKey,
+                        'remote_ip' => (new RemoteAddress)->getIpAddress(),
+                    ]);
+                $this->add($element);
+            }
         }
 
+        // TODO Allow html legal agreement in the tagging form help from here.
         // The legal agreement is checked by default for logged users.
-        if (get_option('tagging_legal_text')) {
-            $this->addElement('checkbox', 'tagging_legal_text', [
-                'label' => get_option('tagging_legal_text'),
-                'value' => (boolean) $user,
-                'required' => true,
-                'uncheckedValue' => '',
-                'checkedValue' => 'checked',
+        $legalText = str_replace('&nbsp;', ' ', strip_tags($settingHelper('folksonomy_legal_text')));
+        if ($legalText) {
+            $this->add([
+                'type' => 'checkbox',
+                'name' => 'legal_agreement',
+                'options' => [
+                    'label' => 'Terms of Service', // @translate
+                    'info' => $legalText,
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'use_hidden_element' => false,
+                ],
+                'attributes' => [
+                    'value' => $this->getOption('is_identified'),
+                    'required' => true,
+                ],
                 'validators' => [
                     ['notEmpty', true, [
                         'messages' => [
-                            'isEmpty' => __('You must agree to the terms and conditions.'),
+                            'isEmpty' => 'You must agree to the terms and conditions.', // @translate
                         ],
                     ]],
                 ],
-                'decorators' => ['ViewHelper', 'Errors', ['label', ['escape' => false]]],
             ]);
         }
 
-        // Add some hidden fields to simplify redirection.
-        $request = Zend_Controller_Front::getInstance()->getRequest();
-        $record_type = empty($this->_record)
-            ? ucfirst(Inflector::singularize($request->getControllerName()))
-            : get_class($this->_record);
-        $record_id = empty($this->_record)
-            ? $request->getParam('id')
-            : $this->_record->id;
-        $this->addElement('hidden', 'path', [
-            'value' => $request->getPathInfo(),
-            'hidden' => true,
-            'class' => 'hidden',
-        ]);
-        $this->addElement('hidden', 'record_type', [
-            'value' => $record_type,
-            'hidden' => true,
-            'class' => 'hidden',
-        ]);
-        $this->addElement('hidden', 'record_id', [
-            'value' => $record_id,
-            'hidden' => true,
-            'class' => 'hidden',
+        $this->add([
+            'type' => 'csrf',
+            'name' => sprintf('csrf_%s', $resourceId),
+            'options' => [
+                'csrf_options' => ['timeout' => 3600],
+            ],
         ]);
 
-        $this->addElement('submit', 'submit', [
-            'label' => __('Tag it'),
+        $this->add([
+            'type' => 'button',
+            'name' => 'submit',
+            'options' => [
+                'label' => 'Tag it!', // @translate
+            ],
+            'attributes' => [
+                'class' => 'folksonomy-tagging-add',
+                'data-url' => $action,
+            ],
         ]);
+    }
+
+    /**
+     * @param Setting $setting
+     */
+    public function setSettingHelper(Setting $settingHelper)
+    {
+        $this->settingHelper = $settingHelper;
+    }
+
+    /**
+     * @return Setting
+     */
+    public function getSettingHelper()
+    {
+        return $this->settingHelper;
+    }
+
+    /**
+     * @param Url $urlHelper
+     */
+    public function setUrlHelper(Url $urlHelper)
+    {
+        $this->urlHelper = $urlHelper;
+    }
+
+    /**
+     * @return Url
+     */
+    public function getUrlHelper()
+    {
+        return $this->urlHelper;
+    }
+
+    /**
+     * @param FormElementManager $formElementManager
+     */
+    public function setFormElementManager($formElementManager)
+    {
+        $this->formElementManager = $formElementManager;
+    }
+
+    /**
+     * @return FormElementManager
+     */
+    public function getFormElementManager()
+    {
+        return $this->formElementManager;
     }
 }

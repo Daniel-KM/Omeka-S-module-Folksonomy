@@ -1,3 +1,42 @@
-<div class="field">
-    <input name="o-module-folksonomy:tag-new" value="" placeholder="<?php echo $this->translate('Add one tag or more'); ?>" class="touched" type="text">
+<?php
+$this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
+$this->headScript()->appendFile($this->assetUrl('js/folksonomy.js', 'Folksonomy'));
+$taggingForm->prepare();
+$formElement = $this->plugin('formElement');
+?>
+<div class="property">
+    <h4><?php echo $this->translate('New Tags'); ?></h4>
+    <?php // echo $this->form($taggingForm); ?>
+    <?php echo $this->form()->openTag($taggingForm); ?>
+    <?php $element = $taggingForm->get('o-module-folksonomy:tag-new'); ?>
+    <div class="field">
+        <div class='inputs'>
+            <?php echo $this->formText($element); ?>
+        </div>
+    </div>
+    <?php if ($taggingForm->has('recaptcha')): ?>
+    <?php $element = $taggingForm->get('recaptcha'); ?>
+    <div class="field">
+        <div class='inputs'>
+            <?php echo $this->formElement($element); ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php if ($taggingForm->has('legal_agreement')): ?>
+    <?php $element = $taggingForm->get('legal_agreement'); ?>
+    <div class="field">
+        <div class='inputs'>
+            <?php echo $this->setting('folksonomy_legal_text'); ?>
+            <?php echo $this->formCheckbox($element); ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php echo $formElement($taggingForm->get('resource_id')); ?>
+    <?php echo $formElement($taggingForm->get('csrf_' . $resource->id())); ?>
+    <?php $element = $taggingForm->get('submit'); ?>
+    <?php echo $this->formButton()->openTag($element); ?>
+    <span class="fa fa-tag">&nbsp;</span>
+    <?php echo $this->formLabel($element); ?>
+    <?php echo $this->formButton()->closeTag(); ?>
+    <?php echo $this->form()->closeTag(); ?>
 </div>

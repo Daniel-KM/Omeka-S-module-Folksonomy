@@ -1,46 +1,41 @@
-jQuery(document).ready(function() {
-    // Handle approved / rejected from any status.
-    jQuery('.tagging.toggle-status').click(function(event) {
-        event.preventDefault();
-        var id = jQuery(this).attr('id');
-        var current = jQuery('#' + id);
-        id = id.substr(id.lastIndexOf('-') + 1);
-        var ajaxUrl = jQuery(this).attr('href') + '/tagging/ajax/update';
-        jQuery(this).addClass('transmit');
-        if (jQuery(this).hasClass('approved')) {
-            jQuery.post(ajaxUrl,
-                {
-                    status: 'rejected',
-                    id: id
-                },
-                function(data) {
-                    current.addClass('rejected');
-                    current.removeClass('proposed');
-                    current.removeClass('allowed');
-                    current.removeClass('approved');
-                    current.removeClass('transmit');
-                    if (current.text() != '') {
-                        current.text(Omeka.messages.tagging.rejected);
-                    }
+(function() {
+    $(document).ready(function() {
+        $('body').on('click', '.folksonomy-tagging-add', function(e) {
+            e.preventDefault();
+            var button = $(this);
+            var form = button.parent('form');
+            var url = button.attr('data-url');
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                data: form.serialize(),
+                timeout: 30000,
+                beforeSend: function() {
+                    button.addClass('transmit');
+                    button.find('span').removeClass('fa-tag');
                 }
-            );
-        } else {
-            jQuery.post(ajaxUrl,
-                {
-                    status: 'approved',
-                    id: id
-                },
-                function(data) {
-                    current.addClass('approved');
-                    current.removeClass('proposed');
-                    current.removeClass('allowed');
-                    current.removeClass('rejected');
-                    current.removeClass('transmit');
-                    if (current.text() != '') {
-                        current.text(Omeka.messages.tagging.approved);
-                    }
+            })
+            .done(function (data) {
+                var msg = 'Data were added to the resource.' + ' ';
+                if (data.moderation) {
+                    msg += 'They will be displayed when approved.';
+                } else {
+                    msg += 'Reload page to see new tags.';
                 }
-            );
-        }
+                alert(msg);
+                form.find('input[type=text]').val(' ');
+            })
+            .fail(function (data, errorString, error) {
+                if (errorString == 'timeout') {
+                    alert('Request too long to process.');
+                } else {
+                    alert(data.responseJSON.error);
+                }
+            })
+            .always(function (data, status) {
+                button.removeClass('transmit');
+                button.find('span').addClass('fa-tag');
+            });
+        });
     });
-});
+})();
