@@ -1,7 +1,7 @@
 <?php echo $this->partial('folksonomy/common/tag-cloud', [
     'tags' => null,
     'resourceName' => $block->dataValue('resource_name', ''),
-    'statuses' => ['allowed', 'approved'],
+    'statuses' => [],
     'orderBy' => 'tag.name',
     'link' => true,
     'maxClasses' => $block->dataValue('max_classes', null),

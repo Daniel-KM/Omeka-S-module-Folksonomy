@@ -253,6 +253,7 @@ SQL;
                 'create',
                 'update',
                 'delete',
+                'view-all',
             ]
         );
 
@@ -287,6 +288,7 @@ SQL;
                 'create',
                 'update',
                 'delete',
+                'view-all',
             ]
         );
 
@@ -396,6 +398,7 @@ SQL;
                 'create',
                 'update',
                 'delete',
+                'view-all',
             ]
         );
 
@@ -430,6 +433,7 @@ SQL;
                 'create',
                 'update',
                 'delete',
+                'view-all',
             ]
         );
     }
@@ -1122,9 +1126,10 @@ SQL;
      */
     public function searchQuery(Event $event)
     {
-        // TODO Add option for context (admin/public) tagging status (all or allowed/approved).
+        // TODO Add option for tagging status in admin search view.
 
         $query = $event->getParam('request')->getContent();
+
         if (!empty($query['has_tags'])) {
             $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
@@ -1202,23 +1207,24 @@ SQL;
     public function cacheResourceTaggingData(Event $event)
     {
         $content = $event->getParam('response')->getContent();
-        // Check if this is an api search or api read.
-        $resourceIds = [];
-        if (is_array($content)) {
-            foreach ($content as $resource) {
-                $resourceIds[] = $resource->getId();
-            }
-        } else {
-            $resourceIds[] = $content->getId();
-        }
+        // Check if this is an api search or api read to get the list of ids.
+        $resourceIds = is_array($content)
+            ? array_map(function ($v) { return $v->getId(); }, $content)
+            : [$content->getId()];
         if (empty($resourceIds)) {
             return;
         }
 
-        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
+
+        $entityManagerFilters->enable('tagging_visibility');
+        $entityManagerFilters->getFilter('tagging_visibility')->setServiceLocator($services);
         $taggings = $api
             ->search('taggings', ['resource_id' => $resourceIds])
             ->getContent();
+        $entityManagerFilters->disable('tagging_visibility');
         foreach ($taggings as $tagging) {
             $resourceId = $tagging->resource()->id();
             // Cache tags.

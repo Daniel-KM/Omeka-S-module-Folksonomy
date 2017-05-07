@@ -2,10 +2,24 @@
 namespace Folksonomy\Controller\Site;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Model\ViewModel;
 
 class TagController extends AbstractActionController
 {
+    /**
+     * @var ServiceLocatorInterface
+     */
+    protected $services;
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function __construct(ServiceLocatorInterface $services)
+    {
+        $this->services = $services;
+    }
+
     public function browseAction()
     {
         $site = $this->currentSite();
@@ -14,11 +28,15 @@ class TagController extends AbstractActionController
 
         $query = $this->params()->fromQuery();
         $query['site_id'] = $site->id();
-        // Limit to public status on public view, in all cases.
-        $query['status'] = ['allowed', 'approved'];
         $query['limit'] = 0;
+
+        $entityManagerFilters = $this->services->get('Omeka\EntityManager')->getFilters();
+
+        $entityManagerFilters->enable('tagging_visibility');
+        $entityManagerFilters->getFilter('tagging_visibility')->setServiceLocator($this->services);
         $response = $this->api()->search('tags', $query);
         $tags = $response->getContent();
+        $entityManagerFilters->disable('tagging_visibility');
 
         $view = new ViewModel;
         $view->setVariable('site', $site);
