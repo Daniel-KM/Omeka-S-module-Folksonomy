@@ -598,6 +598,11 @@ SQL;
         // Add the show tags to the resource show admin pages.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
+            'view.show.before',
+            [$this, 'addHeadersAdmin']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
             'view.show.section_nav',
             [$this, 'addTaggingTab']
         );
@@ -608,6 +613,11 @@ SQL;
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
+            'view.show.before',
+            [$this, 'addHeadersAdmin']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
             'view.show.section_nav',
             [$this, 'addTaggingTab']
         );
@@ -615,6 +625,11 @@ SQL;
             'Omeka\Controller\Admin\ItemSet',
             'view.show.after',
             [$this, 'displayViewResourceTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.show.before',
+            [$this, 'addHeadersAdmin']
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
@@ -630,13 +645,28 @@ SQL;
         // Add the show tags to the resource browse admin pages.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
+            'view.browse.before',
+            [$this, 'addHeadersAdmin']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
             'view.details',
             [$this, 'displayViewEntityTags']
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
+            'view.browse.before',
+            [$this, 'addHeadersAdmin']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
             'view.details',
             [$this, 'displayViewEntityTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.browse.before',
+            [$this, 'addHeadersAdmin']
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Media',
@@ -757,7 +787,7 @@ SQL;
     /**
      * Add the taggings data to the resource JSON-LD.
      *
-     * Event $event
+     * @param Event $event
      */
     public function filterResourceJsonLd(Event $event)
     {
@@ -772,10 +802,17 @@ SQL;
         $event->setParam('jsonLd', $jsonLd);
     }
 
+    public function addHeadersAdmin(Event $event)
+    {
+        $view = $event->getTarget();
+        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
+        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+    }
+
     /**
      * Add the tagging tab to section navigations.
      *
-     * Event $event
+     * @param Event $event
      */
     public function addTaggingTab(Event $event)
     {
@@ -787,7 +824,7 @@ SQL;
     /**
      * Display the tagging form.
      *
-     * Event $event
+     * @param Event $event
      */
     public function displayTaggingForm(Event $event)
     {
@@ -802,11 +839,11 @@ SQL;
         } else {
             $vars->offsetSet('resource', null);
             $vars->offsetSet('tags', []);
-            // $vars->offsetSet('taggings', []);
+            $vars->offsetSet('taggings', []);
         }
         if ($vars->resource) {
-            $vars->offsetSet('tags', $this->listResourceTags($vars->resource));
-            // $vars->offsetSet('taggings', $this->listResourceTaggings($vars->resource));
+            $vars->offsetSet('tags', $this->listResourceTagsByName($vars->resource));
+            $vars->offsetSet('taggings', $this->listResourceTaggingsByName($vars->resource));
         }
 
         echo $event->getTarget()->partial(
@@ -817,7 +854,7 @@ SQL;
     /**
      * Display the tagging form for public.
      *
-     * Event $event
+     * @param Event $event
      */
     public function displayTaggingFormPublic(Event $event)
     {
@@ -844,28 +881,30 @@ SQL;
     /**
      * Display the tags for a resource.
      *
-     * Event $event
+     * @param Event $event
      */
     public function displayViewResourceTags(Event $event)
     {
         $resource = $event->getTarget()->resource;
-        $this->displayResourceTags($event, $resource);
+        $this->displayResourceFolksonomy($event, $resource);
     }
 
     /**
      * Display the tags for a resource.
      *
-     * Event $event
+     * @param Event $event
      */
     public function displayViewResourceTagsPublic(Event $event)
     {
         $resource = $event->getTarget()->resource;
         $tags = $this->listResourceTags($resource);
+        $taggings = $this->listResourceTaggings($resource);
         echo $event->getTarget()->partial(
             'common/site/tags-resource.phtml',
             [
                 'resource' => $resource,
                 'tags' => $tags,
+                'taggings' => $taggings,
             ]
         );
     }
@@ -873,12 +912,12 @@ SQL;
     /**
      * Display the tags for a resource.
      *
-     * Event $event
+     * @param Event $event
      */
     public function displayViewEntityTags(Event $event)
     {
         $representation = $event->getParam('entity');
-        $this->displayResourceTags($event, $representation);
+        $this->displayResourceFolksonomy($event, $representation);
     }
 
     /**
@@ -887,10 +926,11 @@ SQL;
      * @param Event $event
      * @param AbstractResourceRepresentation $resource
      */
-    protected function displayResourceTags(Event $event, AbstractResourceRepresentation $resource)
+    protected function displayResourceFolksonomy(Event $event, AbstractResourceRepresentation $resource)
     {
         $isViewDetails = $event->getName() == 'view.details';
-        $tags = $this->listResourceTags($resource);
+        $tags = $this->listResourceTagsByName($resource);
+        $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $isViewDetails
             ? 'common/admin/tags-resource.phtml'
             : 'common/admin/tags-resource-list.phtml';
@@ -899,6 +939,7 @@ SQL;
             [
                 'resource' => $resource,
                 'tags' => $tags,
+                'taggings' => $taggings,
             ]
         );
     }
@@ -929,6 +970,55 @@ SQL;
         return empty($resourceJson['o-module-folksonomy:tagging'])
             ? []
             : $resourceJson['o-module-folksonomy:tagging'];
+    }
+
+    /**
+     * Helper to return tags of a resource by name.
+     *
+     * @param AbstractResourceRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTagsByName(AbstractResourceRepresentation $resource)
+    {
+        $result = [];
+        $tags = $this->listResourceTags($resource);
+        foreach ($tags as $tag) {
+            $result[$tag->name()] = $tag;
+        }
+        return $result;
+    }
+
+    /**
+     * Helper to return a list of taggings of a resource by tag name.
+     *
+     * @param AbstractResourceRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTaggingsByName(AbstractResourceRepresentation $resource)
+    {
+        $result = [];
+        $taggings = $this->listResourceTaggings($resource);
+        foreach ($taggings as $tagging) {
+            $tag = $tagging->tag();
+            $result[$tag ? $tag->name() : ''] = $tagging;
+        }
+        return $result;
+    }
+
+    /**
+     * Helper to return a flat list of tags by id.
+     *
+     * @param AbstractResourceRepresentation $resource
+     * @return array
+     */
+    protected function listFlatResourceTags(AbstractResourceRepresentation $resource)
+    {
+        $result = [];
+        $tags = $this->listResourceTags($resource);
+        foreach ($tags as $tag) {
+            $result[$tag->internalId()] = $tag->name();
+        }
+        return $result;
     }
 
     /**

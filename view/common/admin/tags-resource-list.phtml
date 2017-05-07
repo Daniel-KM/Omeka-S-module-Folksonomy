@@ -1,18 +1,34 @@
 <?php
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
+$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
 ?>
-<div id="tags" class="section">
+<div id="tags" class="section folksonomy">
 <?php if (empty($tags)): ?>
     <div class="no-resources">
         <p><?php echo $this->translate('There are no tags for this resource.'); ?></p>
     </div>
 <?php else: ?>
-    <?php $resourceName = $resource->getControllerName();
-    $resourceName = in_array($resourceName, ['item-set', 'item', 'media']) ? $resourceName : null; ?>
-    <ul class="tags">
-        <?php foreach ($tags as $tag): ?>
-        <li><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></li>
-        <?php endforeach; ?>
+    <?php
+    $escape = $this->plugin('escapeHtml');
+    $resourceName = $resource->getControllerName();
+    $updateRight = $this->userIsAllowed('Folksonomy\Entity\Tagging', 'update');
+    ?>
+    <ul>
+    <?php foreach ($tags as $tag): ?>
+        <?php $tagging = $taggings[$tag->name()]; ?>
+        <li class="value tag"><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?>
+            <?php if ($updateRight): ?>
+            <span class="single actions"><a href="#"
+                class="status-toggle o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"
+                data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
+                data-status="<?php echo $tagging->status(); ?>"
+                aria-label="<?php echo $escape($this->translate('Toggle status')); ?>"
+                title="<?php echo $escape($this->translate('Toggle status')); ?>"></a></span>
+            <?php else: ?>
+            <span class="no-action o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"></span>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
     </ul>
 <?php endif; ?>
 </div>

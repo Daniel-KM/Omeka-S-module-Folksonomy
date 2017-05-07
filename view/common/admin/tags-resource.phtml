@@ -1,12 +1,25 @@
 <?php
 if ($tags):
+    $escape = $this->plugin('escapeHtml');
     $resourceName = $resource->getControllerName();
-    $resourceName = in_array($resourceName, ['item-set', 'item', 'media']) ? $resourceName : null;
+    $updateRight = $this->userIsAllowed('Folksonomy\Entity\Tagging', 'update');
 ?>
-<div class="meta-group">
+<div class="meta-group folksonomy">
     <h4><?php echo $this->translate('Tags'); ?></h4>
     <?php foreach ($tags as $tag): ?>
-    <div class="value tag"><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></div>
+    <?php $tagging = $taggings[$tag->name()]; ?>
+    <div class="value tag"><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?>
+    <?php if ($updateRight): ?>
+    <span class="single actions"><a href="#"
+        class="status-toggle o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"
+        data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
+        data-status="<?php echo $tagging->status(); ?>"
+        aria-label="<?php echo $escape($this->translate('Toggle status')); ?>"
+        title="<?php echo $escape($this->translate('Toggle status')); ?>"></a></span>
+    <?php else: ?>
+    <span class="no-action o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"></span>
+    <?php endif; ?>
+    </div>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>

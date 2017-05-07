@@ -1,111 +1,121 @@
 @media screen {
-    header nav .tags:before,
-    header nav .taggings:before {
+    header nav .folksonomy:before {
         content:"";
     }
-    .tags .no-resources:before,
-    #tags .no-resources:before,
-    .taggings .no-resources:before,
-    #taggings .no-resources:before {
+    .folksonomy .no-resources:before {
         content:"";
-    }
-    #resource-tags+.no-resources,
-    #resource-taggings+.no-resources {
-        display:none;
     }
     #resource-tags.empty,
-    #resource-taggings.empty {
+    #resource-tags+.no-resources {
         display:none;
     }
-    #resource-tags.empty+.no-resources,
-    #resource-taggings.empty+.no-resources {
+    #resource-tags.empty+.no-resources {
         display:block;
         padding:0 24px;
     }
-    #resource-tags.empty+.no-resources:before,
-    #resource-taggings.empty+.no-resources:before {
+    #resource-tags.empty+.no-resources:before {
         content:"";
     }
-    #resource-tags tr.delete,
-    #resource-taggings tr.delete {
+    #resource-tags tr.delete {
         background-color:#fcc;
     }
-
     .taggings .resource-details .tag-internal-id {
         font-size: 0.7em;
     }
 
-    .tags.browse .batch-edit th:first-child,
-    .tags.browse .batch-edit td:first-child,
-    .taggings.browse .batch-edit th:first-child,
-    .taggings.browse .batch-edit td:first-child {
+    .folksonomy.browse .batch-edit th:first-child,
+    .folksonomy.browse .batch-edit td:first-child {
         width: 32px;
     }
-
+    .tags.browse table:not(.batch-edit) th:nth-child(1n+2),
+    .tags.browse table:not(.batch-edit) td:nth-child(1n+2),
+    .tags.browse table.batch-edit th:nth-child(1n+3),
+    .tags.browse table.batch-edit td:nth-child(1n+3) {
+        text-align: right;
+    }
     .taggings.browse table:not(.batch-edit) th:first-child,
     .taggings.browse table:not(.batch-edit) td:first-child,
-    .taggings.browse .batch-edit th:nth-child(2),
-    .taggings.browse .batch-edit td:nth-child(2) {
+    .taggings.browse table.batch-edit th:nth-child(2),
+    .taggings.browse table.batch-edit td:nth-child(2) {
         max-width: 40%;
     }
-    .taggings.browse td .resource-name {
+
+    .folksonomy table .resource-name {
         display: inline-block;
         vertical-align: bottom;
         margin-left: .5em;
         opacity: .5;
     }
 
-    .tags .resource-name::before,
-    .taggings .status-toggle::before,
-    .taggings .resource-name::before {
+    .folksonomy .single.actions {
+        float: inherit;
+    }
+    .folksonomy .single.actions a::before {
+        text-align: inherit;
+    }
+    .folksonomy .single.actions .o-icon-transmit::before {
+        background: url('../img/waiting-mini.gif') no-repeat scroll 3px 3px transparent !important;
+    }
+    .folksonomy .no-action::before {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        vertical-align: top;
+        border: 0;
+        box-shadow: none;
+        opacity: .5;
+        text-align: inherit;
+    }
+    .folksonomy.meta-group .single.actions,
+    .folksonomy.meta-group .no-action::before {
+        float: right;
+    }
+
+    .folksonomy.meta-group::before,
+    .folksonomy .status-toggle::before,
+    .folksonomy .resource-name::before {
         display: inline-block;
         font-family:"FontAwesome";
         padding-left: 3px;
         padding-right: 3px;
         width: 24px;
     }
-    .tags .resource-name.resource::before,
-    .taggings .resource-name.resource::before {
+    .folksonomy .resource-name.resource::before {
         content: "";
     }
-    .tags .resource-name.no-resource::before,
-    .taggings .resource-name.no-resource::before {
+    .folksonomy .resource-name.no-resource::before {
         content: "❌";
     }
-    .tags .resource-name.item-set::before,
-    .taggings .resource-name.item-set::before {
+    .folksonomy .resource-name.item-set::before {
         content: "";
     }
-    .tags .resource-name.item::before,
-    .taggings .resource-name.item::before {
+    .folksonomy .resource-name.item::before {
         content: "";
     }
-    .tags .resource-name.media::before,
-    .taggings .resource-name.media::before {
+    .folksonomy .resource-name.media::before {
         content: "";
     }
-
-    .taggings .o-icon-proposed::before {
+    .folksonomy .o-icon-proposed::before {
         color: #FFA500;
         content: "";
     }
-    .taggings .o-icon-allowed::before {
+    .folksonomy .o-icon-allowed::before {
         color: #FFA500;
         content: "";
     }
-    .taggings .o-icon-approved::before {
+    .folksonomy .o-icon-approved::before {
         color: #00FF00;
         content: "";
     }
-    .taggings .o-icon-rejected::before {
+    .folksonomy .o-icon-rejected::before {
         color: #FF0000;
         content: "";
     }
-    .taggings .o-icon-undefined::before {
+    .folksonomy .o-icon-undefined::before {
         color: #FF0000;
-        content: "";
+        content: "";
     }
-    .taggings .o-icon-transmit::before {
+    .folksonomy .o-icon-transmit::before {
         background: url('../img/waiting-mini.gif') no-repeat scroll 12px 3px transparent !important;
         color: #000000;
         content: "";

@@ -16,7 +16,7 @@ $tagTemplate = '
     </td>
 </tr>';
 ?>
-<fieldset id="tags" class="section" aria-labelledby="tags-label">
+<fieldset id="tags" class="section folksonomy" aria-labelledby="tags-label">
     <legend id="tags-legend"><?php echo $this->translate('Tags'); ?></legend>
     <table id="resource-tags" data-tablesaw-mode="stack" class="tablesaw tablesaw-stack <?php echo ($resource && $tags) ? '' : 'empty'; ?>">
         <thead>
@@ -29,15 +29,31 @@ $tagTemplate = '
         <?php
         if ($resource && $tags):
             $resourceName = $resource->getControllerName();
-            $resourceName = in_array($resourceName, ['item-set', 'item', 'media']) ? $resourceName : null;
+            $tag = reset($tags);
+            $updateRight = $tag->userIsAllowed('update');
         ?>
         <?php foreach ($tags as $tag): ?>
+        <?php $tagging = $taggings[$tag->name()]; ?>
         <tr>
-            <td><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></td>
+            <td>
+                <?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?>
+           </td>
             <td>
                 <ul class="actions">
                     <li>
-                        <a href="#" class="o-icon-delete" title=" <?php echo $removeStr; ?>" aria-label=" <?php echo $removeStr; ?>"></a>
+                    <?php if ($updateRight): ?>
+                    <span class="single actions"><a href="#"
+                        class="status-toggle o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"
+                        data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
+                        data-status="<?php echo $tagging->status(); ?>"
+                        aria-label="<?php echo $escape($this->translate('Toggle status')); ?>"
+                        title="<?php echo $escape($this->translate('Toggle status')); ?>"></a></span>
+                    <?php else: ?>
+                    <span class="no-action o-icon-<?php echo $tagging->status(); ?>"></span>
+                    <?php endif; ?>
+                    </li>
+                    <li>
+                        <a href="#" class="o-icon-delete" title="<?php echo $removeStr; ?>" aria-label="<?php echo $removeStr; ?>"></a>
                     </li>
                 </ul>
                 <input type="hidden" name="o-module-folksonomy:tag[]" value="<?php echo $escape($tag->name()) ?>">
