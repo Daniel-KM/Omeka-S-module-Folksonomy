@@ -1,9 +1,21 @@
 <?php
 namespace Folksonomy;
 
-use Omeka\Module\AbstractModule;
-use Omeka\Permissions\Assertion\OwnsEntityAssertion;
+/*
+ * Folksonomy
+ *
+ * Add tags and tagging form to any resource to create uncontrolled vocabularies
+ * and tag clouds.
+ *
+ * @copyright Daniel Berthereau, 2013-2017
+ * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
+ */
+
+use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
+use Omeka\Api\Representation\AbstractResourceRepresentation;
+use Omeka\Api\Request;
+use Omeka\Module\AbstractModule;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\Controller\AbstractController;
@@ -23,9 +35,9 @@ use Zend\View\Renderer\PhpRenderer;
 class Module extends AbstractModule
 {
     /**
-     * @var array Cache of taggings and tags.
+     * @var array Cache of tags and taggings by resource.
      */
-    protected $cache = ['taggings' => [], 'tags' => []];
+    protected $cache = ['tags' => [], 'taggings' => []];
 
     /**
      * Settings and their default values.
@@ -114,112 +126,314 @@ SQL;
         }
     }
 
+    /**
+     * Add ACL rules for this module.
+     */
+    protected function addAclRules()
+    {
+        $services = $this->getServiceLocator();
+        $acl = $services->get('Omeka\Acl');
+        $settings = $services->get('Omeka\Settings');
+
+        $publicAllowTag = $settings->get('folksonomy_public_allow_tag', $this->settings['folksonomy_public_allow_tag']);
+        $publicEntityRights = ['read'];
+        $publicAdapterRights = ['search', 'read'];
+        if ($publicAllowTag) {
+            $publicEntityRights[] = 'create';
+            $publicAdapterRights[] = 'create';
+        }
+
+        // Similar than items or item sets from Omeka\Service\AclFactory.
+        $acl->allow(
+            null,
+            [
+                'Folksonomy\Controller\Admin\Tagging',
+                'Folksonomy\Controller\Site\Tagging',
+                'Folksonomy\Controller\Tagging',
+            ]
+        );
+        $acl->allow(
+            null,
+            'Folksonomy\Api\Adapter\TaggingAdapter',
+            $publicAdapterRights
+        );
+        $acl->allow(
+            null,
+            'Folksonomy\Entity\Tagging',
+            $publicEntityRights
+        );
+
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Controller\Admin\Tagging',
+            [
+                'add',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+            ]
+        );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Entity\Tagging',
+            [
+                'create',
+            ]
+        );
+
+        $acl->allow(
+            'author',
+            'Folksonomy\Controller\Admin\Tagging',
+            [
+                'add',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Entity\Tagging',
+            [
+                'create',
+            ]
+        );
+
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Controller\Admin\Tagging',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Entity\Tagging',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+
+        $acl->allow(
+            'editor',
+            'Folksonomy\Controller\Admin\Tagging',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Folksonomy\Entity\Tagging',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+
+        // Similar than items or item sets from Omeka\Service\AclFactory.
+        $acl->allow(
+            null,
+            [
+                'Folksonomy\Controller\Admin\Tag',
+                'Folksonomy\Controller\Site\Tag',
+                'Folksonomy\Controller\Tag',
+            ]
+        );
+        $acl->allow(
+            null,
+            'Folksonomy\Api\Adapter\TagAdapter',
+            $publicAdapterRights
+        );
+        $acl->allow(
+            null,
+            'Folksonomy\Entity\Tag',
+            $publicEntityRights
+        );
+
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Controller\Admin\Tag',
+            [
+                'add',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Api\Adapter\TagAdapter',
+            [
+                'create',
+            ]
+        );
+        $acl->allow(
+            'researcher',
+            'Folksonomy\Entity\Tag',
+            [
+                'create',
+            ]
+        );
+
+        $acl->allow(
+            'author',
+            'Folksonomy\Controller\Admin\Tag',
+            [
+                'add',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Api\Adapter\TagAdapter',
+            [
+                'create',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Folksonomy\Entity\Tag',
+            [
+                'create',
+            ]
+        );
+
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Controller\Admin\Tag',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Api\Adapter\TagAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Folksonomy\Entity\Tag',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+
+        $acl->allow(
+            'editor',
+            'Folksonomy\Controller\Admin\Tag',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Folksonomy\Api\Adapter\TagAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Folksonomy\Entity\Tag',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+    }
+
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
-        // Add the tagging form to the item add and edit pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.add.form.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
-            }
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.edit.form.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
-            }
-        );
-        // Add the tagging form to the item set add and edit pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.add.form.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
-            }
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.edit.form.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
-            }
-        );
-        // Add the tagging and tag to the item show pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.show.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/show.phtml');
-            }
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\Item',
-            'view.show.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/site/show.phtml');
-            }
-        );
-        // Add the tagging and tag to the item set show pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.show.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/admin/show.phtml');
-            }
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\ItemSet',
-            'view.show.after',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/site/show.phtml');
-            }
-        );
-        // Add the tag field to the site's browse page.
-        $sharedEventManager->attach(
-            'Folksonomy\Controller\Site\Index',
-            'view.advanced_search',
-            function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/common/advanced-search.phtml');
-            }
-        );
-        // Add the "has_tags" filter to item search.
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.search.query',
-            function (Event $event) {
-                $query = $event->getParam('request')->getContent();
-                if (isset($query['has_tags'])) {
-                    $qb = $event->getParam('queryBuilder');
-                    $itemAdapter = $event->getTarget();
-                    $tagAlias = $itemAdapter->createAlias();
-                    $itemAlias = $itemAdapter->getEntityClass();
-                    $qb->innerJoin(
-                        'Folksonomy\Entity\Tag', $tagAlias,
-                        'WITH', "$tagAlias.resource_id = $itemAlias.id"
-                    );
-                }
-            }
-        );
-        // Add the "has_tags" filter to item set search.
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.search.query',
-            function (Event $event) {
-                $query = $event->getParam('request')->getContent();
-                if (isset($query['has_tags'])) {
-                    $qb = $event->getParam('queryBuilder');
-                    $itemSetAdapter = $event->getTarget();
-                    $tagAlias = $itemSetAdapter->createAlias();
-                    $itemSetAlias = $itemSetAdapter->getEntityClass();
-                    $qb->innerJoin(
-                        'Folksonomy\Entity\Tag', $tagAlias,
-                        'WITH', "$tagAlias.resource_id = $itemSetAlias.id"
-                        );
-                }
-            }
-        );
         // Add the Folksonomy term definition.
         $sharedEventManager->attach(
             '*',
@@ -232,58 +446,6 @@ SQL;
         );
 
         $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.add.section_nav',
-            [$this, 'addTaggingTab']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.edit.section_nav',
-            [$this, 'addTaggingTab']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Item',
-            'view.show.section_nav',
-            [$this, 'displayResourceTags']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.add.section_nav',
-            [$this, 'addTaggingTab']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.edit.section_nav',
-            [$this, 'addTaggingTab']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Admin\ItemSet',
-            'view.show.section_nav',
-            [$this, 'displayResourceTags']
-        );
-
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.search.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.read.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.search.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.read.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-
-        $sharedEventManager->attach(
             'Omeka\Api\Representation\ItemRepresentation',
             'rep.resource.json',
             [$this, 'filterResourceJsonLd']
@@ -293,6 +455,59 @@ SQL;
             'rep.resource.json',
             [$this, 'filterResourceJsonLd']
         );
+        $sharedEventManager->attach(
+            'Omeka\Api\Representation\MediaRepresentation',
+            'rep.resource.json',
+            [$this, 'filterResourceJsonLd']
+        );
+
+        // Add the tagging and tag filters to resource search.
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.search.query',
+            [$this, 'searchQuery']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.search.query',
+            [$this, 'searchQuery']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\MediaAdapter',
+            'api.search.query',
+            [$this, 'searchQuery']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.search.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.read.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.search.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.read.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\MediaAdapter',
+            'api.search.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\MediaAdapter',
+            'api.read.post',
+            [$this, 'cacheResourceTaggingData']
+        );
 
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\ItemAdapter',
@@ -300,19 +515,170 @@ SQL;
             [$this, 'handleTagging']
         );
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.hydrate.post',
-            [$this, 'handleTags']
-        );
-        $sharedEventManager->attach(
             'Omeka\Api\Adapter\ItemSetAdapter',
             'api.hydrate.post',
             [$this, 'handleTagging']
         );
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
+            'Omeka\Api\Adapter\MediaAdapter',
             'api.hydrate.post',
-            [$this, 'handleTags']
+            [$this, 'handleTagging']
+        );
+
+        // Add the tab tagging form to the resource add and edit admin pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.add.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.add.form.after',
+            [$this, 'displayTaggingForm']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.form.after',
+            [$this, 'displayTaggingForm']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.add.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.edit.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.add.form.after',
+            [$this, 'displayTaggingForm']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.edit.form.after',
+            [$this, 'displayTaggingForm']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.add.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.edit.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.add.form.after',
+            [$this, 'displayTaggingForm']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.edit.form.after',
+            [$this, 'displayTaggingForm']
+        );
+
+        // Add the show tags to the resource show admin pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.show.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.show.after',
+            [$this, 'displayViewResourceTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.show.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.show.after',
+            [$this, 'displayViewResourceTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.show.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.show.after',
+            [$this, 'displayViewResourceTags']
+        );
+
+        // Add the show tags to the resource browse admin pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.details',
+            [$this, 'displayViewEntityTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.details',
+            [$this, 'displayViewEntityTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.details',
+            [$this, 'displayViewEntityTags']
+        );
+
+        // Add the tags to the resource show public pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Item',
+            'view.show.after',
+            [$this, 'displayViewResourceTagsPublic']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\ItemSet',
+            'view.show.after',
+            [$this, 'displayViewResourceTagsPublic']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Media',
+            'view.show.after',
+            [$this, 'displayViewResourceTagsPublic']
+        );
+
+        // Add the tagging form to the resource show public pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Item',
+            'view.show.after',
+            [$this, 'displayTaggingFormPublic']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\ItemSet',
+            'view.show.after',
+            [$this, 'displayTaggingFormPublic']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Media',
+            'view.show.after',
+            [$this, 'displayTaggingFormPublic']
+        );
+
+        // Add the tag field to the site's browse page.
+        $sharedEventManager->attach(
+            'Folksonomy\Controller\Site\Index',
+            'view.advanced_search',
+            function (Event $event) {
+                echo $event->getTarget()->partial('folksonomy/common/advanced-search.phtml');
+            }
         );
     }
 
@@ -381,165 +747,21 @@ SQL;
     }
 
     /**
-     * Add ACL rules for this module.
+     * Add the taggings data to the resource JSON-LD.
      *
-     * @todo To be finalized.
+     * Event $event
      */
-    protected function addAclRules()
+    public function filterResourceJsonLd(Event $event)
     {
-        $acl = $this->getServiceLocator()->get('Omeka\Acl');
-
-        // Similar than items or item sets from Omeka\Service\AclFactory.
-        $acl->allow(
-            null,
-            [
-                'Folksonomy\Controller\Admin\Tagging',
-                'Folksonomy\Controller\Site\Tagging',
-                'Folksonomy\Controller\Tagging',
-            ]
-        );
-        $acl->allow(
-            null,
-            'Folksonomy\Api\Adapter\TaggingAdapter',
-            [
-                'search',
-                'read',
-            ]
-        );
-        $acl->allow(
-            null,
-            'Folksonomy\Entity\Tagging',
-            'read'
-        );
-
-        $acl->allow(
-            'researcher',
-            'Folksonomy\Controller\Admin\Tagging',
-            [
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-
-        $acl->allow(
-            'author',
-            'Folksonomy\Controller\Admin\Tagging',
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'author',
-            'Folksonomy\Api\Adapter\TaggingAdapter',
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'author',
-            'Folksonomy\Entity\Tagging',
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'author',
-            'Folksonomy\Entity\Tagging',
-            [
-                'update',
-                'delete',
-            ],
-            new OwnsEntityAssertion
-        );
-
-        $acl->allow(
-            'reviewer',
-            'Folksonomy\Controller\Admin\Tagging',
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            'Folksonomy\Api\Adapter\TaggingAdapter',
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            'Folksonomy\Entity\Tagging',
-            [
-                'create',
-                'update',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            'Folksonomy\Entity\Tagging',
-            [
-                'delete',
-            ],
-            new OwnsEntityAssertion
-        );
-
-        $acl->allow(
-            'editor',
-            'Folksonomy\Controller\Admin\Tagging',
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            'Folksonomy\Api\Adapter\TaggingAdapter',
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            'Folksonomy\Entity\Tagging',
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
+        $resource = $event->getTarget();
+        $jsonLd = $event->getParam('jsonLd');
+        if (isset($this->cache['tags'][$resource->id()])) {
+            $jsonLd['o-module-folksonomy:tag'] = array_values($this->cache['tags'][$resource->id()]);
+        }
+        if (isset($this->cache['taggings'][$resource->id()])) {
+            $jsonLd['o-module-folksonomy:tagging'] = array_values($this->cache['taggings'][$resource->id()]);
+        }
+        $event->setParam('jsonLd', $jsonLd);
     }
 
     /**
@@ -550,8 +772,28 @@ SQL;
     public function addTaggingTab(Event $event)
     {
         $sectionNav = $event->getParam('section_nav');
-        $sectionNav['tagging-section'] = 'Tagging';
+        $sectionNav['tags'] = 'Tags'; // @translate
         $event->setParam('section_nav', $sectionNav);
+    }
+
+    /**
+     * Display the tagging form.
+     *
+     * Event $event
+     */
+    public function displayTaggingForm(Event $event)
+    {
+        echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
+    }
+
+    /**
+     * Display the tagging form for public.
+     *
+     * Event $event
+     */
+    public function displayTaggingFormPublic(Event $event)
+    {
+        echo $event->getTarget()->partial('folksonomy/site/tagging-form.phtml');
     }
 
     /**
@@ -559,77 +801,180 @@ SQL;
      *
      * Event $event
      */
-    public function displayResourceTags(Event $event)
+    public function displayViewResourceTags(Event $event)
     {
-        // Don't render the tagging tab if there is no tagging data.
-        $resourceJson = $event->getParam('resource')->jsonSerialize();
-        if (!isset($resourceJson['o-module-folksonomy:tag'])) {
-            return;
-        }
-
-        $services = $this->getServiceLocator();
-        $translator = $services->get('MvcTranslator');
-        $getResourceTags = $services->get('ViewHelperManager')
-            ->get('getResourceTags');
-        $tags = $getResourceTags($resource);
-
-        echo '<div class="property meta-group"><h4>'
-            . $translator->translate('Tags')
-            . '</h4><div class="value">'
-            . ($tags ?: '<em>' . $translator->translate('[none]') . '</em>')
-            . '</div></div>';
+        $resource = $event->getTarget()->resource;
+        $this->displayResourceTags($event, $resource);
     }
 
     /**
-     * Cache taggings and tags for item and item set API search/read.
+     * Display the tags for a resource.
+     *
+     * Event $event
+     */
+    public function displayViewResourceTagsPublic(Event $event)
+    {
+        $resource = $event->getTarget()->resource;
+        $tags = $this->listResourceTags($resource);
+        echo $event->getTarget()->partial(
+            'folksonomy/site/tags-resource-list.phtml',
+            [
+                'resource' => $resource,
+                'tags' => $tags,
+            ]
+        );
+    }
+
+    /**
+     * Display the tags for a resource.
+     *
+     * Event $event
+     */
+    public function displayViewEntityTags(Event $event)
+    {
+        $resource = $event->getParam('entity');
+        $this->displayResourceTags($event, $resource);
+    }
+
+    /**
+     * Helper to display the tags for a resource.
+     *
+     * @param Event $event
+     * @param AbstractResourceRepresentation $resource
+     */
+    protected function displayResourceTags(Event $event, AbstractResourceRepresentation $resource)
+    {
+        // Don't render the resource tags if there is no tags.
+        $resourceJson = $resource->jsonSerialize();
+        if (empty($resourceJson['o-module-folksonomy:tagging'])) {
+            return;
+        }
+
+        echo $event->getTarget()->partial(
+            'folksonomy/admin/tags-resource.phtml',
+            [
+                'resource' => $resource,
+                'tags' => $resourceJson['o-module-folksonomy:tagging'],
+            ]
+        );
+    }
+
+    /**
+     * Helper to filter search queries.
+     *
+     * @internal The queries are optimized for big bases. See "Tagging and Folksonomy"
+     * of Jay Pipes
+     *
+     * @param Event $event
+     */
+    public function searchQuery(Event $event)
+    {
+        // TODO Add option for context (admin/public) tagging status (all or allowed/approved).
+
+        $query = $event->getParam('request')->getContent();
+        if (array_key_exists('has_tags', $query)) {
+            $qb = $event->getParam('queryBuilder');
+            $adapter = $event->getTarget();
+            $taggingAlias = $adapter->createAlias();
+            $resourceAlias = $adapter->getEntityClass();
+            $qb->innerJoin(
+                'Folksonomy\Entity\Tagging',
+                $taggingAlias,
+                'WITH',
+                $qb->expr()->andX(
+                    $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                    $qb->expr()->isNotNull($taggingAlias . '.tag')
+                )
+            );
+        }
+
+        if (array_key_exists('tag', $query)) {
+            $tags = is_array($query['tag']) ? $query['tag'] : [$query['tag']];
+            $qb = $event->getParam('queryBuilder');
+            $adapter = $event->getTarget();
+            $resourceAlias = $adapter->getEntityClass();
+            // All resources with any tag ("OR").
+            // TODO The resquest is working, but it needs a format for querying.
+            /*
+            $qb
+                ->innerJoin(
+                    'Folksonomy\Entity\Tagging',
+                    $taggingAlias,
+                    'WITH',
+                    $qb->expr()->eq( $taggingAlias . '.resource', $resourceAlias . '.id')
+                )
+                ->innerJoin(
+                    'Folksonomy\Entity\Tag',
+                    $tagAlias,
+                    'WITH',
+                    $qb->expr()->eq($tagAlias . '.id', $taggingAlias . '.tag')
+                )
+                ->andWhere($qb->expr()->in($tagAlias . '.name', $tags));
+            */
+            // All resources with all tag ("AND").
+            foreach ($tags as $key => $tag) {
+                $tagAlias = $adapter->createAlias();
+                $taggingAlias = $adapter->createAlias();
+                $qb
+                    // Simulate a cross join, not managed by doctrine.
+                    ->innerJoin(
+                        'Folksonomy\Entity\Tag', $tagAlias,
+                        'WITH', '1 = 1'
+                    )
+                    ->innerJoin(
+                        'Folksonomy\Entity\Tagging',
+                        $taggingAlias,
+                        'WITH',
+                        $qb->expr()->andX(
+                            $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                            $qb->expr()->eq($taggingAlias . '.tag', $tagAlias . '.id')
+                        )
+                    )
+                    ->andWhere($qb->expr()->eq(
+                        $tagAlias . '.name',
+                        $adapter->createNamedParameter($qb, $tag)
+                    ));
+            }
+        }
+    }
+
+    /**
+     * Cache taggings and tags for resource API search/read.
      *
      * @internal The cache avoids self::filterItemJsonLd() to make multiple
      * queries to the database during one request.
      *
-     * Event $event
+     * @param Event $event
      */
     public function cacheResourceTaggingData(Event $event)
     {
-        $resourceIds = [];
         $content = $event->getParam('response')->getContent();
+        // Check if this is an api search or api read.
+        $resourceIds = [];
         if (is_array($content)) {
-            // This is an API search.
             foreach ($content as $resource) {
                 $resourceIds[] = $resource->getId();
             }
         } else {
-            // This is an API read.
             $resourceIds[] = $content->getId();
         }
-        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
-        // Cache taggings.
-        $response = $api->search('taggings', ['resource_id' => $resourceIds]);
-        foreach ($response->getContent() as $tagging) {
-            $this->cache['taggings'][$tagging->resource_id()][] = $tagging;
+        if (empty($resourceIds)) {
+            return;
         }
-        // Cache tags.
-        $response = $api->search('tags', ['resource_id' => $resourceIds]);
-        foreach ($response->getContent() as $tag) {
-            $this->cache['tags'][$tag->resource_id()][] = $tag;
-        }
-    }
 
-    /**
-     * Add the taggings and tags data to the resource JSON-LD.
-     *
-     * Event $event
-     */
-    public function filterResourceJsonLd(Event $event)
-    {
-        $resource = $event->getTarget();
-        $jsonLd = $event->getParam('jsonLd');
-        if (isset($this->cache['taggings'][$resource->id()])) {
-            $jsonLd['o-module-folksonomy:tagging'] = $this->cache['taggings'][$resource->id()];
+        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+        $taggings = $api
+            ->search('taggings', ['resource_id' => $resourceIds])
+            ->getContent();
+        foreach ($taggings as $tagging) {
+            $resourceId = $tagging->resource()->id();
+            // Cache tags.
+            if (!is_null($tagging->tag())) {
+                $this->cache['tags'][$resourceId][$tagging->tag()->id()] = $tagging->tag();
+            }
+            // Cache taggings.
+            $this->cache['taggings'][$resourceId][$tagging->id()] = $tagging;
         }
-        if (isset($this->cache['tags'][$resource->id()])) {
-            $jsonLd['o-module-folksonomy:tag'] = $this->cache['tags'][$resource->id()];
-        }
-        $event->setParam('jsonLd', $jsonLd);
     }
 
     /**
@@ -688,58 +1033,6 @@ SQL;
                 $tagging->setItem($event->getParam('entity'));
                 $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
                 $taggingsAdapter->getEntityManager()->persist($tagging);
-            }
-        }
-    }
-
-    /**
-     * Handle hydration for tags data.
-     *
-     * @param Event $event
-     */
-    public function handleTags(Event $event)
-    {
-        $resourceAdapter = $event->getTarget();
-        $request = $event->getParam('request');
-
-        if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tag')) {
-            return;
-        }
-
-        $resource = $event->getParam('entity');
-        $entityManager = $resourceAdapter->getEntityManager();
-        $tagAdapter = $resourceAdapter->getAdapter('tag');
-        $retainTagIds = [];
-
-        // Create/update tags passed in the request.
-        foreach ($request->getValue('o-module-folksonomy:tag', []) as $tagData) {
-            if (isset($tagData['o:id'])) {
-                $subRequest = new \Omeka\Api\Request('update', 'tags');
-                $subRequest->setId($tagData['o:id']);
-                $subRequest->setContent($tagData);
-                $tag = $tagAdapter->findEntity($tagData['o:id'], $subRequest);
-                $tagAdapter->hydrateEntity($subRequest, $tag, new \Omeka\Stdlib\ErrorStore);
-                $retainTagIds[] = $tag->getId();
-            } else {
-                $subRequest = new \Omeka\Api\Request('create', 'tags');
-                $subRequest->setContent($tagData);
-                $tag = new \Folksonomy\Entity\Tag;
-                $tag->setResource($resource);
-                $tagAdapter->hydrateEntity($subRequest, $tag, new \Omeka\Stdlib\ErrorStore);
-                $entityManager->persist($tag);
-            }
-        }
-
-        // Delete existing tags not passed in the request.
-        $existingTags = [];
-        if ($resource->getId()) {
-            $dql = 'SELECT tags FROM Folksonomy\Entity\Tag tags INDEX BY tags.id WHERE tags.resource_id = ?1';
-            $query = $entityManager->createQuery($dql)->setParameter(1, $resource->getId());
-            $existingTags = $query->getResult();
-        }
-        foreach ($existingTags as $existingTagId => $existingTag) {
-            if (!in_array($existingTagId, $retainTagIds)) {
-                $entityManager->remove($existingTag);
             }
         }
     }
