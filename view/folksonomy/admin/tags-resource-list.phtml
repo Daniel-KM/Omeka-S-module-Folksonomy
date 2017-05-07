@@ -1,0 +1,18 @@
+<div id="tags" class="section">
+<?php if (empty($tags)): ?>
+    <div class="no-resources">
+        <p><?php echo $this->translate('There are no tags for this resource.'); ?></p>
+    </div>
+<?php else: ?>
+    <ul class="tags">
+        <?php foreach ($tags as $tag): ?>
+        <li>
+            <?php echo $this->hyperlink(
+                $tag->name(),
+                $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
+            ); ?>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+</div>

@@ -817,7 +817,7 @@ SQL;
         $resource = $event->getTarget()->resource;
         $tags = $this->listResourceTags($resource);
         echo $event->getTarget()->partial(
-            'folksonomy/site/tags-resource-list.phtml',
+            'folksonomy/site/tags-resource.phtml',
             [
                 'resource' => $resource,
                 'tags' => $tags,
@@ -832,8 +832,8 @@ SQL;
      */
     public function displayViewEntityTags(Event $event)
     {
-        $resource = $event->getParam('entity');
-        $this->displayResourceTags($event, $resource);
+        $representation = $event->getParam('entity');
+        $this->displayResourceTags($event, $representation);
     }
 
     /**
@@ -844,19 +844,32 @@ SQL;
      */
     protected function displayResourceTags(Event $event, AbstractResourceRepresentation $resource)
     {
-        // Don't render the resource tags if there is no tags.
-        $resourceJson = $resource->jsonSerialize();
-        if (empty($resourceJson['o-module-folksonomy:tagging'])) {
-            return;
-        }
-
+        $isViewDetails = $event->getName() == 'view.details';
+        $tags = $this->listResourceTags($resource);
+        $partial = $isViewDetails
+            ? 'folksonomy/admin/tags-resource.phtml'
+            : 'folksonomy/admin/tags-resource-list.phtml';
         echo $event->getTarget()->partial(
-            'folksonomy/admin/tags-resource.phtml',
+            $partial,
             [
                 'resource' => $resource,
-                'tags' => $resourceJson['o-module-folksonomy:tagging'],
+                'tags' => $tags,
             ]
         );
+    }
+
+    /**
+     * Helper to return tags of a resource.
+     *
+     * @param AbstractResourceRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTags(AbstractResourceRepresentation $resource)
+    {
+        $resourceJson = $resource->jsonSerialize();
+        return empty($resourceJson['o-module-folksonomy:tag'])
+            ? []
+            : $resourceJson['o-module-folksonomy:tag'];
     }
 
     /**

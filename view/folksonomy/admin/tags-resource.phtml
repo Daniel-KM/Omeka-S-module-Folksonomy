@@ -1,0 +1,13 @@
+<?php if ($tags): ?>
+<div class="meta-group">
+    <h4><?php echo $this->translate('Tags'); ?></h4>
+    <?php foreach ($tags as $tag): ?>
+    <div class="value tag">
+        <?php echo $this->hyperlink(
+            $tag->name(),
+            $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
+        ); ?>
+    </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
