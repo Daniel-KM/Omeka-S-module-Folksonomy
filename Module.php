@@ -1047,39 +1047,27 @@ SQL;
         }
 
         $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        $owner = $services->get('Omeka\AuthenticationService')->getIdentity();
         $acl = $services->get('Omeka\Acl');
+        if (!$acl->userIsAllowed(Tagging::class, 'create')) {
+            return;
+        }
+
+        $api = $services->get('Omeka\ApiManager');
+        $controllerPlugins = $services->get('ControllerPluginManager');
 
         $resourceId = $request->getId();
         $resource = $event->getParam('entity');
         $errorStore = $event->getParam('errorStore');
-        $entityManager = $resourceAdapter->getEntityManager();
-        $tagAdapter = $resourceAdapter->getAdapter('tags');
-        $taggingAdapter = $resourceAdapter->getAdapter('taggings');
-
-        // Prepare the status to set for the tagging.
-        $add = $acl->userIsAllowed(Tagging::class, 'create');
-        if (!$add) {
-            return;
-        }
-        $settings = $services->get('Omeka\Settings');
-        if (!$owner || in_array($owner->getRole(), ['researcher', 'author'])) {
-            $update = false;
-            $status = $settings->get('folksonomy_public_require_moderation', $this->settings['folksonomy_public_require_moderation'])
-                ? Tagging::STATUS_PROPOSED
-                : Tagging::STATUS_ALLOWED;
-        } else {
-            $update = true;
-            $status = Tagging::STATUS_APPROVED;
-        }
-        $rights = [
-            'update' => $update,
-            'delete' => $acl->userIsAllowed(Tagging::class, 'delete'),
-            'status' => $status,
-        ];
 
         $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
+        // Normalized new tags if any.
+        $newTags = array_filter(
+            array_map(
+                'trim',
+                explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
+            ),
+            function ($v) { return strlen($v); }
+        );
 
         // Updated resource.
         if ($resourceId) {
@@ -1097,27 +1085,15 @@ SQL;
             $resourceTags = [];
             $currentTaggings = [];
             $currentTags = [];
-            $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
             $addedTags = $submittedTags;
             $unchangedTags = [];
             $deletedTags = [];
         }
 
-        // For new tags, check if they exist already via database requests to
-        // avoid issues between sql and php characters transliterating.
-        // Get the existing normalized new tags if any.
-        $newTags = array_filter(
-            array_map(
-                'trim',
-                explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
-            ),
-            function ($v) { return strlen($v); }
-        );
         // TODO Create a query that returns new tags as key and formatted as
         // value, or that keeps order and returns each existing value or null.
         foreach ($newTags as $key => $newTag) {
-            $tag = $api
-                ->search('tags', ['name' => $newTag])->getContent();
+            $tag = $api->search('tags', ['name' => $newTag])->getContent();
             if ($tag) {
                 $tag = $tag[0]->name();
                 $listed = array_search($tag, $deletedTags, true);
@@ -1132,82 +1108,15 @@ SQL;
                 unset($newTags[$key]);
             }
         }
-        $addedTags = array_unique($addedTags);
+        $addedTags = array_unique(array_merge($addedTags, $newTags));
 
-        // Prepare the tags.
-        // Note: The tags don't belong to a user, who is only the first tagger.
-
-        // Create tags passed in the request.
-        $createdTags = [];
-        foreach ($newTags as $tagName) {
-            $subRequest = new Request(Request::CREATE, 'tags');
-            $subRequest->setContent(['o:name' => $tagName]);
-            $tag = new Tag;
-            $tagAdapter->hydrateEntity($subRequest, $tag, new ErrorStore);
-            $entityManager->persist($tag);
-            $createdTags[] = $tag;
+        if ($addedTags) {
+            $addTags = $controllerPlugins->get('addTags');
+            $addTags($resource, $addedTags);
         }
-
-        // Update taggings according to all tags passed in the request.
-        $tagsToAdd= $addedTags
-            ? $api
-                ->search('tags', ['name' => $addedTags], ['responseContent' => 'resource'])
-                ->getContent()
-            : [];
-        $tagsToAdd = array_merge($tagsToAdd, $createdTags);
-        foreach ($tagsToAdd as $tag) {
-            $query = [
-                'tag' => $tag->getName(),
-                'resource_id' => $resourceId,
-            ];
-            $taggings = $resourceId && in_array($tag->getName(), $addedTags)
-                ? $api
-                    ->search('taggings', $query, ['responseContent' => 'resource'])
-                    ->getContent()
-                : [];
-            if (empty($taggings)) {
-                $data = [
-                    'o:status' => $rights['status'],
-                    'o-module-folksonomy:tag' => $tag,
-                    'o:resource' => ['o:id' => $resourceId],
-                ];
-                $subRequest = new Request(Request::CREATE, 'taggings');
-                $subRequest->setContent($data);
-                $tagging = new Tagging;
-                $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore);
-                $entityManager->persist($tagging);
-            } elseif ($rights['update']) {
-                foreach ($taggings as $tagging) {
-                    if ($tagging->getStatus() !== $rights['status']) {
-                        $data = [
-                            'o:status' => $rights['status'],
-                        ];
-                        $subRequest = new Request(Request::UPDATE, 'taggings');
-                        $subRequest->setId($tagging->getId());
-                        $subRequest->setContent($data);
-                        $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore);
-                        $entityManager->persist($tagging);
-                    }
-                }
-            }
-        }
-
-        $tagsToDelete = $deletedTags
-            ? $api->search('tags', ['name' => $deletedTags])->getContent()
-            : [];
-        if ($rights['delete']) {
-            foreach ($tagsToDelete as $tag) {
-                $query = [
-                    'tag' => $tag->name(),
-                    'resource_id' => $resourceId,
-                ];
-                $taggings = $api
-                    ->search('taggings', $query, ['responseContent' => 'resource'])
-                    ->getContent();
-                foreach ($taggings as $tagging) {
-                    $entityManager->remove($tagging);
-                }
-            }
+        if ($deletedTags) {
+            $deleteTags = $controllerPlugins->get('deleteTags');
+            $deleteTags($resource, $deletedTags);
         }
     }
 }

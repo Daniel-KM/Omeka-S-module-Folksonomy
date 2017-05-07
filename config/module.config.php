@@ -77,6 +77,12 @@ return [
             'Folksonomy\Controller\Tag' => 'Folksonomy\Controller\TagController',
         ],
     ],
+    'controller_plugins' => [
+        'factories' => [
+            'addTags' => 'Folksonomy\Service\ControllerPlugin\AddTagsFactory',
+            'deleteTags' => 'Folksonomy\Service\ControllerPlugin\DeleteTagsFactory',
+        ],
+    ],
     'router' => [
         'routes' => [
             'site' => [
