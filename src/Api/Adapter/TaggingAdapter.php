@@ -81,8 +81,12 @@ class TaggingAdapter extends AbstractEntityAdapter
                 $entity->setTag($tag);
             }
 
-            if (isset($data['o:resource']['o:id'])) {
-                if (is_numeric($data['o:resource']['o:id'])) {
+            if (isset($data['o:resource'])) {
+                if (is_object($data['o:resource'])) {
+                    $resource = $data['o:resource'] instanceof Resource
+                        ? $data['o:resource']
+                        : null;
+                } elseif (is_numeric($data['o:resource']['o:id'])) {
                     $resource = $this->getAdapter('resources')
                         ->findEntity($data['o:resource']['o:id']);
                 } else {

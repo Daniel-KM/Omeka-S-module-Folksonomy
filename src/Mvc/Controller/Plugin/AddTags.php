@@ -133,7 +133,9 @@ class AddTags extends AbstractPlugin
                 $data = [
                     'o:status' => $status,
                     'o-module-folksonomy:tag' => $tagName,
-                    'o:resource' => ['o:id' => $resourceId],
+                    // Manage the case when the tag and the resource are created
+                    // at the same time.
+                    'o:resource' => $resourceId ? ['o:id' => $resourceId] : $resource,
                 ];
                 $response = $api
                     ->create('taggings', $data);

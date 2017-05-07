@@ -59,7 +59,8 @@ class Tagging extends AbstractEntity
     /**
      * @ManyToOne(
      *     targetEntity="Omeka\Entity\Resource",
-     *     fetch="LAZY"
+     *     fetch="LAZY",
+     *     cascade={"persist"}
      * )
      * @JoinColumn(
      *     nullable=true,
