@@ -35,7 +35,6 @@ $formElement = $this->plugin('formElement');
     <?php echo $formElement($taggingForm->get('csrf_' . $resource->id())); ?>
     <?php $element = $taggingForm->get('submit'); ?>
     <?php echo $this->formButton()->openTag($element); ?>
-    <span class="fa fa-tag">&nbsp;</span>
     <?php echo $this->formLabel($element); ?>
     <?php echo $this->formButton()->closeTag(); ?>
     <?php echo $this->form()->closeTag(); ?>

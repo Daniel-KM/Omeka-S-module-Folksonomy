@@ -1,78 +1,56 @@
 <?php
 namespace Folksonomy\Controller\Site;
 
-use Doctrine\ORM\EntityManager;
-use Folksonomy\Entity\Tagging;
-use Omeka\Permissions\Acl;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 
 class TaggingController extends AbstractActionController
 {
-    /**
-     * @var Acl
-     */
-    protected $acl;
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(Acl $acl, EntityManager $entityManager)
-    {
-        $this->acl = $acl;
-        $this->entityManager = $entityManager;
-    }
-
     public function addAction()
     {
-        if ($this->settings('folksonomy_legal_text')
-            && empty($this->params()->fromPost('legal_agreement'))
-        ) {
+        // TODO Validate via form.
+        // $form = $this->getForm(TaggingForm::class);
+
+        $legalText = $this->settings()->get('folksonomy_legal_text', '');
+        if ($legalText && empty($this->params()->fromPost('legal_agreement'))) {
             return $this->jsonErrorLegalAgreement();
         }
 
-        $tags = array_filter(
-            array_unique(
-                array_map(
-                    [$this, 'sanitizeString'],
-                    explode(',', $this->params()->fromPost('o-module-folksonomy:tag-new', ''))
-                )
-            ),
-            function ($v) { return strlen($v); }
-        );
-
-        if (empty($tags)) {
-            return $this->jsonErrorEmpty();
-        }
-
-        $id = $this->params()->fromPost('resource_id');
-        if (!$id) {
-            return $this->jsonErrorNotFound();
-        }
-
-        if (!$this->acl->userIsAllowed(Tagging::class, 'create')) {
+        if (!$this->userIsAllowed(Tagging::class, 'create')) {
             return $this->jsonErrorUnauthorized();
         }
 
+        $resourceId = $this->params()->fromPost('resource_id');
+        if (!$resourceId) {
+            return $this->jsonErrorNotFound();
+        }
+
         $resource = $this->api()
-            ->read('resources', $id, [], ['responseContent' => 'resource'])
+            ->read('resources', $resourceId, [], ['responseContent' => 'resource'])
             ->getContent();
         if (!$resource) {
             return $this->jsonErrorNotFound();
         }
 
+        $tags = $this->params()->fromPost('o-module-folksonomy:tag-new', '');
+        $tags = explode(',', $tags);
+
         $addedTags = $this->addTags($resource, $tags);
+        if (is_null($addedTags)) {
+            return $this->jsonErrorEmpty();
+        }
+
         if (empty($addedTags)) {
             return $this->jsonErrorExistingTags();
         }
 
         return new JsonModel([
             'content' => [
+                'resource_id' => $resourceId,
                 'tags' => $addedTags,
-                'moderation' => $this->acl->userIsAllowed(Tagging::class, 'update'),
+                'moderation' => $this->settings()->get('folksonomy_public_require_moderation')
+                    || !$this->userIsAllowed(Tagging::class, 'update'),
             ],
         ]);
     }
@@ -110,23 +88,5 @@ class TaggingController extends AbstractActionController
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_404);
         return new JsonModel(['error' => 'Resource not found.']); // @translate
-    }
-
-    /**
-     * Returns a sanitized string.
-     *
-     * @param string $string The string to sanitize.
-     * @return string The sanitized string.
-     */
-    protected function sanitizeString($string)
-    {
-        // Quote is allowed.
-        $string = strip_tags($string);
-        // The first character is a space and the last one is a no-break space.
-        $string = trim($string, ' /\\?<>:*%|"`&; ' . "\t\n\r");
-        $string = preg_replace('/[\(\{]/', '[', $string);
-        $string = preg_replace('/[\)\}]/', ']', $string);
-        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
-        return trim(preg_replace('/\s+/', ' ', $string));
     }
 }

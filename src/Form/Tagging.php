@@ -35,16 +35,15 @@ class Tagging extends Form
         $settingHelper = $this->getSettingHelper();
         $urlHelper = $this->getUrlHelper();
         $resourceId = $this->getOption('resource_id');
-        $action = $urlHelper(
-            'site/tagging-id',
-            [
-                'site-slug' => $this->getOption('site-slug'),
-                'controller' => 'tagging',
-                'resource-id' => $resourceId,
-                'action' => 'add',
-            ]
-        );
+        $siteSlug = $this->getOption('site-slug');
+        $isPublic = (boolean) strlen($siteSlug);
+        $action = $isPublic
+            ? $urlHelper('site/tagging', ['action' => 'add', 'site-slug' => $siteSlug])
+            : $urlHelper('admin/tagging', ['action' => 'add']);
+
         $this->setAttribute('id', 'tagging-form-' . $resourceId);
+        $this->setAttribute('action', $action);
+        $this->setAttribute('class', 'tagging-form');
         $this->setAttribute('data-resource-id', $resourceId);
 
         $this->add([
@@ -96,33 +95,36 @@ class Tagging extends Form
             }
         }
 
-        // TODO Allow html legal agreement in the tagging form help from here.
         // The legal agreement is checked by default for logged users.
-        $legalText = str_replace('&nbsp;', ' ', strip_tags($settingHelper('folksonomy_legal_text')));
-        if ($legalText) {
-            $this->add([
-                'type' => 'checkbox',
-                'name' => 'legal_agreement',
-                'options' => [
-                    'label' => 'Terms of Service', // @translate
-                    'info' => $legalText,
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'use_hidden_element' => false,
-                ],
-                'attributes' => [
-                    'value' => $this->getOption('is_identified'),
-                    'required' => true,
-                ],
-                'validators' => [
-                    ['notEmpty', true, [
-                        'messages' => [
-                            'isEmpty' => 'You must agree to the terms and conditions.', // @translate
+        if ($isPublic) {
+            $legalText = $settingHelper('folksonomy_legal_text');
+            if ($legalText) {
+                // TODO Allow html legal agreement in the tagging form help from here.
+                $legalText = str_replace('&nbsp;', ' ', strip_tags($legalText));
+                $this->add([
+                    'type' => 'checkbox',
+                    'name' => 'legal_agreement',
+                    'options' => [
+                        'label' => 'Terms of Service', // @translate
+                        'info' => $legalText,
+                        'label_options' => [
+                            'disable_html_escape' => true,
                         ],
-                    ]],
-                ],
-            ]);
+                        'use_hidden_element' => false,
+                    ],
+                    'attributes' => [
+                        'value' => $this->getOption('is_identified'),
+                        'required' => true,
+                    ],
+                    'validators' => [
+                        ['notEmpty', true, [
+                            'messages' => [
+                                'isEmpty' => 'You must agree to the terms and conditions.', // @translate
+                            ],
+                        ]],
+                    ],
+                ]);
+            }
         }
 
         $this->add([
@@ -140,8 +142,7 @@ class Tagging extends Form
                 'label' => 'Tag it!', // @translate
             ],
             'attributes' => [
-                'class' => 'folksonomy-tagging-add',
-                'data-url' => $action,
+                'class' => 'fa fa-tag',
             ],
         ]);
     }

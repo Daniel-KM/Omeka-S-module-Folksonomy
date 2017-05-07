@@ -791,25 +791,6 @@ SQL;
             'view.show.after',
             [$this, 'displayViewResourceTagsPublic']
         );
-
-        // Add the tagging form to the resource show public pages.
-        if ($settings->get('folksonomy_public_allow_tag')) {
-            $sharedEventManager->attach(
-                'Omeka\Controller\Site\Item',
-                'view.show.after',
-                [$this, 'displayTaggingFormPublic']
-            );
-            $sharedEventManager->attach(
-                'Omeka\Controller\Site\ItemSet',
-                'view.show.after',
-                [$this, 'displayTaggingFormPublic']
-            );
-            $sharedEventManager->attach(
-                'Omeka\Controller\Site\Media',
-                'view.show.after',
-                [$this, 'displayTaggingFormPublic']
-            );
-        }
     }
 
     public function getConfigForm(PhpRenderer $renderer)
@@ -823,15 +804,15 @@ SQL;
             $data[$name] = $settings->get($name);
         }
         $formData = [];
-        $formData['folksonomy_tagging_form'] = [
-            'folksonomy_message' => $data['folksonomy_message'],
-            'folksonomy_max_length_tag' => $data['folksonomy_max_length_tag'],
-            'folksonomy_max_length_total' => $data['folksonomy_max_length_total'],
-        ];
         $formData['folksonomy_public_rights'] = [
-            'folksonomy_legal_text' => $data['folksonomy_legal_text'],
             'folksonomy_public_allow_tag' => $data['folksonomy_public_allow_tag'],
             'folksonomy_public_require_moderation' => $data['folksonomy_public_require_moderation'],
+        ];
+        $formData['folksonomy_tagging_form'] = [
+            'folksonomy_max_length_tag' => $data['folksonomy_max_length_tag'],
+            'folksonomy_max_length_total' => $data['folksonomy_max_length_total'],
+            'folksonomy_message' => $data['folksonomy_message'],
+            'folksonomy_legal_text' => $data['folksonomy_legal_text'],
         ];
 
         $form = $formElementManager->get(ConfigForm::class);
@@ -944,22 +925,18 @@ SQL;
     }
 
     /**
-     * Display the tagging form for public.
+     * Display the quick tagging form.
      *
      * @param Event $event
      */
-    public function displayTaggingFormPublic(Event $event)
+    public function displayQuickTaggingForm(Event $event)
     {
         $view = $event->getTarget();
         $services = $this->getServiceLocator();
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $viewHelperManager = $services->get('ViewHelperManager');
 
-        //$form = $services->get('FormElementManager')->get(TaggingForm::class);
-        $form = new TaggingForm;
-        $form->setSettingHelper($viewHelperManager->get('setting'));
-        $form->setUrlHelper($viewHelperManager->get('Url'));
-        $form->setFormElementManager($services->get('FormElementManager'));
+        $form = $services->get('FormElementManager')->get(TaggingForm::class);
         $form->setOptions([
             'site-slug' => $view->params()->fromRoute('site-slug'),
             'resource_id' => $view->vars()->resource->id(),
@@ -967,7 +944,7 @@ SQL;
         ]);
         $form->init();
         $view->vars()->offsetSet('taggingForm', $form);
-        echo $view->partial('folksonomy/common/site/tagging-form.phtml');
+        echo $view->partial('folksonomy/common/tagging-quick-form.phtml');
     }
 
     /**
@@ -977,8 +954,16 @@ SQL;
      */
     public function displayViewResourceTags(Event $event)
     {
+        $acl = $this->getServiceLocator()->get('Omeka\Acl');
+        $allowed = $acl->userIsAllowed(Tagging::class, 'create');
+
+        echo '<div id="tags" class="section">';
         $resource = $event->getTarget()->resource;
         $this->displayResourceFolksonomy($event, $resource);
+        if ($allowed) {
+            $this->displayQuickTaggingForm($event);
+        }
+        echo '</div>';
     }
 
     /**
@@ -999,6 +984,12 @@ SQL;
                 'taggings' => $taggings,
             ]
         );
+
+        $services = $this->getServiceLocator();
+        $acl = $services->get('Omeka\Acl');
+        if ($acl->userIsAllowed(Tagging::class, 'create')) {
+            $this->displayQuickTaggingForm($event);
+        }
     }
 
     /**

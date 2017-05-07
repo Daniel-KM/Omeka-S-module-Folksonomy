@@ -75,7 +75,11 @@ $('#content').on('click', 'a.status-toggle', function(e) {
         }
     })
     .fail(function(jqXHR, textStatus) {
-        alert(Omeka.jsTranslate('Something went wrong'));
+        if (jqXHR.status == 404) {
+            alert(Omeka.jsTranslate('The resource or the tag doesn’t exist.'));
+        } else {
+            alert(Omeka.jsTranslate('Something went wrong'));
+        }
     })
     .always(function () {
         button.removeClass('o-icon-transmit').addClass('o-icon-' + status);
@@ -123,7 +127,11 @@ $('#content').on('click', 'a.status-batch', function(e) {
         selected.closest('tr').find('.status-toggle').each(function() {
             $(this).removeClass('o-icon-transmit').addClass('o-icon-' + $(this).data('status'));
         });
-        alert(Omeka.jsTranslate('Something went wrong'));
+        if (jqXHR.status == 404) {
+            alert(Omeka.jsTranslate('The resource or the tag doesn’t exist.'));
+        } else {
+            alert(Omeka.jsTranslate('Something went wrong'));
+        }
     })
 });
 

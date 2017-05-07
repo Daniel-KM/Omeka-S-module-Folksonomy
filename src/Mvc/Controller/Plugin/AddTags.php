@@ -137,8 +137,8 @@ class AddTags extends AbstractPlugin
             $status = $settings->get('folksonomy_public_require_moderation', false)
                 ? Tagging::STATUS_PROPOSED
                 : Tagging::STATUS_ALLOWED;
-            $dataUpdate = ['o:status' => $status];
         }
+        $dataUpdate = ['o:status' => $status];
 
         // Add tags to the resource and update the status if needed.
         $addedTags = [];

@@ -1,7 +1,14 @@
 @media screen {
-    button.folksonomy-tagging-add.transmit span {
+    .tagging-form .o-icon-transmit::before {
         background: url('../img/waiting-mini.gif') no-repeat scroll 0 0 transparent !important;
-        min-width: 1em;
+        content: "";
+        width: 18px;
+        height: 18px;
+        line-height: 24px;
+        vertical-align: top;
+    }
+    .tagging-form .o-icon-transmit {
+        cursor: progress;
     }
 }
 

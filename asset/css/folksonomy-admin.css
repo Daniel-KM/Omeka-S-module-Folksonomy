@@ -39,12 +39,6 @@
     .taggings.browse table.batch-edit td:nth-child(2) {
         max-width: 40%;
     }
-    .taggings.browse table:not(.batch-edit) th:nth-child(2),
-    .taggings.browse table:not(.batch-edit) td:nth-child(2),
-    .taggings.browse table.batch-edit th:nth-child(3),
-    .taggings.browse table.batch-edit td:nth-child(3) {
-        min-width: 120px;
-    }
 
     .folksonomy table .resource-name {
         display: inline-block;
@@ -76,6 +70,13 @@
     .folksonomy.meta-group .single.actions,
     .folksonomy.meta-group .no-action::before {
         float: right;
+    }
+
+    .folksonomy.meta-group span,
+    .folksonomy .meta-group span {
+        display: inline;
+        hyphens: auto;
+        word-wrap: break-word;
     }
 
     .folksonomy.meta-group::before,

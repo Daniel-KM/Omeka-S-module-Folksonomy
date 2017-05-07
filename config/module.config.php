@@ -83,9 +83,7 @@ return [
             'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
             'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
             'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
-        ],
-        'factories' => [
-            'Folksonomy\Controller\Site\Tagging' => Service\Controller\Site\TaggingControllerFactory::class,
+            'Folksonomy\Controller\Site\Tagging' => Controller\Site\TaggingController::class,
         ],
     ],
     'controller_plugins' => [
@@ -150,10 +148,10 @@ return [
                             ],
                         ],
                     ],
-                    'tagging-id' => [
+                    'tagging' => [
                         'type' => 'Segment',
                         'options' => [
-                            'route' => '/tagging/:resource-id[/:action]',
+                            'route' => '/tagging[/:action]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
@@ -262,10 +260,11 @@ return [
         'Allowed', // @translate
         'Approved', // @translate
         'Rejected', // @translate
-        'You must check the legal agreement.', // @translate
+        'You should accept the legal agreement.', // @translate
         'Data were added to the resource.', // @translate
         'They will be displayed when approved.', // @translate
         'Reload page to see new tags.', // @translate
         'Request too long to process.', // @translate
+        'The resource or the tag doesn’t exist.', // @translate
     ],
 ];

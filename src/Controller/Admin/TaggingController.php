@@ -33,6 +33,48 @@ class TaggingController extends AbstractActionController
         return $view;
     }
 
+    public function addAction()
+    {
+        // TODO Validate via form.
+        // $form = $this->getForm(TaggingForm::class);
+
+        if (!$this->userIsAllowed(Tagging::class, 'create')) {
+            return $this->jsonErrorUnauthorized();
+        }
+
+        $resourceId = $this->params()->fromPost('resource_id');
+        if (!$resourceId) {
+            return $this->jsonErrorNotFound();
+        }
+
+        $resource = $this->api()
+            ->read('resources', $resourceId, [], ['responseContent' => 'resource'])
+            ->getContent();
+        if (!$resource) {
+            return $this->jsonErrorNotFound();
+        }
+
+        $tags = $this->params()->fromPost('o-module-folksonomy:tag-new', '');
+        $tags = explode(',', $tags);
+
+        $addedTags = $this->addTags($resource, $tags);
+        if (is_null($addedTags)) {
+            return $this->jsonErrorEmpty();
+        }
+
+        if (empty($addedTags)) {
+            return $this->jsonErrorExistingTags();
+        }
+
+        return new JsonModel([
+            'content' => [
+                'resource_id' => $resourceId,
+                'tags' => $addedTags,
+                'moderation' => !$this->userIsAllowed(Tagging::class, 'update'),
+            ],
+        ]);
+    }
+
     public function deleteAction()
     {
         if ($this->getRequest()->isPost()) {
@@ -177,6 +219,13 @@ class TaggingController extends AbstractActionController
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_400);
         return new JsonModel(['error' => 'No taggings submitted.']); // @translate
+    }
+
+    protected function jsonErrorExistingTags()
+    {
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_400);
+        return new JsonModel(['error' => 'Submitted tags are already set.']); // @translate
     }
 
     protected function jsonErrorUnauthorized()
