@@ -124,6 +124,36 @@ class TagController extends AbstractActionController
         $this->messenger()->addError('Delete of all tags is not supported currently.'); // @translate
     }
 
+    public function updateAction()
+    {
+        $id = $this->params('id');
+        $name = $this->params()->fromPost('text');
+        $tag = $this->api()->read('tags', $id)->getContent();
+
+        $data = [];
+        $data['o:name'] = $name;
+        $response = $this->api()->update('tags', $id, $data, ['isPartial' => true]);
+        if (!$response) {
+            return $this->jsonErrorName();
+        }
+
+        $tag = $response->getContent();
+        $escape = $this->viewHelpers()->get('escapeHtml');
+        return new JsonModel([
+            'content' => [
+                'text' => $tag->name(),
+                'escaped' => $escape($tag->name()),
+                'urls' => [
+                    'update' => $tag->url('update'),
+                    'delete_confirm' => $tag->url('delete-confirm'),
+                    'item_sets' => $tag->urlResources('item-set'),
+                    'items' => $tag->urlResources('item'),
+                    'media' => $tag->urlResources('media'),
+                ],
+            ],
+        ]);
+    }
+
     public function browseResourcesAction()
     {
         return $this->redirect()->toRoute(
@@ -143,6 +173,13 @@ class TagController extends AbstractActionController
         return new JsonModel(['error' => 'No tags submitted.']); // @translate
     }
 
+    protected function jsonErrorName()
+    {
+        $response = $this->getResponse();
+        $response->setStatusCode(Response::STATUS_CODE_400);
+        return new JsonModel(['error' => 'This tag is invalid: it is a duplicate or it contains forbidden characters.']); // @translate
+    }
+
     protected function jsonErrorUnauthorized()
     {
         $response = $this->getResponse();
@@ -154,7 +191,7 @@ class TagController extends AbstractActionController
     {
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_404);
-        return new JsonModel(['error' => 'tag not found.']); // @translate
+        return new JsonModel(['error' => 'Tag not found.']); // @translate
     }
 
     protected function jsonErrorUpdate()

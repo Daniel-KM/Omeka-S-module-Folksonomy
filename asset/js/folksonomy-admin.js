@@ -127,4 +127,76 @@ $('#content').on('click', 'a.status-batch', function(e) {
     })
 });
 
+//Update the name of a tag.
+$('.folksonomy .o-icon-edit.contenteditable')
+    .on('click', function(e) {
+        e.preventDefault();
+        var field = $(this).closest('td').find('.tag-name');
+        field.focus();
+    });
+
+// Update the name of a tag.
+$('.folksonomy .tag-name[contenteditable=true]')
+    .focus(function() {
+        var field = $(this);
+        field.data('original-text', field.text());
+    })
+    .blur(function(e) {
+        var field = $(this);
+        var oldText = field.data('original-text');
+        var newText = $.trim(field.text().replace(/\s+/g,' '));
+        $.removeData(field, 'original-text');
+        if (newText.length > 0 && newText !== oldText) {
+            var url = field.data('update-url');
+            $.post({
+                url: url,
+                data: {text: newText},
+                beforeSend: function() {
+                    field.text(newText);
+                    field.addClass('o-icon-transmit');
+                }
+            })
+            .done(function(data) {
+                var row = field.closest('tr');
+                field.text(data.content.text);
+                field.data('update-url', data.content.urls.update);
+                row.find('[name="resource_ids[]"]').val(data.content.escaped);
+                row.find('.o-icon-delete').data('sidebar-content-url', data.content.urls.delete_confirm);
+                row.find('.tag-browse-item-sets').prop('href', data.content.urls.item_sets);
+                row.find('.tag-browse-items').prop('href', data.content.urls.items);
+                row.find('.tag-browse-media').prop('href', data.content.urls.media);
+            })
+            .fail(function(jqXHR, textStatus) {
+                var msg = jqXHR.hasOwnProperty('responseJSON')
+                    && typeof jqXHR.responseJSON.error !== 'undefined'
+                    ? jqXHR.responseJSON.error
+                    : Omeka.jsTranslate('Something went wrong');
+                alert(msg);
+                field.text(oldText);
+            })
+            .always(function () {
+                field.removeClass('o-icon-transmit');
+                field.parent().focus();
+            });
+        } else {
+            field.text(newText);
+        }
+    })
+    .keydown(function(e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+        }
+    })
+    .keyup(function(e) {
+        if (e.keyCode === 13) {
+            $(this).blur();
+        } else if (e.keyCode === 27) {
+            var field = $(this);
+            var oldText = field.data('original-text');
+            $.removeData(field, 'original-text');
+            field.text(oldText);
+            field.parent().focus();
+        }
+    });
+
 });

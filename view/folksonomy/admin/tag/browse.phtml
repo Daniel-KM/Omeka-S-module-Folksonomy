@@ -90,8 +90,7 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
                 <ul class="actions">
                     <?php if ($updateRight): ?>
                     <li><a href="#"
-                        class="o-icon-edit"
-                        data-update-url="<?php echo $escape($tag->url('update')); ?>"
+                        class="o-icon-edit contenteditable"
                         aria-label="<?php echo $escape($this->translate('Edit name')); ?>"
                         title="<?php echo $escape($this->translate('Edit name')); ?>"></a></li>
                     <?php endif; ?>
@@ -103,20 +102,27 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
                         title="<?php echo $escape($this->translate('Delete')); ?>"></a></li>
                     <?php endif; ?>
                 </ul>
-                <?php echo $this->hyperlink($name, $tag->urlResources()); ?>
+                <span class="tag-name"<?php
+                    if ($updateRight) echo ' contenteditable="true" data-update-url="' . $tag->url('update') . '"';
+                ?>><?php
+                    echo $name;
+                ?></span>
             </td>
             <td><?php if ($tagCount[$name]['count']) echo $tagCount[$name]['count']; ?></td>
             <td><?php if ($tagCount[$name]['item_sets']) echo $this->hyperlink(
                 $tagCount[$name]['item_sets'],
-                $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $name])
+                $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $name]),
+                ['class' => 'tag-browse-item-sets']
             ); ?></td>
             <td><?php if ($tagCount[$name]['items']) echo $this->hyperlink(
                 $tagCount[$name]['items'],
-                $this->url('admin/tag-resource', ['resource' => 'item', 'id' => $name])
+                $this->url('admin/tag-resource', ['resource' => 'item', 'id' => $name]),
+                ['class' => 'tag-browse-items']
             ); ?></td>
             <td><?php if ($tagCount[$name]['media']) echo $this->hyperlink(
                 $tagCount[$name]['media'],
-                $this->url('admin/tag-resource', ['resource' => 'media', 'id' => $name])
+                $this->url('admin/tag-resource', ['resource' => 'media', 'id' => $name]),
+                ['class' => 'tag-browse-media']
             ); ?></td>
         </tr>
         <?php endforeach; ?>

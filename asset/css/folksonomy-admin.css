@@ -56,6 +56,7 @@
     .folksonomy .single.actions .o-icon-transmit::before {
         background: url('../img/waiting-mini.gif') no-repeat scroll 3px 3px transparent !important;
     }
+    .folksonomy .tag-name[contenteditable=true].o-icon-transmit::before,
     .folksonomy .no-action::before {
         width: 24px;
         height: 24px;
@@ -120,6 +121,36 @@
         color: #000000;
         content: "";
         cursor: progress;
+    }
+
+    .folksonomy .tag-name[contenteditable="true"] {
+        background: inherit;
+        border: hidden;
+        display:inline;
+        min-height: unset;
+        max-height: 2em;
+        padding: inherit;
+        width: 84%;
+    }
+    .folksonomy .tag-name[contenteditable=true]:hover,
+    .folksonomy .tag-name[contenteditable=true]:focus {
+        outline: 1px dotted rgba(0,0,0,0.15);
+    }
+    .folksonomy .tag-name[contenteditable="true"]:active {
+        display: inline;
+        outline: 1px dashed rgba(0,0,0,0.15);
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .folksonomy .tag-name[contenteditable="true"]:active br {
+        display:none;
+    }
+    .folksonomy .tag-name[contenteditable="true"]:active * {
+        display:inline;
+        white-space:nowrap;
+    }
+    .folksonomy .tag-name[contenteditable=true].o-icon-transmit::before {
+        background: url('../img/waiting-mini.gif') no-repeat scroll 3px 3px transparent !important;
     }
 }
 
