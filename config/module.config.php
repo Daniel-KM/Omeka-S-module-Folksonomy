@@ -19,6 +19,14 @@ return [
             __DIR__ . '/../view',
         ],
     ],
+    'view_helpers' => [
+        'invokables' => [
+            'tagSelector' => 'Folksonomy\View\Helper\TagSelector',
+        ],
+        'factories' => [
+            'tagSelect' => 'Folksonomy\Service\ViewHelper\TagSelectFactory',
+        ],
+    ],
     'block_layouts' => [
         'invokables' => [
             'tagCloud' => 'Folksonomy\Site\BlockLayout\TagCloud',
@@ -32,8 +40,11 @@ return [
     'form_elements' => [
         'invokables' => [
             'Folksonomy\Form\Config' => 'Folksonomy\Form\Config',
-            'Folksonomy\Form\Tagging' => 'Folksonomy\Form\Tagging',
+            'Folksonomy\Form\Element\TagSelect' => 'Folksonomy\Service\Form\Element\TagSelectFactory',
             'Folksonomy\Form\TagCloudBlock' => 'Folksonomy\Form\TagCloudBlock',
+        ],
+        'factories' => [
+            'Folksonomy\Form\Tagging' => 'Folksonomy\Service\Form\TaggingFactory',
         ],
     ],
     'navigation' => [
@@ -70,17 +81,18 @@ return [
         'routes' => [
             'site' => [
                 'child_routes' => [
-                    'tagging' => [
+                    'tagging-id' => [
                         'type' => 'Segment',
                         'options' => [
-                            'route' => '/tagging[/:action]',
+                            'route' => '/tagging/:resource-id[/:action]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
                                 'controller' => 'Tagging',
-                                'action' => 'browse',
+                                'action' => 'add',
+                                'resource-id' => '\d+',
                             ],
                         ],
                     ],

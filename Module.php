@@ -11,11 +11,13 @@ namespace Folksonomy;
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 
+use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
+use Omeka\Stdlib\ErrorStore;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\Controller\AbstractController;
@@ -434,6 +436,9 @@ SQL;
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
+        $serviceLocator = $this->getServiceLocator();
+        $settings = $serviceLocator->get('Omeka\Settings');
+
         // Add the Folksonomy term definition.
         $sharedEventManager->attach(
             '*',
@@ -656,21 +661,23 @@ SQL;
         );
 
         // Add the tagging form to the resource show public pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\Item',
-            'view.show.after',
-            [$this, 'displayTaggingFormPublic']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\ItemSet',
-            'view.show.after',
-            [$this, 'displayTaggingFormPublic']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\Media',
-            'view.show.after',
-            [$this, 'displayTaggingFormPublic']
-        );
+        if ($settings->get('folksonomy_public_allow_tag')) {
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\Item',
+                'view.show.after',
+                [$this, 'displayTaggingFormPublic']
+            );
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\ItemSet',
+                'view.show.after',
+                [$this, 'displayTaggingFormPublic']
+            );
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\Media',
+                'view.show.after',
+                [$this, 'displayTaggingFormPublic']
+            );
+        }
 
         // Add the tag field to the site's browse page.
         $sharedEventManager->attach(
@@ -783,7 +790,27 @@ SQL;
      */
     public function displayTaggingForm(Event $event)
     {
-        echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
+        $vars = $event->getTarget()->vars();
+        // Manage add/edit form.
+        if (isset($vars->item)) {
+            $vars->offsetSet('resource', $vars->item);
+        } elseif (isset($vars->itemSet)) {
+            $vars->offsetSet('resource', $vars->itemSet);
+        } elseif (isset($vars->media)) {
+            $vars->offsetSet('resource', $vars->media);
+        } else {
+            $vars->offsetSet('resource', null);
+            $vars->offsetSet('tags', []);
+            // $vars->offsetSet('taggings', []);
+        }
+        if ($vars->resource) {
+            $vars->offsetSet('tags', $this->listResourceTags($vars->resource));
+            // $vars->offsetSet('taggings', $this->listResourceTaggings($vars->resource));
+        }
+
+        echo $event->getTarget()->partial(
+            'folksonomy/admin/tagging-form.phtml'
+        );
     }
 
     /**
@@ -870,6 +897,20 @@ SQL;
         return empty($resourceJson['o-module-folksonomy:tag'])
             ? []
             : $resourceJson['o-module-folksonomy:tag'];
+    }
+
+    /**
+     * Helper to return taggings of a resource.
+     *
+     * @param AbstractResourceRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTaggings(AbstractResourceRepresentation $resource)
+    {
+        $resourceJson = $resource->jsonSerialize();
+        return empty($resourceJson['o-module-folksonomy:tagging'])
+            ? []
+            : $resourceJson['o-module-folksonomy:tagging'];
     }
 
     /**
@@ -991,8 +1032,9 @@ SQL;
     }
 
     /**
-     * Handle hydration for tagging data.
+     * Handle hydration for tag and tagging data after hydration of resource.
      *
+     * @todo Clarify and use acl only.
      * @param Event $event
      */
     public function handleTagging(Event $event)
@@ -1000,52 +1042,171 @@ SQL;
         $resourceAdapter = $event->getTarget();
         $request = $event->getParam('request');
 
-        if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tagging')) {
+        if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tag')) {
             return;
         }
 
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $owner = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $acl = $services->get('Omeka\Acl');
+
+        $resourceId = $request->getId();
+        $resource = $event->getParam('entity');
+        $errorStore = $event->getParam('errorStore');
+        $entityManager = $resourceAdapter->getEntityManager();
+        $tagAdapter = $resourceAdapter->getAdapter('tags');
         $taggingAdapter = $resourceAdapter->getAdapter('taggings');
-        $taggingData = $request->getValue('o-module-folksonomy:tagging', []);
 
-        $taggingId = null;
-        $tags = null;
-
-        if (isset($taggingData['o:id']) && is_numeric($taggingData['o:id'])) {
-            $taggingId = $taggingData['o:id'];
+        // Prepare the status to set for the tagging.
+        $add = $acl->userIsAllowed(Tagging::class, 'create');
+        if (!$add) {
+            return;
         }
-        if (isset($taggingData['o-module-folksonomy:tag'])
-            && '' !== trim($taggingData['o-module-folksonomy:tag'])
-        ) {
-            $tags = $taggingData['o-module-folksonomy:tag'];
-        }
-
-        if (null === $tags) {
-            // This request has no tagging data. If a tagging for this resource
-            // exists, delete it. If no tagging for this resource exists, do nothing.
-            if (null !== $taggingId) {
-                // Delete tagging
-                $subRequest = new \Omeka\Api\Request('delete', 'taggings');
-                $subRequest->setId($taggingId);
-                $taggingsAdapter->deleteEntity($subRequest);
-            }
+        $settings = $services->get('Omeka\Settings');
+        if (!$owner || in_array($owner->getRole(), ['researcher', 'author'])) {
+            $update = false;
+            $status = $settings->get('folksonomy_public_require_moderation', $this->settings['folksonomy_public_require_moderation'])
+                ? Tagging::STATUS_PROPOSED
+                : Tagging::STATUS_ALLOWED;
         } else {
-            // This request has tagging data. If a tagging for this resource exists,
-            // update it. If no tagging for this resource exists, create it.
-            if ($taggingId) {
-                // Update tagging
-                $subRequest = new \Omeka\Api\Request('update', 'taggings');
-                $subRequest->setId($taggingData['o:id']);
-                $subRequest->setContent($taggingData);
-                $tagging = $taggingsAdapter->findEntity($taggingData['o:id'], $subRequest);
-                $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
-            } else {
-                // Create tagging
-                $subRequest = new \Omeka\Api\Request('create', 'taggings');
-                $subRequest->setContent($taggingData);
-                $tagging = new \Folksonomy\Entity\Tagging;
-                $tagging->setItem($event->getParam('entity'));
-                $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
-                $taggingsAdapter->getEntityManager()->persist($tagging);
+            $update = true;
+            $status = Tagging::STATUS_APPROVED;
+        }
+        $rights = [
+            'update' => $update,
+            'delete' => $acl->userIsAllowed(Tagging::class, 'delete'),
+            'status' => $status,
+        ];
+
+        $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
+
+        // Updated resource.
+        if ($resourceId) {
+            $representation = $resourceAdapter->getRepresentation($resource);
+            $resourceTags = $this->listResourceTags($representation);
+            $currentTaggings = $this->listResourceTaggings($representation);
+            $currentTags = array_map(function ($v) { return $v->name(); }, $resourceTags);
+            $addedTags = array_diff($submittedTags, $currentTags);
+            $unchangedTags = array_intersect($currentTags, $submittedTags);
+            $deletedTags = array_diff($currentTags, $unchangedTags);
+        }
+        // Added resource.
+        else {
+            $representation = null;
+            $resourceTags = [];
+            $currentTaggings = [];
+            $currentTags = [];
+            $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
+            $addedTags = $submittedTags;
+            $unchangedTags = [];
+            $deletedTags = [];
+        }
+
+        // For new tags, check if they exist already via database requests to
+        // avoid issues between sql and php characters transliterating.
+        // Get the existing normalized new tags if any.
+        $newTags = array_filter(
+            array_map(
+                'trim',
+                explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
+            ),
+            function ($v) { return strlen($v); }
+        );
+        // TODO Create a query that returns new tags as key and formatted as
+        // value, or that keeps order and returns each existing value or null.
+        foreach ($newTags as $key => $newTag) {
+            $tag = $api
+                ->search('tags', ['name' => $newTag])->getContent();
+            if ($tag) {
+                $tag = $tag[0]->name();
+                $listed = array_search($tag, $deletedTags, true);
+                if ($listed !== false) {
+                    unset($deletedTags[$listed]);
+                } else {
+                    $listed = array_search($tag, $unchangedTags, true);
+                    if ($listed === false) {
+                        $addedTags[] = $tag;
+                    }
+                }
+                unset($newTags[$key]);
+            }
+        }
+        $addedTags = array_unique($addedTags);
+
+        // Prepare the tags.
+        // Note: The tags don't belong to a user, who is only the first tagger.
+
+        // Create tags passed in the request.
+        $createdTags = [];
+        foreach ($newTags as $tagName) {
+            $subRequest = new Request(Request::CREATE, 'tags');
+            $subRequest->setContent(['o:name' => $tagName]);
+            $tag = new Tag;
+            $tagAdapter->hydrateEntity($subRequest, $tag, new ErrorStore);
+            $entityManager->persist($tag);
+            $createdTags[] = $tag;
+        }
+
+        // Update taggings according to all tags passed in the request.
+        $tagsToAdd= $addedTags
+            ? $api
+                ->search('tags', ['name' => $addedTags], ['responseContent' => 'resource'])
+                ->getContent()
+            : [];
+        $tagsToAdd = array_merge($tagsToAdd, $createdTags);
+        foreach ($tagsToAdd as $tag) {
+            $query = [
+                'tag' => $tag->getName(),
+                'resource_id' => $resourceId,
+            ];
+            $taggings = $resourceId && in_array($tag->getName(), $addedTags)
+                ? $api
+                    ->search('taggings', $query, ['responseContent' => 'resource'])
+                    ->getContent()
+                : [];
+            if (empty($taggings)) {
+                $data = [
+                    'o:status' => $rights['status'],
+                    'o-module-folksonomy:tag' => $tag,
+                    'o:resource' => ['o:id' => $resourceId],
+                ];
+                $subRequest = new Request(Request::CREATE, 'taggings');
+                $subRequest->setContent($data);
+                $tagging = new Tagging;
+                $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore);
+                $entityManager->persist($tagging);
+            } elseif ($rights['update']) {
+                foreach ($taggings as $tagging) {
+                    if ($tagging->getStatus() !== $rights['status']) {
+                        $data = [
+                            'o:status' => $rights['status'],
+                        ];
+                        $subRequest = new Request(Request::UPDATE, 'taggings');
+                        $subRequest->setId($tagging->getId());
+                        $subRequest->setContent($data);
+                        $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore);
+                        $entityManager->persist($tagging);
+                    }
+                }
+            }
+        }
+
+        $tagsToDelete = $deletedTags
+            ? $api->search('tags', ['name' => $deletedTags])->getContent()
+            : [];
+        if ($rights['delete']) {
+            foreach ($tagsToDelete as $tag) {
+                $query = [
+                    'tag' => $tag->name(),
+                    'resource_id' => $resourceId,
+                ];
+                $taggings = $api
+                    ->search('taggings', $query, ['responseContent' => 'resource'])
+                    ->getContent();
+                foreach ($taggings as $tagging) {
+                    $entityManager->remove($tagging);
+                }
             }
         }
     }

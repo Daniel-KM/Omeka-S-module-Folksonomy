@@ -1,3 +1,38 @@
+@media screen {
+    header nav .tags:before {
+        content:"";
+    }
+    .tags .no-resources:before,
+    #tags .no-resources:before {
+        content:"";
+    }
+    #resource-tags+.no-resources {
+        display:none;
+    }
+    #resource-tags.empty {
+        display:none;
+    }
+    #resource-tags.empty+.no-resources {
+        display:block;
+        padding:0 24px;
+    }
+    #resource-tags.empty+.no-resources:before {
+        content:"";
+    }
+    #resource-tags tr.delete {
+        background-color:#fcc;
+    }
+}
+@media screen and (max-width: 640px) {
+    fieldset.section>#resource-tags.empty+.no-resources {
+        display:none;
+    }
+    fieldset.section.mobile-active>#resource-tags.empty+.no-resources {
+        display:block;
+        margin-top:48px;
+    }
+}
+
 .taggings-list {
   padding: 0;
   margin: 0;

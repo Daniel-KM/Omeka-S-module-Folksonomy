@@ -1,0 +1,33 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+
+// Tags are already sorted.
+$tagsByInitial = [];
+foreach ($tags as $tag) {
+    $initial = mb_substr($tag->name(), 0, 1);
+    $tagsByInitial[$initial][] = $tag;
+}
+?>
+<div id="tag-selector" class='selector sidebar active'>
+    <a href="#" class="mobile-only sidebar-close o-icon-close"><span class="screen-reader-text"><?php echo $this->translate('Close Me'); ?></span></a>
+    <h3><?php echo $this->translate('Click on a tag to add it to the edit panel.'); ?></h3>
+    <input type="text" class="selector-filter" placeholder="<?php echo $escape($this->translate('Filter tags')); ?>">
+    <ul>
+        <li class="total-count-heading"><?php echo $this->translate('All Tags'); ?> (<span class="selector-total-count"><?php echo count($tags); ?></span>)
+            <ul class="selectable-list">
+                <?php foreach ($tagsByInitial as $initial => $tags): ?>
+                    <li class="selector-parent">
+                        <span><?php echo $initial; ?></span>
+                        (<span class="selector-child-count"><?php echo count($tagsByInitial[$initial]); ?></span>)
+                        <ul>
+                        <?php foreach($tags as $tag): ?>
+                            <li class="selector-child" data-child-search="<?php echo $escape($tag->name()); ?>" data-tag-internal-id="<?php echo $escape($tag->internalId()); ?>">
+                                <span><?php echo $escape($tag->name()); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                        </ul>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    </ul>
+</div>
