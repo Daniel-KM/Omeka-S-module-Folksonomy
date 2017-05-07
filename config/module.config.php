@@ -1,9 +1,11 @@
 <?php
+namespace Folksonomy;
+
 return [
     'api_adapters' => [
         'invokables' => [
-            'tags' => 'Folksonomy\Api\Adapter\TagAdapter',
-            'taggings' => 'Folksonomy\Api\Adapter\TaggingAdapter',
+            'tags' => Api\Adapter\TagAdapter::class,
+            'taggings' => Api\Adapter\TaggingAdapter::class,
         ],
     ],
     'entity_manager' => [
@@ -21,30 +23,30 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
-            'tagSelector' => 'Folksonomy\View\Helper\TagSelector',
+            'tagSelector' => View\Helper\TagSelector::class,
         ],
         'factories' => [
-            'tagSelect' => 'Folksonomy\Service\ViewHelper\TagSelectFactory',
+            'tagSelect' => Service\ViewHelper\TagSelectFactory::class,
         ],
     ],
     'block_layouts' => [
         'invokables' => [
-            'tagCloud' => 'Folksonomy\Site\BlockLayout\TagCloud',
+            'tagCloud' => Site\BlockLayout\TagCloud::class,
         ],
     ],
     'navigation_links' => [
         'invokables' => [
-            'browseTags' => 'Folksonomy\Site\Navigation\Link\BrowseTags',
+            'browseTags' => Site\Navigation\Link\BrowseTags::class,
         ],
     ],
     'form_elements' => [
         'invokables' => [
-            'Folksonomy\Form\Config' => 'Folksonomy\Form\Config',
-            'Folksonomy\Form\Element\TagSelect' => 'Folksonomy\Service\Form\Element\TagSelectFactory',
-            'Folksonomy\Form\TagCloudBlock' => 'Folksonomy\Form\TagCloudBlock',
+            'Folksonomy\Form\Config' => Form\Config::class,
+            'Folksonomy\Form\Element\TagSelect' => Service\Form\Element\TagSelectFactory::class,
+            'Folksonomy\Form\TagCloudBlock' => Form\TagCloudBlock::class,
         ],
         'factories' => [
-            'Folksonomy\Form\Tagging' => 'Folksonomy\Service\Form\TaggingFactory',
+            'Folksonomy\Form\Tagging' => Service\Form\TaggingFactory::class,
         ],
     ],
     'navigation' => [
@@ -52,7 +54,7 @@ return [
             [
                 'label' => 'Taggings', // @translate
                 'route' => 'admin/tagging',
-                'resource' => 'Folksonomy\Controller\Admin\Tagging',
+                'resource' => Controller\Admin\Tagging::class,
                 'privilege' => 'browse',
                 'pages' => [
                     [
@@ -69,20 +71,20 @@ return [
     ],
     'controllers' => [
         'invokables' => [
-            'Folksonomy\Controller\Admin\Tagging' => 'Folksonomy\Controller\Admin\TaggingController',
-            'Folksonomy\Controller\Admin\Tag' => 'Folksonomy\Controller\Admin\TagController',
-            'Folksonomy\Controller\Site\Tag' => 'Folksonomy\Controller\Site\TagController',
-            'Folksonomy\Controller\Tagging' => 'Folksonomy\Controller\TaggingController',
-            'Folksonomy\Controller\Tag' => 'Folksonomy\Controller\TagController',
+            'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
+            'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
+            'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
+            'Folksonomy\Controller\Tagging' => Controller\TaggingController::class,
+            'Folksonomy\Controller\Tag' => Controller\TagController::class,
         ],
         'factories' => [
-            'Folksonomy\Controller\Site\Tagging' => 'Folksonomy\Service\Controller\Site\TaggingControllerFactory',
+            'Folksonomy\Controller\Site\Tagging' => Service\Controller\Site\TaggingControllerFactory::class,
         ],
     ],
     'controller_plugins' => [
         'factories' => [
-            'addTags' => 'Folksonomy\Service\ControllerPlugin\AddTagsFactory',
-            'deleteTags' => 'Folksonomy\Service\ControllerPlugin\DeleteTagsFactory',
+            'addTags' => Service\ControllerPlugin\AddTagsFactory::class,
+            'deleteTags' => Service\ControllerPlugin\DeleteTagsFactory::class,
         ],
     ],
     'router' => [

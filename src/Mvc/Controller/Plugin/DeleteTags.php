@@ -17,7 +17,6 @@ class DeleteTags extends AbstractPlugin
     protected $api;
 
     /**
-     *
      * @var Acl
      */
     protected $acl;
