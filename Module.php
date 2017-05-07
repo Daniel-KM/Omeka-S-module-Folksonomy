@@ -63,27 +63,30 @@ class Module extends AbstractModule
         $t = $serviceLocator->get('MvcTranslator');
 
         $sql = <<<'SQL'
-CREATE TABLE IF NOT EXISTS `tag` (
-  `id` int unsigned NOT NULL auto_increment,
-  `text` varchar(255) collate utf8_unicode_ci default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `tagging` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `resource_id` int unsigned NOT NULL,
-    `text` varchar(255) collate utf8_unicode_ci NOT NULL DEFAULT '',
-    `status` enum('proposed', 'allowed', 'approved', 'rejected') NOT NULL,
-    `owner_id` int(10) DEFAULT NULL,
-    `ip` tinytext COLLATE utf8_unicode_ci,
-    `user_agent` tinytext COLLATE utf8_unicode_ci,
-    `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY (`resource_id`),
-    KEY (`name`),
-    KEY (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_389B7835E237E06` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE `tagging` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tag_id` int(11) DEFAULT NULL,
+  `resource_id` int(11) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `owner_tag_resource` (`owner_id`,`tag_id`,`resource_id`),
+  KEY `IDX_A4AED1237B00651C` (`status`),
+  KEY `IDX_A4AED123BAD26311` (`tag_id`),
+  KEY `IDX_A4AED12389329D25` (`resource_id`),
+  KEY `IDX_A4AED1237E3C61F9` (`owner_id`),
+  CONSTRAINT `FK_A4AED1237E3C61F9` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_A4AED12389329D25` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_A4AED123BAD26311` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 SQL;
         $conn = $serviceLocator->get('Omeka\Connection');
         $conn->exec($sql);
@@ -105,8 +108,8 @@ SQL;
     public function uninstall(ServiceLocatorInterface $serviceLocator)
     {
         $sql = <<<'SQL'
-DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS tagging;
+DROP TABLE IF EXISTS tag;
 SQL;
         $conn = $serviceLocator->get('Omeka\Connection');
         $conn->exec($sql);
