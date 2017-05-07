@@ -86,14 +86,22 @@ class TagRepresentation extends AbstractEntityRepresentation
      */
     public function resources()
     {
-        //TODO Check if resources are true resources (item, item set, media).
+        // Note: Use a workaround because the reverse doctrine relation cannot
+        // be set. See the entity.
+        // TODO Fix entities for many to many relations.
         $resources = [];
-        $resourceAdapter = $this->getAdapter('resources');
-        foreach ($this->resource->getResources() as $resourceEntity) {
-            $resources[$resourceEntity->getId()] =
-                $resourceAdapter->getRepresentation($resourceEntity);
+        // $resourceAdapter = $this->getAdapter('resources');
+        // foreach ($this->resource->getResources() as $resourceEntity) {
+        //     $resources[$resourceEntity->getId()] =
+        //         $resourceAdapter->getRepresentation($resourceEntity);
+        // }
+        $taggings = $this->taggings();
+        foreach ($taggings as $tagging) {
+            if ($resource = $tagging->resource()) {
+                $resources[$resource->id()] = $resource;
+            }
         }
-        return $resources;
+        return array_values($resources);
     }
 
     /**
@@ -103,13 +111,22 @@ class TagRepresentation extends AbstractEntityRepresentation
      */
     public function owners()
     {
+        // Note: Use a workaround because the reverse doctrine relation cannot
+        // be set. See the entity.
+        // TODO Fix entities for many to many relations.
         $owners = [];
-        $ownerAdapter = $this->getAdapter('users');
-        foreach ($this->resource->getOwners() as $ownerEntity) {
-            $owners[$ownerEntity->getId()] =
-                $ownerAdapter->getRepresentation($ownerEntity);
+        // $ownerAdapter = $this->getAdapter('users');
+        // foreach ($this->resource->getOwners() as $ownerEntity) {
+        //     $owners[$ownerEntity->getId()] =
+        //         $ownerAdapter->getRepresentation($ownerEntity);
+        // }
+        $taggings = $this->taggings();
+        foreach ($taggings as $tagging) {
+            if ($owner = $tagging->owner()) {
+                $owners[$owner->id()] = $owner;
+            }
         }
-        return $owners;
+        return array_values($owners);
     }
 
     /**

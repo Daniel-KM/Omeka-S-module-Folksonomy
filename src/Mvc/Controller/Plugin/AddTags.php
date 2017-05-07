@@ -42,11 +42,11 @@ class AddTags extends AbstractPlugin
     }
 
     /**
-     * Add tags to a resource.
+     * Add tags to a resource (create tag if needed, then tag the resource).
      *
      * @param Resource $resource
-     * @param array $tags List of tag names to add.
-     * @return array|null List of tag names that were added.
+     * @param array $tags List of tag names to add to the resource.
+     * @return array|null List of tag names that were added to the resource.
      */
     public function __invoke(Resource $resource, array $tags)
     {

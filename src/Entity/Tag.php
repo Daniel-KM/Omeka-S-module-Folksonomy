@@ -52,7 +52,9 @@ class Tag extends AbstractEntity
      */
     protected $taggings;
 
-    /**
+    /* *
+     * @todo A many to many relation requires to set the relation in the core too.
+     *
      * Many Tags have Many Resources.
      * @var Collection
      * @ManyToMany(
@@ -79,7 +81,9 @@ class Tag extends AbstractEntity
      */
     protected $resources;
 
-    /**
+    /* *
+     * @todo A many to many relation requires to set the relation in the core too.
+     *
      * Many Tags have Many Owners.
      * @var Collection
      * @ManyToMany(

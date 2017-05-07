@@ -34,11 +34,11 @@ class DeleteTags extends AbstractPlugin
     }
 
     /**
-     * Add tags to a resource.
+     * Delete tags from a resource. The tags themselves are not deleted.
      *
      * @param Resource $resource
-     * @param array $tags List of tag names to delete.
-     * @return array|null List of tag names that were deleted.
+     * @param array $tags List of tag names to remove from the resource.
+     * @return array|null List of tag names that were removed from the resource.
      */
     public function __invoke(Resource $resource, array $tags)
     {
