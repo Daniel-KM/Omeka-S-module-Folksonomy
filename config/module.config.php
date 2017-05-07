@@ -2,8 +2,8 @@
 return [
     'api_adapters' => [
         'invokables' => [
-            'tags' => 'Tagging\Api\Adapter\TagAdapter',
-            'taggings' => 'Tagging\Api\Adapter\TaggingAdapter',
+            'tags' => 'Folksonomy\Api\Adapter\TagAdapter',
+            'taggings' => 'Folksonomy\Api\Adapter\TaggingAdapter',
         ],
     ],
     'entity_manager' => [
@@ -21,19 +21,19 @@ return [
     ],
     'block_layouts' => [
         'invokables' => [
-            'tagCloud' => 'Tagging\Site\BlockLayout\TagCloud',
+            'tagCloud' => 'Folksonomy\Site\BlockLayout\TagCloud',
         ],
     ],
     'navigation_links' => [
         'invokables' => [
-            'browseTags' => 'Tagging\Site\Navigation\Link\BrowseTags',
+            'browseTags' => 'Folksonomy\Site\Navigation\Link\BrowseTags',
         ],
     ],
     'form_elements' => [
         'invokables' => [
-            'Tagging\Form\Config' => 'Tagging\Form\Config',
-            'Tagging\Form\Tagging' => 'Tagging\Form\Tagging',
-            'Tagging\Form\TagCloudBlock' => 'Tagging\Form\TagCloudBlock',
+            'Folksonomy\Form\Config' => 'Folksonomy\Form\Config',
+            'Folksonomy\Form\Tagging' => 'Folksonomy\Form\Tagging',
+            'Folksonomy\Form\TagCloudBlock' => 'Folksonomy\Form\TagCloudBlock',
         ],
     ],
     'navigation' => [
@@ -41,7 +41,7 @@ return [
             [
                 'label' => 'Taggings', // @translate
                 'route' => 'admin/tagging',
-                'resource' => 'Tagging\Controller\Admin\Tagging',
+                'resource' => 'Folksonomy\Controller\Admin\Tagging',
                 'privilege' => 'browse',
                 'pages' => [
                     [
@@ -58,44 +58,14 @@ return [
     ],
     'controllers' => [
         'invokables' => [
-            'Tagging\Controller\Admin\Tagging' => 'Tagging\Controller\Admin\TaggingController',
-            'Tagging\Controller\Site\Tagging' => 'Tagging\Controller\Site\TaggingController',
+            'Folksonomy\Controller\Admin\Tagging' => 'Folksonomy\Controller\Admin\TaggingController',
+            'Folksonomy\Controller\Admin\Tag' => 'Folksonomy\Controller\Admin\TagController',
+            'Folksonomy\Controller\Site\Tagging' => 'Folksonomy\Controller\Site\TaggingController',
+            'Folksonomy\Controller\Site\Tag' => 'Folksonomy\Controller\Site\TagController',
         ],
     ],
     'router' => [
         'routes' => [
-            'admin' => [
-                'child_routes' => [
-                    'tagging' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/tagging[/:action]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
-                            'defaults' => [
-                                '__NAMESPACE__' => 'Tagging\Controller\Admin',
-                                'controller' => 'Tagging',
-                                'action' => 'browse',
-                            ],
-                        ],
-                    ],
-                    'tags' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/tag[/:action]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
-                            'defaults' => [
-                                '__NAMESPACE__' => 'Tagging\Controller\Admin',
-                                'controller' => 'Tag',
-                                'action' => 'browse',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
             'site' => [
                 'child_routes' => [
                     'tagging' => [
@@ -106,13 +76,13 @@ return [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
                             'defaults' => [
-                                '__NAMESPACE__' => 'Tagging\Controller\Site',
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
                                 'controller' => 'Tagging',
                                 'action' => 'browse',
                             ],
                         ],
                     ],
-                    'tags' => [
+                    'tag' => [
                         'type' => 'Segment',
                         'options' => [
                             'route' => '/tag[/:action]',
@@ -120,7 +90,39 @@ return [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
                             'defaults' => [
-                                '__NAMESPACE__' => 'Tagging\Controller\Site',
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
+                                'controller' => 'Tag',
+                                'action' => 'browse',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'admin' => [
+                'child_routes' => [
+                    'tagging' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/tagging[/:action]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
+                                'controller' => 'Tagging',
+                                'action' => 'browse',
+                            ],
+                        ],
+                    ],
+                    'tag' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/tag[/:action]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
                                 'controller' => 'Tag',
                                 'action' => 'browse',
                             ],

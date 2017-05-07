@@ -1,4 +1,4 @@
-# Translation for the Tagging plugin for Omeka.
+# Translation for the Folksonomy module for Omeka S.
 # Copyright (C) 2011 Roy Rosenzweig Center for History and New Media
 # This file is distributed under the same license as the Omeka package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Tagging\n"
-"Report-Msgid-Bugs-To: http://github.com/Daniel-KM/Tagging/issues\n"
+"Project-Id-Version: Folksonomy\n"
+"Report-Msgid-Bugs-To: http://github.com/Daniel-KM/Omeka-S-module-Folksonomy/issues\n"
 "POT-Creation-Date: 2013-11-25 17:13-0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

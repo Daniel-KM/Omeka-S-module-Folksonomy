@@ -1,10 +1,9 @@
 <?php
-namespace Tagging;
+namespace Folksonomy;
 
-use Omeka\Api\Exception;
 use Omeka\Module\AbstractModule;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
-use Tagging\Form\Config as ConfigForm;
+use Folksonomy\Form\Config as ConfigForm;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\Controller\AbstractController;
@@ -12,16 +11,15 @@ use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Renderer\PhpRenderer;
 
-
 /**
- * Tagging
+ * Folksonomy
  *
- * Allows users to add tags with or without approbation to create a folksonomy.
+ * Add tags and tagging form to any resource to create uncontrolled vocabularies
+ * and tag clouds.
  *
  * @copyright Daniel Berthereau, 2013-2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
-
 class Module extends AbstractModule
 {
     /**
@@ -35,18 +33,18 @@ class Module extends AbstractModule
      * @var array
      */
     protected $settings = [
-        'tagging_form_class' => '',
-        'tagging_max_length_total' => 400,
-        'tagging_max_length_tag' => 40,
-        'tagging_message' => '+',
-        'tagging_legal_text' => '',
+        'folksonomy_form_class' => '',
+        'folksonomy_max_length_total' => 400,
+        'folksonomy_max_length_tag' => 40,
+        'folksonomy_message' => '+',
+        'folksonomy_legal_text' => '',
         // Without roles.
-        'tagging_public_allow_tag' => true,
-        'tagging_public_require_moderation' => true,
+        'folksonomy_public_allow_tag' => true,
+        'folksonomy_public_require_moderation' => true,
         // With roles.
-        'tagging_tag_roles' => [],
-        'tagging_require_moderation_roles' => [],
-        'tagging_moderate_roles' => [],
+        'folksonomy_tag_roles' => [],
+        'folksonomy_require_moderation_roles' => [],
+        'folksonomy_moderate_roles' => [],
     ];
 
     public function getConfig()
@@ -96,7 +94,7 @@ SQL;
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
         ));
         $html .= '</p>';
-        $this->settings['tagging_legal_text'] = $html;
+        $this->settings['folksonomy_legal_text'] = $html;
 
         $settings = $serviceLocator->get('Omeka\Settings');
         foreach ($this->settings as $name => $value) {
@@ -126,14 +124,14 @@ SQL;
             'Omeka\Controller\Admin\Item',
             'view.add.form.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
             }
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.edit.form.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
             }
         );
         // Add the tagging form to the item set add and edit pages.
@@ -141,14 +139,14 @@ SQL;
             'Omeka\Controller\Admin\ItemSet',
             'view.add.form.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
             }
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\ItemSet',
             'view.edit.form.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/tagging-form.phtml');
             }
         );
         // Add the tagging and tag to the item show pages.
@@ -156,14 +154,14 @@ SQL;
             'Omeka\Controller\Admin\Item',
             'view.show.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/show.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/show.phtml');
             }
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Site\Item',
             'view.show.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/site/show.phtml');
+                echo $event->getTarget()->partial('folksonomy/site/show.phtml');
             }
         );
         // Add the tagging and tag to the item set show pages.
@@ -171,22 +169,22 @@ SQL;
             'Omeka\Controller\Admin\ItemSet',
             'view.show.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/admin/show.phtml');
+                echo $event->getTarget()->partial('folksonomy/admin/show.phtml');
             }
         );
         $sharedEventManager->attach(
             'Omeka\Controller\Site\ItemSet',
             'view.show.after',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/site/show.phtml');
+                echo $event->getTarget()->partial('folksonomy/site/show.phtml');
             }
         );
         // Add the tag field to the site's browse page.
         $sharedEventManager->attach(
-            'Tagging\Controller\Site\Index',
+            'Folksonomy\Controller\Site\Index',
             'view.advanced_search',
             function (Event $event) {
-                echo $event->getTarget()->partial('tagging/common/advanced-search.phtml');
+                echo $event->getTarget()->partial('folksonomy/common/advanced-search.phtml');
             }
         );
         // Add the "has_tags" filter to item search.
@@ -201,7 +199,7 @@ SQL;
                     $tagAlias = $itemAdapter->createAlias();
                     $itemAlias = $itemAdapter->getEntityClass();
                     $qb->innerJoin(
-                        'Tagging\Entity\Tag', $tagAlias,
+                        'Folksonomy\Entity\Tag', $tagAlias,
                         'WITH', "$tagAlias.resource_id = $itemAlias.id"
                     );
                 }
@@ -219,19 +217,19 @@ SQL;
                     $tagAlias = $itemSetAdapter->createAlias();
                     $itemSetAlias = $itemSetAdapter->getEntityClass();
                     $qb->innerJoin(
-                        'Tagging\Entity\Tag', $tagAlias,
+                        'Folksonomy\Entity\Tag', $tagAlias,
                         'WITH', "$tagAlias.resource_id = $itemSetAlias.id"
                         );
                 }
             }
         );
-        // Add the Tagging term definition.
+        // Add the Folksonomy term definition.
         $sharedEventManager->attach(
             '*',
             'api.context',
             function (Event $event) {
                 $context = $event->getParam('context');
-                $context['o-module-tagging'] = 'http://omeka.org/s/vocabs/module/tagging#';
+                $context['o-module-folksonomy'] = 'http://omeka.org/s/vocabs/module/folksonomy#';
                 $event->setParam('context', $context);
             }
         );
@@ -372,14 +370,14 @@ SQL;
         $acl->allow(
             null,
             [
-                'Tagging\Controller\Admin\Tagging',
-                'Tagging\Controller\Site\Tagging',
-                'Tagging\Controller\Tagging',
+                'Folksonomy\Controller\Admin\Tagging',
+                'Folksonomy\Controller\Site\Tagging',
+                'Folksonomy\Controller\Tagging',
             ]
         );
         $acl->allow(
             null,
-            'Tagging\Api\Adapter\TaggingAdapter',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
             [
                 'search',
                 'read',
@@ -387,13 +385,13 @@ SQL;
         );
         $acl->allow(
             null,
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             'read'
         );
 
         $acl->allow(
             'researcher',
-            'Tagging\Controller\Admin\Tagging',
+            'Folksonomy\Controller\Admin\Tagging',
             [
                 'index',
                 'search',
@@ -406,7 +404,7 @@ SQL;
 
         $acl->allow(
             'author',
-            'Tagging\Controller\Admin\Tagging',
+            'Folksonomy\Controller\Admin\Tagging',
             [
                 'add',
                 'edit',
@@ -421,7 +419,7 @@ SQL;
         );
         $acl->allow(
             'author',
-            'Tagging\Api\Adapter\TaggingAdapter',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
             [
                 'create',
                 'update',
@@ -430,14 +428,14 @@ SQL;
         );
         $acl->allow(
             'author',
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             [
                 'create',
             ]
         );
         $acl->allow(
             'author',
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             [
                 'update',
                 'delete',
@@ -447,7 +445,7 @@ SQL;
 
         $acl->allow(
             'reviewer',
-            'Tagging\Controller\Admin\Tagging',
+            'Folksonomy\Controller\Admin\Tagging',
             [
                 'add',
                 'edit',
@@ -462,7 +460,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            'Tagging\Api\Adapter\TaggingAdapter',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
             [
                 'create',
                 'update',
@@ -471,7 +469,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             [
                 'create',
                 'update',
@@ -479,7 +477,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             [
                 'delete',
             ],
@@ -488,7 +486,7 @@ SQL;
 
         $acl->allow(
             'editor',
-            'Tagging\Controller\Admin\Tagging',
+            'Folksonomy\Controller\Admin\Tagging',
             [
                 'add',
                 'edit',
@@ -503,7 +501,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            'Tagging\Api\Adapter\TaggingAdapter',
+            'Folksonomy\Api\Adapter\TaggingAdapter',
             [
                 'create',
                 'update',
@@ -512,7 +510,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            'Tagging\Entity\Tagging',
+            'Folksonomy\Entity\Tagging',
             [
                 'create',
                 'update',
@@ -542,7 +540,7 @@ SQL;
     {
         // Don't render the tagging tab if there is no tagging data.
         $resourceJson = $event->getParam('resource')->jsonSerialize();
-        if (!isset($resourceJson['o-module-tagging:tag'])) {
+        if (!isset($resourceJson['o-module-folksonomy:tag'])) {
             return;
         }
 
@@ -603,10 +601,10 @@ SQL;
         $resource = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
         if (isset($this->cache['taggings'][$resource->id()])) {
-            $jsonLd['o-module-tagging:tagging'] = $this->cache['taggings'][$resource->id()];
+            $jsonLd['o-module-folksonomy:tagging'] = $this->cache['taggings'][$resource->id()];
         }
         if (isset($this->cache['tags'][$resource->id()])) {
-            $jsonLd['o-module-tagging:tag'] = $this->cache['tags'][$resource->id()];
+            $jsonLd['o-module-folksonomy:tag'] = $this->cache['tags'][$resource->id()];
         }
         $event->setParam('jsonLd', $jsonLd);
     }
@@ -621,12 +619,12 @@ SQL;
         $resourceAdapter = $event->getTarget();
         $request = $event->getParam('request');
 
-        if (!$resourceAdapter->shouldHydrate($request, 'o-module-tagging:tagging')) {
+        if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tagging')) {
             return;
         }
 
         $taggingAdapter = $resourceAdapter->getAdapter('taggings');
-        $taggingData = $request->getValue('o-module-tagging:tagging', []);
+        $taggingData = $request->getValue('o-module-folksonomy:tagging', []);
 
         $taggingId = null;
         $tags = null;
@@ -634,10 +632,10 @@ SQL;
         if (isset($taggingData['o:id']) && is_numeric($taggingData['o:id'])) {
             $taggingId = $taggingData['o:id'];
         }
-        if (isset($taggingData['o-module-tagging:tag'])
-            && '' !== trim($taggingData['o-module-tagging:tag'])
+        if (isset($taggingData['o-module-folksonomy:tag'])
+            && '' !== trim($taggingData['o-module-folksonomy:tag'])
         ) {
-            $tags = $taggingData['o-module-tagging:tag'];
+            $tags = $taggingData['o-module-folksonomy:tag'];
         }
 
         if (null === $tags) {
@@ -663,7 +661,7 @@ SQL;
                 // Create tagging
                 $subRequest = new \Omeka\Api\Request('create', 'taggings');
                 $subRequest->setContent($taggingData);
-                $tagging = new \Tagging\Entity\Tagging;
+                $tagging = new \Folksonomy\Entity\Tagging;
                 $tagging->setItem($event->getParam('entity'));
                 $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
                 $taggingsAdapter->getEntityManager()->persist($tagging);
@@ -681,7 +679,7 @@ SQL;
         $resourceAdapter = $event->getTarget();
         $request = $event->getParam('request');
 
-        if (!$resourceAdapter->shouldHydrate($request, 'o-module-tagging:tag')) {
+        if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tag')) {
             return;
         }
 
@@ -691,7 +689,7 @@ SQL;
         $retainTagIds = [];
 
         // Create/update tags passed in the request.
-        foreach ($request->getValue('o-module-tagging:tag', []) as $tagData) {
+        foreach ($request->getValue('o-module-folksonomy:tag', []) as $tagData) {
             if (isset($tagData['o:id'])) {
                 $subRequest = new \Omeka\Api\Request('update', 'tags');
                 $subRequest->setId($tagData['o:id']);
@@ -702,7 +700,7 @@ SQL;
             } else {
                 $subRequest = new \Omeka\Api\Request('create', 'tags');
                 $subRequest->setContent($tagData);
-                $tag = new \Tagging\Entity\Tag;
+                $tag = new \Folksonomy\Entity\Tag;
                 $tag->setResource($resource);
                 $tagAdapter->hydrateEntity($subRequest, $tag, new \Omeka\Stdlib\ErrorStore);
                 $entityManager->persist($tag);
@@ -712,7 +710,7 @@ SQL;
         // Delete existing tags not passed in the request.
         $existingTags = [];
         if ($resource->getId()) {
-            $dql = 'SELECT tags FROM Tagging\Entity\Tag tags INDEX BY tags.id WHERE tags.resource_id = ?1';
+            $dql = 'SELECT tags FROM Folksonomy\Entity\Tag tags INDEX BY tags.id WHERE tags.resource_id = ?1';
             $query = $entityManager->createQuery($dql)->setParameter(1, $resource->getId());
             $existingTags = $query->getResult();
         }

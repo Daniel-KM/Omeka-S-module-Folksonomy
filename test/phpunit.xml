@@ -7,8 +7,8 @@
     backupGlobals="false"
     >
     <testsuites>
-        <testsuite name="Tagging">
-            <directory>./TaggingTest</directory>
+        <testsuite name="Folksonomy">
+            <directory>./FolksonomyTest</directory>
         </testsuite>
     </testsuites>
 </phpunit>
