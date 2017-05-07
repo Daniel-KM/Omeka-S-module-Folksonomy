@@ -1,0 +1,114 @@
+<?php
+// Inspired from the function tag_cloud() of Omeka Classic.
+
+$this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
+$escape = $this->plugin('escapeHtml');
+
+if (!empty($tags) || is_null($tags)) {
+    // Set default values.
+    $resourceName = empty($resourceName) ? '' : $resourceName;
+    $statuses = isset($statuses) ? $statuses : ['allowed', 'approved'];
+    $orderBy = empty($orderBy) ? '' : $orderBy;
+    $usedOnly = !empty($usedOnly);
+    // Browse resources or media are not supported.
+    $link = (empty($link) || in_array($resourceName, ['resources', 'media'])) ? null : $link;
+    $maxClasses = isset($maxClasses) ? $maxClasses : 9;
+    $tagNumbers = empty($tagNumbers) ? false : $tagNumbers;
+    $slug = $this->params()->fromRoute('site-slug');
+
+    $tagNames = $tags
+        ? array_map(function ($v) { return is_object($v) ? $v->name() : $v; }, $tags)
+        : [];
+
+    $tags = $this->tagCount($tagNames, $resourceName, $statuses, $orderBy, $usedOnly);
+}
+
+if (empty($tags)): ?>
+<div class="no-resources">
+    <p><?php echo $this->translate('No tags are available.'); ?></p>
+</div>
+<?php else: ?>
+<div class="hTagcloud">
+    <ul class="popularity">
+    <?php
+    // Get the largest value in the tags array.
+    $largest = max(array_map(function ($v) { return $v['count']; }, $tags));
+    if ($maxClasses > $largest ) {
+        $maxClasses = $largest;
+    }
+
+    // Define the base of urls to avoid to repeat the whole process of url building.
+    $urls = [];
+    if ($link) {
+        $url = $this->url(
+            'site/resource',
+            ['site-slug' => $slug, 'controller' => '__OMEKAS_RESOURCENAME__', 'action' => 'browse'],
+            ['query' => ['tag' => '__FOLKSONOMY_TAGNAME__']]
+        );
+        // Resources and media browse are not supported.
+        // $urls['resources'] = str_replace('__OMEKAS_RESOURCENAME__', 'resource', $url);
+        $urls['resources'] = '';
+        $urls['item_sets'] = str_replace('__OMEKAS_RESOURCENAME__', 'item-set', $url);
+        $urls['items'] = str_replace('__OMEKAS_RESOURCENAME__', 'item', $url);
+        // $urls['media'] = str_replace('__OMEKAS_RESOURCENAME__', 'media', $url);
+        $urls['media'] = '';
+    }
+
+    foreach( $tags as $tag):
+        $size = $largest > 1
+            ? (int) (($tag['count'] * $maxClasses) / ($largest - 1))
+            : $tag['count'] == 1 ? 0 : -1;
+        $class = $size < 0 ? 'unused' : ($size ? str_repeat('v', $size) . '-' : '') . 'popular';
+
+        $mainUrl = $link && $resourceName && !empty($urls[$resourceName])
+            ? $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls[$resourceName]))
+            : '';
+
+        $tagHtml = '';
+        if ($tagNumbers):
+            if ($link && !$resourceName):
+                $tagHtml .= sprintf('<a href="%s">%s</a>',
+                    $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['item_sets'])),
+                    '<span class="item-sets count">' . $tag['item_sets'] . '</span>'
+                );
+                $tagHtml .= sprintf('<a href="%s">%s</a>',
+                    $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['items'])),
+                    '<span class="items count">' . $tag['items'] . '</span>'
+                );
+                $tagHtml .= '<span class="media count">' . $tag['media'] . '</span>';
+            else:
+                $tagHtml .= '<span class="' . $resourceName . ' count">' . $tag['count'] . '</span>';
+            endif;
+        elseif ($link && !$resourceName):
+            $tagHtml .= sprintf('<a href="%s">%s</a>',
+                $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['item_sets'])),
+                '<span class="item-sets"></span>'
+            );
+            $tagHtml .= sprintf('<a href="%s">%s</a>',
+                $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['items'])),
+                '<span class="items"></span>'
+            );
+            $tagHtml .= '<span class="media"></span>';
+        endif;
+    ?>
+        <li class="<?php echo $class; ?>">
+            <?php
+            if ($mainUrl):
+                echo '<a href="' . $mainUrl . '">';
+            endif;
+            if ($tagNumbers == 'before'):
+                echo $tagHtml;
+            endif;
+            echo $escape($tag['name']);
+            if ($tagHtml || $tagNumbers == 'after'):
+                echo $tagHtml;
+            endif;
+            if ($mainUrl):
+                echo '</a>';
+            endif;
+            ?>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>

@@ -26,6 +26,7 @@ return [
             'tagSelector' => View\Helper\TagSelector::class,
         ],
         'factories' => [
+            'tagCount' => Service\ViewHelper\TagCountFactory::class,
             'tagSelect' => Service\ViewHelper\TagSelectFactory::class,
         ],
     ],
@@ -113,6 +114,18 @@ return [
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
+                                'controller' => 'Tag',
+                                'action' => 'browse',
+                            ],
+                        ],
+                    ],
+                    // A simple common alias to browse all tags.
+                    'tags' => [
+                        'type' => 'Literal',
+                        'options' => [
+                            'route' => '/tags',
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
                                 'controller' => 'Tag',
