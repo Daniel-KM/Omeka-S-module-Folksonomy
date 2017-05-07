@@ -25,4 +25,17 @@ class TagController extends AbstractActionController
         $view->setVariable('tags', $tags);
         return $view;
     }
+
+    public function browseResourcesAction()
+    {
+        return $this->redirect()->toRoute(
+            'site/resource',
+            [
+                'controller' => $this->params('resource', 'item'),
+                'action' => 'browse',
+                'site-slug' => $this->params('site-slug'),
+            ],
+            ['query' => ['tag' => $this->params('id', '')]]
+        );
+    }
 }

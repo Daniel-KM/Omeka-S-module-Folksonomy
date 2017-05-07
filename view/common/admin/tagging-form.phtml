@@ -26,15 +26,14 @@ $tagTemplate = '
         </tr>
         </thead>
         <tbody>
-        <?php if ($resource && $tags): ?>
+        <?php
+        if ($resource && $tags):
+            $resourceName = $resource->getControllerName();
+            $resourceName = in_array($resourceName, ['item-set', 'item', 'media']) ? $resourceName : null;
+        ?>
         <?php foreach ($tags as $tag): ?>
         <tr>
-            <td>
-                <?php echo $this->hyperlink(
-                    $tag->name(),
-                    $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
-                ); ?>
-            </td>
+            <td><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></td>
             <td>
                 <ul class="actions">
                     <li>

@@ -5,11 +5,7 @@
         <h4><?php echo $escape($this->translate('Tag')); ?></h4>
         <div class="value">
         <?php if ($tag = $tagging->tag()): ?>
-            <span class="tag-name"><?php
-            echo $this->hyperlink(
-                $tag->name(),
-                $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
-            ); ?></span>
+            <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
             <span class="tag-internal-id">(#<?php echo $tag->internalId(); ?>)</span>
         <?php else: ?>
             <span class="tag-name no-tag"><?php echo $this->translate('[Removed]'); ?></span>

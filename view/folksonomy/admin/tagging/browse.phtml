@@ -125,12 +125,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
                     <?php endif; ?>
                 </ul>
                 <?php if ($tag): ?>
-                <span class="tag-name"><?php
-                    echo $this->hyperlink(
-                        $tag->name(),
-                        $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
-                    );
-                ?></span>
+                <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
                 <span class="is-public-or-not <?php if (!$tagging->isPublic()) echo 'o-icon-private'; ?>"></span>
                 <?php else: ?>
                 <span class="tag-name no-tag">[<?php echo $this->translate('Removed'); ?>]</span>

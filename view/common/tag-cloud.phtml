@@ -40,17 +40,21 @@ if (empty($tags)): ?>
     // Define the base of urls to avoid to repeat the whole process of url building.
     $urls = [];
     if ($link) {
-        $url = $this->url(
-            'site/resource',
-            ['site-slug' => $slug, 'controller' => '__OMEKAS_RESOURCENAME__', 'action' => 'browse'],
-            ['query' => ['tag' => '__FOLKSONOMY_TAGNAME__']]
-        );
-        // Resources and media browse are not supported.
-        // $urls['resources'] = str_replace('__OMEKAS_RESOURCENAME__', 'resource', $url);
+        // Resources are not supported.
         $urls['resources'] = '';
-        $urls['item_sets'] = str_replace('__OMEKAS_RESOURCENAME__', 'item-set', $url);
-        $urls['items'] = str_replace('__OMEKAS_RESOURCENAME__', 'item', $url);
-        // $urls['media'] = str_replace('__OMEKAS_RESOURCENAME__', 'media', $url);
+        $urls['item_sets'] = $this->url(
+            'site/tag-resource',
+            ['site-slug' => $slug, 'resource' => 'item-set', 'id' => '__FOLKSONOMY_TAGNAME__']
+        );
+        $urls['items'] = $this->url(
+            'site/tag-resource',
+            ['site-slug' => $slug, 'resource' => 'item', 'id' => '__FOLKSONOMY_TAGNAME__']
+        );
+        // Media are not supported in public views.
+        // $urls['media'] = $this->url(
+        //     'site/tag-resource',
+        //     ['site-slug' => $slug, 'resource' => 'media', 'id' => '__FOLKSONOMY_TAGNAME__']
+        // );
         $urls['media'] = '';
     }
 
@@ -67,32 +71,27 @@ if (empty($tags)): ?>
         $tagHtml = '';
         if ($tagNumbers):
             if ($link && !$resourceName):
-                $tagHtml .= sprintf('<a href="%s">%s</a>',
-                    $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['item_sets'])),
-                    '<span class="item-sets count">' . $tag['item_sets'] . '</span>'
-                );
-                $tagHtml .= sprintf('<a href="%s">%s</a>',
-                    $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['items'])),
-                    '<span class="items count">' . $tag['items'] . '</span>'
-                );
+                foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media' */] as $resName => $resClass):
+                    $tagHtml .= sprintf('<a href="%s">%s</a>',
+                        $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls[$resName])),
+                        '<span class="' . $resClass. ' count">' . $tag[$resName] . '</span>'
+                    );
+                endforeach;
                 $tagHtml .= '<span class="media count">' . $tag['media'] . '</span>';
             else:
                 $tagHtml .= '<span class="' . $resourceName . ' count">' . $tag['count'] . '</span>';
             endif;
         elseif ($link && !$resourceName):
-            $tagHtml .= sprintf('<a href="%s">%s</a>',
-                $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['item_sets'])),
-                '<span class="item-sets"></span>'
-            );
-            $tagHtml .= sprintf('<a href="%s">%s</a>',
-                $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls['items'])),
-                '<span class="items"></span>'
-            );
+            foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media'*/] as $resName=> $resClass):
+                $tagHtml .= sprintf('<a href="%s">%s</a>',
+                    $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($tag['name']), $urls[$resName])),
+                    '<span class="' . $resClass. '"></span>'
+                );
+            endforeach;
             $tagHtml .= '<span class="media"></span>';
         endif;
     ?>
-        <li class="<?php echo $class; ?>">
-            <?php
+        <li class="<?php echo $class; ?>"><?php
             if ($mainUrl):
                 echo '<a href="' . $mainUrl . '">';
             endif;
@@ -106,8 +105,7 @@ if (empty($tags)): ?>
             if ($mainUrl):
                 echo '</a>';
             endif;
-            ?>
-        </li>
+    ?></li>
     <?php endforeach; ?>
     </ul>
 </div>

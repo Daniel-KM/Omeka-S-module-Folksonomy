@@ -156,4 +156,79 @@ class TagRepresentation extends AbstractEntityRepresentation
         $result = $stmt->fetch(\PDO::FETCH_COLUMN);
         return $result;
     }
+
+    public function adminUrl($action = null, $canonical = false)
+    {
+        $url = $this->getViewHelper('Url');
+        return $url(
+            'admin/tag-id',
+            [
+                'action' => $action ?: 'browse-resources',
+                'id' => $this->name(),
+            ],
+            ['force_canonical' => $canonical]
+        );
+    }
+
+    public function siteUrl($siteSlug = null, $canonical = false)
+    {
+        if (!$siteSlug) {
+            $siteSlug = $this->getServiceLocator()->get('Application')
+                ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
+        }
+        $url = $this->getViewHelper('Url');
+        return $url(
+            'site/tag-id',
+            [
+                'site-slug' => $siteSlug,
+                'id' => $this->name(),
+            ],
+            ['force_canonical' => $canonical]
+        );
+    }
+
+    /**
+     * Return the public or admin URL to the resouce browse page for this tag.
+     *
+     * Similar to url(), but with the type of resource.
+     *
+     * @param string|null $resource May be "resource" (unsupported), "item-set",
+     * "item" or "media" (unsupported in public view).
+     * @param bool $canonical Whether to return an absolute URL
+     * @return string
+     */
+    public function urlResources($resource = null, $canonical = false)
+    {
+        $routeMatch = $this->getServiceLocator()->get('Application')
+            ->getMvcEvent()->getRouteMatch();
+        $url = null;
+        if ($routeMatch->getParam('__ADMIN__')) {
+            $url = $this->getViewHelper('Url');
+            if (is_null($resource)) {
+                $resource = 'item';
+            }
+            return $url(
+                'admin/tag-resource',
+                [
+                    'id' => $this->name(),
+                    'resource' => $resource,
+                ],
+                ['force_canonical' => $canonical]
+            );
+        } elseif ($routeMatch->getParam('__SITE__')) {
+            $siteSlug = $this->getServiceLocator()->get('Application')
+                ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
+            $url = $this->getViewHelper('Url');
+            return $url(
+                is_null($resource) ? 'site/tag-id' : 'site/tag-resource',
+                [
+                    'site-slug' => $siteSlug,
+                    'id' => $this->name(),
+                    'resource' => $resource,
+                ],
+                ['force_canonical' => $canonical]
+            );
+        }
+        return $url;
+    }
 }

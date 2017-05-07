@@ -1,13 +1,12 @@
-<?php if ($tags): ?>
+<?php
+if ($tags):
+    // In public view, only items (default) and item sets are available.
+    $resourceName = $resource->getControllerName() == 'item-set' ? 'item-set' : null;
+?>
 <div class="property tags">
     <h4><?php echo $this->translate('Tags'); ?></h4>
     <?php foreach ($tags as $tag): ?>
-    <div class="value tag">
-        <?php echo $this->hyperlink(
-            $tag->name(),
-            $this->url('admin/default', ['controller' => 'item', 'action' => 'browse'], ['query' => ['tag' => $tag->name()]])
-        ); ?>
-    </div>
+    <div class="value tag"><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></div>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>

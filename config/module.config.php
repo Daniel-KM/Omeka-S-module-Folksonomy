@@ -54,8 +54,9 @@ return [
         'AdminModule' => [
             [
                 'label' => 'Folksonomy', // @translate
-                'route' => 'admin/tagging',
-                'resource' => Controller\Admin\Tagging::class,
+                'route' => 'admin/tag',
+                'action' => 'browse',
+                'resource' => Controller\Admin\Tag::class,
                 'privilege' => 'browse',
                 'useRouteMatch' => true,
                 'pages' => [
@@ -95,32 +96,43 @@ return [
         'routes' => [
             'site' => [
                 'child_routes' => [
-                    'tagging-id' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/tagging/:resource-id[/:action]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
-                            'defaults' => [
-                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tagging',
-                                'action' => 'add',
-                                'resource-id' => '\d+',
-                            ],
-                        ],
-                    ],
                     'tag' => [
-                        'type' => 'Segment',
+                        'type' => 'Literal',
                         'options' => [
-                            'route' => '/tag[/:action]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
+                            'route' => '/tag',
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
                                 'controller' => 'Tag',
                                 'action' => 'browse',
+                            ],
+                        ],
+                    ],
+                    'tag-id' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            // There is no action in public views, else force
+                            // the ending "/" or make the action unskippable.
+                            'route' => '/tag/:id',
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
+                                'controller' => 'Tag',
+                                'action' => 'browse-resources',
+                                'resource' => 'item',
+                            ],
+                        ],
+                    ],
+                    'tag-resource' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/:resource/tag/:id',
+                            'constraints' => [
+                                'resource' => 'item|item-set|media|resource',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
+                                'controller' => 'Tag',
+                                'resource' => 'item',
+                                'action' => 'browse-resources',
                             ],
                         ],
                     ],
@@ -136,10 +148,70 @@ return [
                             ],
                         ],
                     ],
+                    'tagging-id' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/tagging/:resource-id[/:action]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Site',
+                                'controller' => 'Tagging',
+                                'action' => 'add',
+                                'resource-id' => '\d+',
+                            ],
+                        ],
+                    ],
                 ],
             ],
             'admin' => [
                 'child_routes' => [
+                    'tag' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/tag[/:action]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
+                                'controller' => 'Tag',
+                                'action' => 'browse',
+                            ],
+                        ],
+                    ],
+                    'tag-id' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            // The action is not skippable in order to use name.
+                            // Require ending "/" when there is no action.
+                            'route' => '/tag/:id/:action',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
+                                'controller' => 'Tag',
+                                'action' => 'browse-resources',
+                            ],
+                        ],
+                    ],
+                    'tag-resource' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/:resource/tag/:id',
+                            'constraints' => [
+                                'resource' => 'item|item-set|media|resource',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
+                                'controller' => 'Tag',
+                                'resource' => 'item',
+                                'action' => 'browse-resources',
+                            ],
+                        ],
+                    ],
                     'tagging' => [
                         'type' => 'Segment',
                         'options' => [
@@ -166,20 +238,6 @@ return [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
                                 'controller' => 'Tagging',
                                 'action' => 'show',
-                            ],
-                        ],
-                    ],
-                    'tag' => [
-                        'type' => 'Segment',
-                        'options' => [
-                            'route' => '/tag[/:action]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ],
-                            'defaults' => [
-                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tag',
-                                'action' => 'browse',
                             ],
                         ],
                     ],
