@@ -1,28 +1,112 @@
 @media screen {
-    header nav .tags:before {
+    header nav .tags:before,
+    header nav .taggings:before {
         content:"";
     }
     .tags .no-resources:before,
-    #tags .no-resources:before {
+    #tags .no-resources:before,
+    .taggings .no-resources:before,
+    #taggings .no-resources:before {
         content:"";
     }
-    #resource-tags+.no-resources {
+    #resource-tags+.no-resources,
+    #resource-taggings+.no-resources {
         display:none;
     }
-    #resource-tags.empty {
+    #resource-tags.empty,
+    #resource-taggings.empty {
         display:none;
     }
-    #resource-tags.empty+.no-resources {
+    #resource-tags.empty+.no-resources,
+    #resource-taggings.empty+.no-resources {
         display:block;
         padding:0 24px;
     }
-    #resource-tags.empty+.no-resources:before {
+    #resource-tags.empty+.no-resources:before,
+    #resource-taggings.empty+.no-resources:before {
         content:"";
     }
-    #resource-tags tr.delete {
+    #resource-tags tr.delete,
+    #resource-taggings tr.delete {
         background-color:#fcc;
     }
+
+    .taggings .resource-details .tag-internal-id {
+        font-size: 0.7em;
+    }
+
+    .tags.browse .batch-edit th:first-child,
+    .tags.browse .batch-edit td:first-child,
+    .taggings.browse .batch-edit th:first-child,
+    .taggings.browse .batch-edit td:first-child {
+        width: 32px;
+    }
+
+    .taggings.browse table:not(.batch-edit) th:first-child,
+    .taggings.browse table:not(.batch-edit) td:first-child,
+    .taggings.browse .batch-edit th:nth-child(2),
+    .taggings.browse .batch-edit td:nth-child(2) {
+        max-width: 40%;
+    }
+    .taggings.browse td .resource-name {
+        display: inline-block;
+        vertical-align: bottom;
+        margin-left: .5em;
+        opacity: .5;
+    }
+
+    .taggings .status-toggle::before,
+    .taggings .resource-name::before {
+        display: inline-block;
+        font-family:"FontAwesome";
+        padding-left: 3px;
+        padding-right: 3px;
+        width: 24px;
+    }
+    .taggings .resource-name.resource::before {
+        content: "";
+    }
+    .taggings .resource-name.no-resource::before {
+        content: "❌";
+    }
+    .taggings .resource-name.item-set::before {
+        content: "";
+    }
+    .taggings .resource-name.item::before {
+        content: "";
+    }
+    .taggings .resource-name.media::before {
+        content: "";
+    }
+
+    .taggings .o-icon-proposed::before {
+        color: #FFA500;
+        content: "";
+    }
+    .taggings .o-icon-allowed::before {
+        color: #FFA500;
+        content: "";
+    }
+    .taggings .o-icon-approved::before {
+        color: #00FF00;
+        content: "";
+    }
+    .taggings .o-icon-rejected::before {
+        color: #FF0000;
+        content: "";
+    }
+    .taggings .o-icon-undefined::before {
+        color: #FF0000;
+        content: "";
+    }
+    .taggings .o-icon-transmit::before {
+        background: url('../img/waiting-mini.gif') no-repeat scroll 12px 3px transparent !important;
+        color: #000000;
+        content: "";
+        cursor: progress;
+    }
 }
+
 @media screen and (max-width: 640px) {
     fieldset.section>#resource-tags.empty+.no-resources {
         display:none;
@@ -31,44 +115,4 @@
         display:block;
         margin-top:48px;
     }
-}
-
-.taggings-list {
-  padding: 0;
-  margin: 0;
-}
-.taggings-list li {
-    list-style: none outside none;
-    padding-left: 10px;
-    display: inline-block;
-    font-family: "Arvo",serif;
-    margin: 0;
-    padding: 4px 4px 4px 4px;
-}
-
-a.tagging.status {
-    position:relative;
-    padding-left: 20px;
-    margin-left: 3px;
-    margin-right: 3px;
-    cursor: pointer;
-}
-a.tagging.toggle-status.proposed {
-    background: url('../img/silk-icons/error.png') no-repeat scroll 0 0 transparent;
-}
-a.tagging.toggle-status.allowed {
-    background: url('../img/silk-icons/note_error.png') no-repeat scroll 0 0 transparent;
-}
-a.tagging.toggle-status.approved {
-    background: url('../img/silk-icons/tick.png') no-repeat scroll 0 0 transparent;
-}
-a.tagging.toggle-status.rejected {
-    background: url('../img/silk-icons/cancel.png') no-repeat scroll 0 0 transparent;
-}
-a.tagging.transmit {
-    background: url('../img/waiting-mini.gif') no-repeat scroll 0 0 transparent !important;
-}
-.action {
-    color: #338899;
-    cursor: pointer;
 }

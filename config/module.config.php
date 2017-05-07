@@ -53,18 +53,21 @@ return [
     'navigation' => [
         'AdminModule' => [
             [
-                'label' => 'Taggings', // @translate
+                'label' => 'Folksonomy', // @translate
                 'route' => 'admin/tagging',
                 'resource' => Controller\Admin\Tagging::class,
                 'privilege' => 'browse',
+                'useRouteMatch' => true,
                 'pages' => [
                     [
-                        'route' => 'admin/tagging',
-                        'visible' => false,
+                        'label' => 'Tags', // @translate
+                        'route' => 'admin/tag',
+                        'visible' => true,
                     ],
                     [
-                        'route' => 'admin/tag',
-                        'visible' => false,
+                        'label' => 'Taggings', // @translate
+                        'route' => 'admin/tagging',
+                        'visible' => true,
                     ],
                 ],
             ],
@@ -72,8 +75,8 @@ return [
     ],
     'controllers' => [
         'invokables' => [
-            'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
             'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
+            'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
             'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
             'Folksonomy\Controller\Tagging' => Controller\TaggingController::class,
             'Folksonomy\Controller\Tag' => Controller\TagController::class,
@@ -151,6 +154,21 @@ return [
                             ],
                         ],
                     ],
+                    'tagging-id' => [
+                        'type' => 'Segment',
+                        'options' => [
+                            'route' => '/tagging/:id[/:action]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'id' => '\d+',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
+                                'controller' => 'Tagging',
+                                'action' => 'show',
+                            ],
+                        ],
+                    ],
                     'tag' => [
                         'type' => 'Segment',
                         'options' => [
@@ -178,5 +196,11 @@ return [
                 'text_domain' => null,
             ],
         ],
+    ],
+    'js_translate_strings' => [
+        'Proposed', // @translate
+        'Allowed', // @translate
+        'Approved', // @translate
+        'Rejected', // @translate
     ],
 ];

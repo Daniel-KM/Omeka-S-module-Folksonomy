@@ -80,7 +80,13 @@ class TaggingRepresentation extends AbstractEntityRepresentation
         $status = $this->resource->getStatus();
         return isset($this->statusLabels[$status])
             ? $this->statusLabels[$status]
-            : 'Unknown'; // @translate
+            : 'Undefined'; // @translate
+    }
+
+    public function isPublic()
+    {
+        return in_array($this->status(), [Tagging::STATUS_ALLOWED, Tagging::STATUS_APPROVED])
+            && !empty($this->resource->getTag());
     }
 
     /**

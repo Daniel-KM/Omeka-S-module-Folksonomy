@@ -22,14 +22,23 @@ class TaggingAdapter extends AbstractEntityAdapter
     protected $sortFields = [
         'id' => 'id',
         'status' => 'status',
-        // TODO Sort tagging by tag name.
-        // 'tag' => 'tag'
         'tag_id' => 'tag',
         'resource_id' => 'resource',
         'item_set_id' => 'resource',
         'item_id' => 'resource',
         'media_id' => 'resource',
         'owner_id' => 'owner',
+        // For info.
+        // 'tag_name' => 'tag',
+        // 'owner_name' => 'owner',
+        // // 'resource_title' => 'resource',
+    ];
+
+    protected $statuses = [
+        Tagging::STATUS_PROPOSED,
+        Tagging::STATUS_ALLOWED,
+        Tagging::STATUS_APPROVED,
+        Tagging::STATUS_REJECTED,
     ];
 
     public function getResourceName()
@@ -50,42 +59,43 @@ class TaggingAdapter extends AbstractEntityAdapter
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
     ) {
-        // The owner, tag and resource can be null.
         $data = $request->getContent();
-        $this->hydrateOwner($request, $entity);
 
-        if (isset($data['o:status'])
-            && $this->shouldHydrate($request, 'o:status')
-        ) {
+        // The owner, tag and resource can be null.
+        if (Request::CREATE == $request->getOperation()) {
             $entity->setStatus($data['o:status']);
-        }
 
-        if ($this->shouldHydrate($request, 'o-module-folksonomy:tag')) {
+            $this->hydrateOwner($request, $entity);
+
             if (isset($data['o-module-folksonomy:tag'])) {
                 if (is_object($data['o-module-folksonomy:tag'])) {
                     $tag = $data['o-module-folksonomy:tag'] instanceof Tag
                         ? $data['o-module-folksonomy:tag']
                         : null;
-                } else {
+                } elseif (strlen($data['o-module-folksonomy:tag'])) {
                     $tag = $this->getAdapter('tags')
                         ->findEntity(['name' => $data['o-module-folksonomy:tag']]);
+                } else {
+                    $tag = null;
                 }
-            } else {
-                $tag = null;
+                $entity->setTag($tag);
             }
-            $entity->setTag($tag);
+
+            if (isset($data['o:resource']['o:id'])) {
+                if (is_numeric($data['o:resource']['o:id'])) {
+                    $resource = $this->getAdapter('resources')
+                        ->findEntity($data['o:resource']['o:id']);
+                } else {
+                    $resource = null;
+                }
+                $entity->setResource($resource);
+            }
         }
 
-        if ($this->shouldHydrate($request, 'o:resource')) {
-            if (isset($data['o:resource']['o:id'])
-                && is_numeric($data['o:resource']['o:id'])
-            ) {
-                $resource = $this->getAdapter('resources')
-                    ->findEntity($data['o:resource']['o:id']);
-            } else {
-                $resource = null;
+        if (Request::UPDATE == $request->getOperation()) {
+            if ($this->shouldHydrate($request, 'o:status')) {
+                $entity->setStatus($data['o:status']);
             }
-            $entity->setResource($resource);
         }
     }
 
@@ -93,28 +103,34 @@ class TaggingAdapter extends AbstractEntityAdapter
     {
         $data = $request->getContent();
         if (isset($data['o:status'])) {
-            $statuses = [
-                Tagging::STATUS_PROPOSED,
-                Tagging::STATUS_ALLOWED,
-                Tagging::STATUS_APPROVED,
-                Tagging::STATUS_REJECTED,
-            ];
-            if (!in_array($data['o:status'], $statuses)) {
+            $this->validateStatus($data['o:status'], $errorStore);
+        }
+        if (Request::CREATE == $request->getOperation()) {
+            if (!isset($data['o-module-folksonomy:tag'])
+                || (is_string($data['o-module-folksonomy:tag']) && trim($data['o-module-folksonomy:tag']) === '')
+            ) {
                 $errorStore->addError(
-                    'o:status',
-                    sprintf('The status "%s" is unknown.', $data['o:status'])); // @translate
+                    'o-module-folksonomy:tag',
+                    'The name of the tag must be set.'); // @translate
+            }
+            if (empty($data['o:resource'])) {
+                $errorStore->addError(
+                    'o:resource',
+                    'The tagged resource must be set.'); // @translate
             }
         }
     }
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
+        $this->validateStatus($entity->getStatus(), $errorStore);
+
         // Validate uniqueness.
-        $owner = $entity->getOwner();
         $tag = $entity->getTag();
+        $owner = $entity->getOwner();
         $resource = $entity->getResource();
-        if ($owner && $owner instanceof User
-            && $tag && $tag instanceof Tag
+        if ($tag && $tag instanceof Tag
+            && $owner && $owner instanceof User
             && $resource && $resource instanceof Resource
         ) {
             $criteria = [
@@ -128,6 +144,15 @@ class TaggingAdapter extends AbstractEntityAdapter
                     $owner->getId(), $tag->getName(), $resource->getId()
                 ));
             }
+        }
+    }
+
+    protected function validateStatus($status, ErrorStore $errorStore)
+    {
+        if (!in_array($status, $this->statuses)) {
+            $errorStore->addError(
+                'o:status',
+                sprintf('The status "%s" is unknown.', $status)); // @translate
         }
     }
 
@@ -175,6 +200,32 @@ class TaggingAdapter extends AbstractEntityAdapter
         ] as $queryKey => $column) {
             if (array_key_exists($queryKey, $query)) {
                 $this->buildQueryIds($qb, $query[$queryKey], $column, 'id');
+            }
+        }
+    }
+
+    public function sortQuery(QueryBuilder $qb, array $query)
+    {
+        if (is_string($query['sort_by'])) {
+            switch ($query['sort_by']) {
+                case 'tag_name':
+                    $alias = $this->createAlias();
+                    $qb->leftJoin('Folksonomy\Entity\Tagging.tag', $alias)
+                        ->addOrderBy($alias . '.name', $query['sort_order']);
+                    break;
+                // case 'resource_title':
+                //     // TODO Order tagging by resource title.
+                //     // @see AbstractResourceEntityAdapter::sortQuery()
+                //     $alias = $this->createAlias();
+                //     break;
+                case 'owner_name':
+                    $alias = $this->createAlias();
+                    $qb->leftJoin('Folksonomy\Entity\Tagging.owner', $alias)
+                        ->addOrderBy($alias . '.name', $query['sort_order']);
+                    break;
+                default:
+                    parent::sortQuery($qb, $query);
+                    break;
             }
         }
     }

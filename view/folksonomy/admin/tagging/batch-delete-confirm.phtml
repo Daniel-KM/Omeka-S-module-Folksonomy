@@ -1,0 +1,7 @@
+<div id="sidebar-confirm">
+    <h3><?php echo $this->translate('Delete Taggings'); ?></h3>
+    <p><?php echo $this->translate('Are you sure you would like to delete the selected taggings?'); ?></p>
+    <p><?php echo sprintf($this->translate('Note: This won’t delete tags: check the %stags page%s to manage them.'),
+        '<a href="' . $this->url('admin/tag') . '">', '</a>'); ?></p>
+    <?php echo $this->form($this->form); ?>
+</div>
