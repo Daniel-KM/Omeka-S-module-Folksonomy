@@ -1,59 +1,40 @@
 <?php
 namespace Tagging;
 
+use Omeka\Api\Exception;
 use Omeka\Module\AbstractModule;
+use Omeka\Permissions\Assertion\OwnsEntityAssertion;
+use Tagging\Form\Config as ConfigForm;
+use Zend\EventManager\Event;
+use Zend\EventManager\SharedEventManagerInterface;
+use Zend\Mvc\Controller\AbstractController;
+use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\View\Renderer\PhpRenderer;
+
 
 /**
  * Tagging
  *
  * Allows users to add tags with or without approbation to create a folksonomy.
  *
- * @copyright Copyright Daniel Berthereau, 2013-2014
+ * @copyright Daniel Berthereau, 2013-2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
- * @package Tagging
- *
- * @todo Use mixin_owner
  */
 
-/**
- * The Tagging plugin.
- * @package Omeka\Plugins\Tagging
- */
 class Module extends AbstractModule
 {
     /**
-     * @var array Hooks for the plugin.
+     * @var array Cache of taggings and tags.
      */
-    protected $_hooks = [
-        'install',
-        'upgrade',
-        'uninstall',
-        'initialize',
-        'config_form',
-        'config',
-        'define_acl',
-        'admin_head',
-        'public_head',
-        'admin_items_browse',
-        'admin_items_browse_simple_each',
-        'admin_items_browse_detailed_each',
-        'admin_items_show_sidebar',
-        'public_items_show',
-        'after_delete_item',
-        'remove_item_tag',
-    ];
+    protected $cache = ['taggings' => [], 'tags' => []];
 
     /**
-     * @var array Filters for the plugin.
+     * Settings and their default values.
+     *
+     * @var array
      */
-    protected $_filters = [
-        'admin_navigation_main',
-    ];
-
-    /**
-     * @var array Options and their default values.
-     */
-    protected $_options = [
+    protected $settings = [
         'tagging_form_class' => '',
         'tagging_max_length_total' => 400,
         'tagging_max_length_tag' => 40,
@@ -62,309 +43,683 @@ class Module extends AbstractModule
         // Without roles.
         'tagging_public_allow_tag' => true,
         'tagging_public_require_moderation' => true,
-        // With roles, in particular if Guest User is installed.
-        // serialize(array()) = 'a:0:{}'.
-        'tagging_tag_roles' => 'a:0:{}',
-        'tagging_require_moderation_roles' => 'a:0:{}',
-        'tagging_moderate_roles' => 'a:0:{}',
+        // With roles.
+        'tagging_tag_roles' => [],
+        'tagging_require_moderation_roles' => [],
+        'tagging_moderate_roles' => [],
     ];
 
-    /**
-     * Install the plugin.
-     */
-    public function hookInstall()
+    public function getConfig()
     {
-        $db = $this->_db;
-        // Currently, in Omeka, tags are allowed only for items, but the code
-        // allows to tag anything.
-        $sql = "
-        CREATE TABLE IF NOT EXISTS `$db->Tagging` (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `record_type` varchar(50) collate utf8_unicode_ci NOT NULL DEFAULT '',
-            `record_id` int unsigned NOT NULL,
-            `name` varchar(255) collate utf8_unicode_ci NOT NULL DEFAULT '',
-            `status` enum('proposed', 'allowed', 'approved', 'rejected') NOT NULL,
-            `user_id` int(10) DEFAULT NULL,
-            `ip` tinytext COLLATE utf8_unicode_ci,
-            `user_agent` tinytext COLLATE utf8_unicode_ci,
-            `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `record_type_record_id` (`record_type`, `record_id`),
-            KEY (`name`),
-            KEY (`status`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-        ";
-        $db->query($sql);
+        return include __DIR__ . '/config/module.config.php';
+    }
+
+    public function onBootstrap(MvcEvent $event)
+    {
+        parent::onBootstrap($event);
+        $this->addAclRules();
+    }
+
+    public function install(ServiceLocatorInterface $serviceLocator)
+    {
+        $t = $serviceLocator->get('MvcTranslator');
+
+        $sql = <<<'SQL'
+CREATE TABLE IF NOT EXISTS `tag` (
+  `id` int unsigned NOT NULL auto_increment,
+  `text` varchar(255) collate utf8_unicode_ci default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `tagging` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `resource_id` int unsigned NOT NULL,
+    `text` varchar(255) collate utf8_unicode_ci NOT NULL DEFAULT '',
+    `status` enum('proposed', 'allowed', 'approved', 'rejected') NOT NULL,
+    `owner_id` int(10) DEFAULT NULL,
+    `ip` tinytext COLLATE utf8_unicode_ci,
+    `user_agent` tinytext COLLATE utf8_unicode_ci,
+    `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY (`resource_id`),
+    KEY (`name`),
+    KEY (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+SQL;
+        $conn = $serviceLocator->get('Omeka\Connection');
+        $conn->exec($sql);
 
         $html = '<p>';
-        $html .= __('I agree with %s terms of use %s and I accept to free my contribution under the licence %s CC BY-SA %s.',
+        $html .= $t->translate(sprintf('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.', // @translate
             '<a rel="licence" href="#" target="_blank">', '</a>',
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
-        );
+        ));
         $html .= '</p>';
-        $this->_options['tagging_legal_text'] = $html;
+        $this->settings['tagging_legal_text'] = $html;
 
-        $this->_installOptions();
-    }
-
-    /**
-     * Upgrade the plugin.
-     */
-    public function hookUpgrade($args)
-    {
-        $oldVersion = $args['old_version'];
-        $newVersion = $args['new_version'];
-        $db = $this->_db;
-
-        if (version_compare($oldVersion, '2.2', '<')) {
-            $sql = "
-                ALTER TABLE `{$db->Tagging}`
-                CHANGE `status` `status` enum('proposed', 'allowed', 'approved', 'rejected') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `name`
-            ";
-            $db->query($sql);
+        $settings = $serviceLocator->get('Omeka\Settings');
+        foreach ($this->settings as $name => $value) {
+            $settings->set($name, $value);
         }
     }
 
-    /**
-     * Uninstall the plugin.
-     */
-    public function hookUninstall()
+    public function uninstall(ServiceLocatorInterface $serviceLocator)
     {
-        $db = $this->_db;
-        $sql = "DROP TABLE IF EXISTS `$db->Tagging`";
-        $db->query($sql);
+        $sql = <<<'SQL'
+DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS tagging;
+SQL;
+        $conn = $serviceLocator->get('Omeka\Connection');
+        $conn->exec($sql);
 
-        $this->_uninstallOptions();
+        $settings = $serviceLocator->get('Omeka\Settings');
+        foreach ($this->settings as $name => $value) {
+            $settings->delete($name);
+        }
     }
 
-    /**
-     * Add the translations.
-     */
-    public function hookInitialize()
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
-        add_translation_source(dirname(__FILE__) . '/languages');
-    }
-
-    /**
-     * Shows plugin configuration page.
-     */
-    public function hookConfigForm($args)
-    {
-        $view = get_view();
-        echo $view->partial(
-            'plugins/tagging-config-form.php'
+        // Add the tagging form to the item add and edit pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.add.form.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+            }
         );
-    }
-
-    /**
-     * Processes the configuration form.
-     */
-    public function hookConfig($args)
-    {
-        $post = $args['post'];
-        foreach ($this->_options as $optionKey => $optionValue) {
-            if (in_array($optionKey, [
-                    'tagging_tag_roles',
-                    'tagging_require_moderation_roles',
-                    'tagging_moderate_roles',
-                ])) {
-                $post[$optionKey] = serialize($post[$optionKey]) ?: serialize([]);
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.form.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/form.phtml');
             }
-            if (isset($post[$optionKey])) {
-                set_option($optionKey, $post[$optionKey]);
+        );
+        // Add the tagging form to the item set add and edit pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.add.form.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/form.phtml');
             }
-        }
-    }
-
-    /**
-     * Defines the plugin's access control list.
-     *
-     * @param object $args
-     */
-    public function hookDefineAcl($args)
-    {
-        $acl = $args['acl'];
-        $acl->addResource('Tagging_Tagging');
-        $acl->allow(null, 'Tagging_Tagging', ['show', 'flag']);
-
-        if (get_option('tagging_public_allow_tag')) {
-            $acl->allow(null, 'Tagging_Tagging', ['add']);
-        } else {
-            $roles = unserialize(get_option('tagging_tag_roles'));
-            // Check that all the roles exist, in case a plugin-added role has
-            // been removed (e.g. GuestUser).
-            foreach ($roles as $role) {
-                if ($acl->hasRole($role)) {
-                    $acl->allow($role, 'Tagging_Tagging', 'add');
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.edit.form.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/form.phtml');
+            }
+        );
+        // Add the tagging and tag to the item show pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.show.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/show.phtml');
+            }
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\Item',
+            'view.show.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/site/show.phtml');
+            }
+        );
+        // Add the tagging and tag to the item set show pages.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.show.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/admin/show.phtml');
+            }
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Site\ItemSet',
+            'view.show.after',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/site/show.phtml');
+            }
+        );
+        // Add the tag field to the site's browse page.
+        $sharedEventManager->attach(
+            'Tagging\Controller\Site\Index',
+            'view.advanced_search',
+            function (Event $event) {
+                echo $event->getTarget()->partial('tagging/common/advanced-search.phtml');
+            }
+        );
+        // Add the "has_tags" filter to item search.
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.search.query',
+            function (Event $event) {
+                $query = $event->getParam('request')->getContent();
+                if (isset($query['has_tags'])) {
+                    $qb = $event->getParam('queryBuilder');
+                    $itemAdapter = $event->getTarget();
+                    $tagAlias = $itemAdapter->createAlias();
+                    $itemAlias = $itemAdapter->getEntityClass();
+                    $qb->innerJoin(
+                        'Tagging\Entity\Tag', $tagAlias,
+                        'WITH', "$tagAlias.resource_id = $itemAlias.id"
+                    );
                 }
             }
+        );
+        // Add the "has_tags" filter to item set search.
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.search.query',
+            function (Event $event) {
+                $query = $event->getParam('request')->getContent();
+                if (isset($query['has_tags'])) {
+                    $qb = $event->getParam('queryBuilder');
+                    $itemSetAdapter = $event->getTarget();
+                    $tagAlias = $itemSetAdapter->createAlias();
+                    $itemSetAlias = $itemSetAdapter->getEntityClass();
+                    $qb->innerJoin(
+                        'Tagging\Entity\Tag', $tagAlias,
+                        'WITH', "$tagAlias.resource_id = $itemSetAlias.id"
+                        );
+                }
+            }
+        );
+        // Add the Tagging term definition.
+        $sharedEventManager->attach(
+            '*',
+            'api.context',
+            function (Event $event) {
+                $context = $event->getParam('context');
+                $context['o-module-tagging'] = 'http://omeka.org/s/vocabs/module/tagging#';
+                $event->setParam('context', $context);
+            }
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.add.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.show.section_nav',
+            [$this, 'displayResourceTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.add.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.edit.section_nav',
+            [$this, 'addTaggingTab']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.show.section_nav',
+            [$this, 'displayResourceTags']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.search.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.read.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.search.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.read.post',
+            [$this, 'cacheResourceTaggingData']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Api\Representation\ItemRepresentation',
+            'rep.resource.json',
+            [$this, 'filterResourceJsonLd']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Representation\ItemSetRepresentation',
+            'rep.resource.json',
+            [$this, 'filterResourceJsonLd']
+        );
+
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.hydrate.post',
+            [$this, 'handleTagging']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemAdapter',
+            'api.hydrate.post',
+            [$this, 'handleTags']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.hydrate.post',
+            [$this, 'handleTagging']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Api\Adapter\ItemSetAdapter',
+            'api.hydrate.post',
+            [$this, 'handleTags']
+        );
+    }
+
+    public function getConfigForm(PhpRenderer $renderer)
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        $data = [];
+        foreach ($this->settings as $name => $value) {
+            $data[$name] = $settings->get($name);
         }
 
-        // This role is used only inside addAction().
-        // $requireModerationRoles = unserialize(get_option('tagging_require_moderation_roles'));
+        $form = new ConfigForm;
+        $form->init();
+        $form->setData($data);
+        return $renderer->formCollection($form, false);
+    }
 
-        // Moderation is available even if public can tag without moderation.
-        $moderateRoles = unserialize(get_option('tagging_moderate_roles'));
-        foreach ($moderateRoles as $role) {
-            if ($acl->hasRole($role)) {
-                $acl->allow($role, 'Tagging_Tagging', [
-                    'browse',
-                    'delete',
-                    'update',
-                ]);
+    public function handleConfigForm(AbstractController $controller)
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        $form = new ConfigForm;
+        $form->init();
+        $form->setData($controller->params()->fromPost());
+        if (!$form->isValid()) {
+            $controller->messenger()->addErrors($form->getMessages());
+            return false;
+        }
+
+        $data = $form->getData();
+        foreach ($this->settings as $settingKey => $settingValue) {
+            if (isset($post[$settingKey])) {
+                $settings->set($settingKey, $post[$settingKey]);
             }
         }
+        return true;
     }
 
-    public function hookAdminHead($args)
+    /**
+     * Add ACL rules for this module.
+     *
+     * @todo To be finalized.
+     */
+    protected function addAclRules()
     {
-        $request = Zend_Controller_Front::getInstance()->getRequest();
-        $controller = $request->getControllerName();
-        $action = $request->getActionName();
-        if ($controller == 'items'
-                && ($action == 'browse' || $action == 'show')
-            ) {
-            queue_css_file('tagging');
-            queue_js_file('tagging');
+        $acl = $this->getServiceLocator()->get('Omeka\Acl');
+
+        // Similar than items or item sets from Omeka\Service\AclFactory.
+        $acl->allow(
+            null,
+            [
+                'Tagging\Controller\Admin\Tagging',
+                'Tagging\Controller\Site\Tagging',
+                'Tagging\Controller\Tagging',
+            ]
+        );
+        $acl->allow(
+            null,
+            'Tagging\Api\Adapter\TaggingAdapter',
+            [
+                'search',
+                'read',
+            ]
+        );
+        $acl->allow(
+            null,
+            'Tagging\Entity\Tagging',
+            'read'
+        );
+
+        $acl->allow(
+            'researcher',
+            'Tagging\Controller\Admin\Tagging',
+            [
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+
+        $acl->allow(
+            'author',
+            'Tagging\Controller\Admin\Tagging',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Tagging\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Tagging\Entity\Tagging',
+            [
+                'create',
+            ]
+        );
+        $acl->allow(
+            'author',
+            'Tagging\Entity\Tagging',
+            [
+                'update',
+                'delete',
+            ],
+            new OwnsEntityAssertion
+        );
+
+        $acl->allow(
+            'reviewer',
+            'Tagging\Controller\Admin\Tagging',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Tagging\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Tagging\Entity\Tagging',
+            [
+                'create',
+                'update',
+            ]
+        );
+        $acl->allow(
+            'reviewer',
+            'Tagging\Entity\Tagging',
+            [
+                'delete',
+            ],
+            new OwnsEntityAssertion
+        );
+
+        $acl->allow(
+            'editor',
+            'Tagging\Controller\Admin\Tagging',
+            [
+                'add',
+                'edit',
+                'delete',
+                'index',
+                'search',
+                'browse',
+                'show',
+                'show-details',
+                'sidebar-select',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Tagging\Api\Adapter\TaggingAdapter',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+        $acl->allow(
+            'editor',
+            'Tagging\Entity\Tagging',
+            [
+                'create',
+                'update',
+                'delete',
+            ]
+        );
+    }
+
+    /**
+     * Add the tagging tab to section navigations.
+     *
+     * Event $event
+     */
+    public function addTaggingTab(Event $event)
+    {
+        $sectionNav = $event->getParam('section_nav');
+        $sectionNav['tagging-section'] = 'Tagging';
+        $event->setParam('section_nav', $sectionNav);
+    }
+
+    /**
+     * Display the tags for a resource.
+     *
+     * Event $event
+     */
+    public function displayResourceTags(Event $event)
+    {
+        // Don't render the tagging tab if there is no tagging data.
+        $resourceJson = $event->getParam('resource')->jsonSerialize();
+        if (!isset($resourceJson['o-module-tagging:tag'])) {
+            return;
         }
+
+        $services = $this->getServiceLocator();
+        $translator = $services->get('MvcTranslator');
+        $getResourceTags = $services->get('ViewHelperManager')
+            ->get('getResourceTags');
+        $tags = $getResourceTags($resource);
+
+        echo '<div class="property meta-group"><h4>'
+            . $translator->translate('Tags')
+            . '</h4><div class="value">'
+            . ($tags ?: '<em>' . $translator->translate('[none]') . '</em>')
+            . '</div></div>';
     }
 
-    public function hookPublicHead($args)
+    /**
+     * Cache taggings and tags for item and item set API search/read.
+     *
+     * @internal The cache avoids self::filterItemJsonLd() to make multiple
+     * queries to the database during one request.
+     *
+     * Event $event
+     */
+    public function cacheResourceTaggingData(Event $event)
     {
-        if ($args['view']->isTaggingAllowed()) {
-            queue_css_file('tagging');
-        }
-    }
-
-    public function hookAdminItemsBrowse($args)
-    {
-        ?>
-<script type="text/javascript">
-    Omeka.messages = jQuery.extend(Omeka.messages,
-        {'tagging':{
-            'proposed':<?php echo json_encode(__('Proposed')); ?>,
-            'allowed':<?php echo json_encode(__('Allowed')); ?>,
-            'approved':<?php echo json_encode(__('Approved')); ?>,
-            'rejected':<?php echo json_encode(__('Rejected')); ?>
-        }}
-    );
-</script>
-    <?php
-
-    }
-
-    public function hookAdminItemsBrowseSimpleEach($args)
-    {
-        $view = $args['view'];
-        $item = $args['item'];
-
-        $taggings = $this->_db->getTable('Tagging')->findByRecord($item);
-        if (!count($taggings)) {
-            echo __('No proposed taggings');
+        $resourceIds = [];
+        $content = $event->getParam('response')->getContent();
+        if (is_array($content)) {
+            // This is an API search.
+            foreach ($content as $resource) {
+                $resourceIds[] = $resource->getId();
+            }
         } else {
-            $moderatedTaggings = $this->_db->getTable('Tagging')->findModeratedByRecord($item);
-            echo __('Taggings: %d proposed (%d not moderated)', count($taggings), count($taggings) - count($moderatedTaggings));
+            // This is an API read.
+            $resourceIds[] = $content->getId();
+        }
+        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+        // Cache taggings.
+        $response = $api->search('taggings', ['resource_id' => $resourceIds]);
+        foreach ($response->getContent() as $tagging) {
+            $this->cache['taggings'][$tagging->resource_id()][] = $tagging;
+        }
+        // Cache tags.
+        $response = $api->search('tags', ['resource_id' => $resourceIds]);
+        foreach ($response->getContent() as $tag) {
+            $this->cache['tags'][$tag->resource_id()][] = $tag;
         }
     }
 
-    public function hookAdminItemsBrowseDetailedEach($args)
+    /**
+     * Add the taggings and tags data to the resource JSON-LD.
+     *
+     * Event $event
+     */
+    public function filterResourceJsonLd(Event $event)
     {
-        $item = $args['item'];
-        $html = '<p><strong>' . __('Taggings:') . '</strong></p>';
-        $html .= $this->_displayTaggingsOfItem($item);
-        echo $html;
+        $resource = $event->getTarget();
+        $jsonLd = $event->getParam('jsonLd');
+        if (isset($this->cache['taggings'][$resource->id()])) {
+            $jsonLd['o-module-tagging:tagging'] = $this->cache['taggings'][$resource->id()];
+        }
+        if (isset($this->cache['tags'][$resource->id()])) {
+            $jsonLd['o-module-tagging:tag'] = $this->cache['tags'][$resource->id()];
+        }
+        $event->setParam('jsonLd', $jsonLd);
     }
 
-    private function _displayTaggingsOfItem($item)
+    /**
+     * Handle hydration for tagging data.
+     *
+     * @param Event $event
+     */
+    public function handleTagging(Event $event)
     {
-        $html = '';
-        $taggings = $this->_db->getTable('Tagging')->findByRecord($item);
-        if (count($taggings)) {
-            $html .= '<ul class="taggings-list">';
-            foreach ($taggings as $tagging) {
-                $html .= $this->_displayTaggingForModeration($tagging);
+        $resourceAdapter = $event->getTarget();
+        $request = $event->getParam('request');
+
+        if (!$resourceAdapter->shouldHydrate($request, 'o-module-tagging:tagging')) {
+            return;
+        }
+
+        $taggingAdapter = $resourceAdapter->getAdapter('taggings');
+        $taggingData = $request->getValue('o-module-tagging:tagging', []);
+
+        $taggingId = null;
+        $tags = null;
+
+        if (isset($taggingData['o:id']) && is_numeric($taggingData['o:id'])) {
+            $taggingId = $taggingData['o:id'];
+        }
+        if (isset($taggingData['o-module-tagging:tag'])
+            && '' !== trim($taggingData['o-module-tagging:tag'])
+        ) {
+            $tags = $taggingData['o-module-tagging:tag'];
+        }
+
+        if (null === $tags) {
+            // This request has no tagging data. If a tagging for this resource
+            // exists, delete it. If no tagging for this resource exists, do nothing.
+            if (null !== $taggingId) {
+                // Delete tagging
+                $subRequest = new \Omeka\Api\Request('delete', 'taggings');
+                $subRequest->setId($taggingId);
+                $taggingsAdapter->deleteEntity($subRequest);
             }
-            $html .= '</ul>';
         } else {
-            $html .= __('No taggings.');
-        }
-        return $html;
-    }
-
-    private function _displayTaggingForModeration($tagging)
-    {
-        $html = '<li>';
-        $html .= '<span href="" id="tagging-edit-%d" class="tag-edit-tag">%s</span>';
-        $html .= '<a href="' . ADMIN_BASE_URL . '" id="tagging-%d" class="tagging toggle-status status %s"></a>';
-        $html .= '</li>';
-        $args = [];
-        $args[] = $tagging->id;
-        $args[] = html_escape($tagging->name);
-        $args[] = $tagging->id;
-        $args[] = $tagging->status;
-        return vsprintf($html, $args);
-    }
-
-    public function hookAdminItemsShowSidebar($args)
-    {
-        $item = $args['item'];
-        $html = '<div class="panel">';
-        $html .= '<h4>' . __('Taggings') . '</h4>';
-        $html .= $this->_displayTaggingsOfItem($item);
-        $html .= '</div>';
-        echo $html;
-    }
-
-    /**
-     * Hook to append html to items/show page.
-     */
-    public function hookPublicItemsShow($args)
-    {
-        $view = $args['view'];
-        $item = $args['item'];
-        echo $view->partial('common/tagging.php', [
-            'item' => $item,
-            'tagging_message' => get_option('tagging_message'),
-        ]);
-    }
-
-    /**
-     * Hook used when an item is removed.
-     */
-    public function hookAfterDeleteItem($args)
-    {
-        $item = $args['record'];
-        $taggings = $this->_db->getTable('Tagging')->findByRecord($item);
-        foreach ($taggings as $tagging) {
-            $tagging->delete();
-        }
-    }
-
-    /**
-     * Hook used when an item tag is removed.
-     */
-    public function hookRemoveItemTag($args)
-    {
-        $item = $args['record'];
-        $removed = $args['removed'];
-        foreach ($removed as $tag) {
-            // Check if this tag is a tagging.
-            $tagging = $this->_db->getTable('Tagging')->findByRecordAndName($item, $tag->name);
-            if ($tagging) {
-                $tagging->saveStatus('rejected');
+            // This request has tagging data. If a tagging for this resource exists,
+            // update it. If no tagging for this resource exists, create it.
+            if ($taggingId) {
+                // Update tagging
+                $subRequest = new \Omeka\Api\Request('update', 'taggings');
+                $subRequest->setId($taggingData['o:id']);
+                $subRequest->setContent($taggingData);
+                $tagging = $taggingsAdapter->findEntity($taggingData['o:id'], $subRequest);
+                $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
+            } else {
+                // Create tagging
+                $subRequest = new \Omeka\Api\Request('create', 'taggings');
+                $subRequest->setContent($taggingData);
+                $tagging = new \Tagging\Entity\Tagging;
+                $tagging->setItem($event->getParam('entity'));
+                $taggingsAdapter->hydrateEntity($subRequest, $tagging, new \Omeka\Stdlib\ErrorStore);
+                $taggingsAdapter->getEntityManager()->persist($tagging);
             }
         }
     }
 
-    public function filterAdminNavigationMain($nav)
+    /**
+     * Handle hydration for tags data.
+     *
+     * @param Event $event
+     */
+    public function handleTags(Event $event)
     {
-        if (is_allowed('Tagging_Tagging', 'browse')) {
-            $nav[] = [
-                'label' => __('Taggings'),
-                'uri' => url('tagging'),
-            ];
+        $resourceAdapter = $event->getTarget();
+        $request = $event->getParam('request');
+
+        if (!$resourceAdapter->shouldHydrate($request, 'o-module-tagging:tag')) {
+            return;
         }
 
-        return $nav;
+        $resource = $event->getParam('entity');
+        $entityManager = $resourceAdapter->getEntityManager();
+        $tagAdapter = $resourceAdapter->getAdapter('tag');
+        $retainTagIds = [];
+
+        // Create/update tags passed in the request.
+        foreach ($request->getValue('o-module-tagging:tag', []) as $tagData) {
+            if (isset($tagData['o:id'])) {
+                $subRequest = new \Omeka\Api\Request('update', 'tags');
+                $subRequest->setId($tagData['o:id']);
+                $subRequest->setContent($tagData);
+                $tag = $tagAdapter->findEntity($tagData['o:id'], $subRequest);
+                $tagAdapter->hydrateEntity($subRequest, $tag, new \Omeka\Stdlib\ErrorStore);
+                $retainTagIds[] = $tag->getId();
+            } else {
+                $subRequest = new \Omeka\Api\Request('create', 'tags');
+                $subRequest->setContent($tagData);
+                $tag = new \Tagging\Entity\Tag;
+                $tag->setResource($resource);
+                $tagAdapter->hydrateEntity($subRequest, $tag, new \Omeka\Stdlib\ErrorStore);
+                $entityManager->persist($tag);
+            }
+        }
+
+        // Delete existing tags not passed in the request.
+        $existingTags = [];
+        if ($resource->getId()) {
+            $dql = 'SELECT tags FROM Tagging\Entity\Tag tags INDEX BY tags.id WHERE tags.resource_id = ?1';
+            $query = $entityManager->createQuery($dql)->setParameter(1, $resource->getId());
+            $existingTags = $query->getResult();
+        }
+        foreach ($existingTags as $existingTagId => $existingTag) {
+            if (!in_array($existingTagId, $retainTagIds)) {
+                $entityManager->remove($existingTag);
+            }
+        }
     }
 }
