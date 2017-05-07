@@ -19,7 +19,7 @@ class TagAdapter extends AbstractEntityAdapter
      */
     protected $sortFields = [
         'internal_id' => 'id',
-        // "Tag" and "name" are alias.
+        // "Tag" is an alias of "name".
         'name' => 'name',
         'tag' => 'name',
     ];
@@ -48,11 +48,18 @@ class TagAdapter extends AbstractEntityAdapter
         }
     }
 
+    public function validateRequest(Request $request, ErrorStore $errorStore)
+    {
+        $data = $request->getContent();
+        if (array_key_exists('o:name', $data)) {
+            $result = $this->validateTagName($data['o:name'], $errorStore);
+        }
+    }
+
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
         $name = $entity->getName();
-        if (is_string($name) && trim($name) !== '') {
-            $name = trim($name);
+        if ($this->validateTagName($name, $errorStore)) {
             $criteria = [
                 'name' => $name,
             ];
@@ -62,9 +69,34 @@ class TagAdapter extends AbstractEntityAdapter
                     $name
                 ));
             }
+        }
+    }
+
+    /**
+     * Validate a name.
+     *
+     * @param string $name
+     * @param ErrorStore $errorStore
+     * @return bool
+     */
+    protected function validateTagName($name, ErrorStore $errorStore)
+    {
+        $sanitized = $this->sanitizeLightString($name);
+        if (is_string($name) && $sanitized !== '') {
+            $name = $sanitized;
+            $sanitized = $this->sanitizeString($sanitized);
+            if ($name !== $sanitized) {
+                $errorStore->addError('o:name', new Message(
+                    'The tag "%s" contains forbidden characters.', // @translate
+                    $name
+                ));
+                return false;
+            }
         } else {
             $errorStore->addError('o:name', 'A tag must have a name.'); // @translate
+            return false;
         }
+        return true;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query)
@@ -132,6 +164,35 @@ class TagAdapter extends AbstractEntityAdapter
         ]);
         $this->getEventManager()->triggerEvent($event);
         return new Response($entity);
+    }
+
+    /**
+     * Returns a sanitized string.
+     *
+     * @param string $string The string to sanitize.
+     * @return string The sanitized string.
+     */
+    protected function sanitizeString($string)
+    {
+        // Quote is allowed.
+        $string = strip_tags($string);
+        // The first character is a space and the last one is a no-break space.
+        $string = trim($string, ' /\\?<>:*%|"`&; ' . "\t\n\r");
+        $string = preg_replace('/[\(\{]/', '[', $string);
+        $string = preg_replace('/[\)\}]/', ']', $string);
+        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
+        return trim(preg_replace('/\s+/', ' ', $string));
+    }
+
+    /**
+     * Returns a light sanitized string.
+     *
+     * @param string $string The string to sanitize.
+     * @return string The sanitized string.
+     */
+    protected function sanitizeLightString($string)
+    {
+        return trim(preg_replace('/\s+/', ' ', $string));
     }
 
     /**

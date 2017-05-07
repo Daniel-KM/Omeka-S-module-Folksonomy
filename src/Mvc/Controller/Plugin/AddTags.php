@@ -5,12 +5,10 @@ use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\Manager as ApiAdapterManager;
 use Omeka\Api\Manager as Api;
-use Omeka\Api\Request;
 use Omeka\Entity\Resource;
 use Omeka\Entity\User;
 use Omeka\Permissions\Acl;
 use Omeka\Settings\Settings;
-use Omeka\Stdlib\ErrorStore;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 class AddTags extends AbstractPlugin
@@ -53,7 +51,15 @@ class AddTags extends AbstractPlugin
     public function __invoke(Resource $resource, array $tags)
     {
         // A quick cleaning (and "0" may be a valid tag).
-        $tags = array_filter(array_unique(array_map('trim', $tags)), function ($v) { return strlen($v); });
+        $tags = array_filter(
+            array_unique(
+                array_map(
+                    [$this, 'sanitizeString'],
+                    $tags
+                )
+            ),
+            function ($v) { return strlen($v); }
+        );
         if (empty($tags)) {
             return;
         }
@@ -69,7 +75,6 @@ class AddTags extends AbstractPlugin
         $apiAdapterManager = $this->apiAdapterManager;
         $tagAdapter = $apiAdapterManager->get('tags');
         $taggingAdapter = $apiAdapterManager->get('taggings');
-        $entityManager = $tagAdapter->getEntityManager();
         $user = $acl->getAuthenticationService()->getIdentity();
         $resourceId = $resource->getId();
 
@@ -84,17 +89,15 @@ class AddTags extends AbstractPlugin
         $tagsToAdd = [];
         foreach ($tags as $newTag) {
             $tag = $api
-                ->search('tags', ['name' => $newTag], ['responseContent' => 'resource'])
+                ->search('tags', ['name' => $newTag])
                 ->getContent();
             if ($tag) {
-                $tagsToAdd[$tag[0]->getName()] = $tag[0];
+                $tagsToAdd[$tag[0]->name()] = $tag[0];
             } else {
-                $subRequest = new Request(Request::CREATE, 'tags');
-                $subRequest->setContent(['o:name' => $newTag]);
-                $tag = new Tag;
-                $tagAdapter->hydrateEntity($subRequest, $tag, new ErrorStore);
-                $entityManager->persist($tag);
-                $tagsToAdd[$tag->getName()] = $tag;
+                $tag = $api
+                    ->create('tags', ['o:name' => $newTag])
+                    ->getContent();
+                $tagsToAdd[$tag->name()] = $tag;
             }
         }
 
@@ -122,35 +125,47 @@ class AddTags extends AbstractPlugin
                 ? $api
                     ->search(
                         'taggings',
-                        ['tag' => $tagName, 'resource_id' => $resourceId],
-                        ['responseContent' => 'resource'])
+                        ['tag' => $tagName, 'resource_id' => $resourceId]
+                    )
                     ->getContent()
                 : [];
             if (empty($taggings)) {
                 $data = [
                     'o:status' => $status,
-                    'o-module-folksonomy:tag' => $tag,
+                    'o-module-folksonomy:tag' => $tagName,
                     'o:resource' => ['o:id' => $resourceId],
                 ];
-                $subRequest = new Request(Request::CREATE, 'taggings');
-                $subRequest->setContent($data);
-                $tagging = new Tagging;
-                $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore);
-                $entityManager->persist($tagging);
-                $addedTags = $tagName;
+                $response = $api
+                    ->create('taggings', $data);
+                $addedTags[] = $tagName;
             } elseif ($updateRight) {
                 foreach ($taggings as $tagging) {
-                    if ($tagging->getStatus() === $status) {
+                    if ($tagging->status() === $status) {
                         continue;
                     }
-                    $subRequest = new Request(Request::UPDATE, 'taggings');
-                    $subRequest->setId($tagging->getId());
-                    $subRequest->setContent($dataUpdate);
-                    $taggingAdapter->hydrateEntity($subRequest, $tagging, new ErrorStore());
-                    $entityManager->persist($tagging);
+                    $response = $api
+                        ->update('taggings', $tagging->id(), $dataUpdate, ['isPartial' => true]);
                 }
             }
         }
         return $addedTags;
+    }
+
+    /**
+     * Returns a sanitized string.
+     *
+     * @param string $string The string to sanitize.
+     * @return string The sanitized string.
+     */
+    protected function sanitizeString($string)
+    {
+        // Quote is allowed.
+        $string = strip_tags($string);
+        // The first character is a space and the last one is a no-break space.
+        $string = trim($string, ' /\\?<>:*%|"`&; ' . "\t\n\r");
+        $string = preg_replace('/[\(\{]/', '[', $string);
+        $string = preg_replace('/[\)\}]/', ']', $string);
+        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
+        return trim(preg_replace('/\s+/', ' ', $string));
     }
 }

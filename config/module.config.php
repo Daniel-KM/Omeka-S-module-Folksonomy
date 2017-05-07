@@ -260,5 +260,10 @@ return [
         'Allowed', // @translate
         'Approved', // @translate
         'Rejected', // @translate
+        'You must check the legal agreement.', // @translate
+        'Data were added to the resource.', // @translate
+        'They will be displayed when approved.', // @translate
+        'Reload page to see new tags.', // @translate
+        'Request too long to process.', // @translate
     ],
 ];

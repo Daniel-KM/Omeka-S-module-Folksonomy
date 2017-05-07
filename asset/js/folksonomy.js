@@ -4,10 +4,21 @@
             e.preventDefault();
             var button = $(this);
             var form = button.parent('form');
+            var field = form.find('[name="o-module-folksonomy:tag-new"]');
+            var text = $.trim(field.val().replace(/\s+/g,' '));
+            if (text.length == 0) {
+                field.val('');
+                return;
+            }
+            if (!form.find('[name="legal_agreement"]').prop('checked')) {
+                var msg = 'You must check the legal agreement.';
+                var isOmeka = typeof Omeka !== 'undefined';
+                alert(isOmeka ? Omeka.jsTranslate(msg) : msg)
+                return;
+            }
             var url = button.attr('data-url');
-            $.ajax({
+            $.post({
                 url: url,
-                dataType: 'json',
                 data: form.serialize(),
                 timeout: 30000,
                 beforeSend: function() {
@@ -16,23 +27,33 @@
                 }
             })
             .done(function (data) {
-                var msg = 'Data were added to the resource.' + ' ';
+                var isOmeka = typeof Omeka !== 'undefined';
+                var msg = 'Data were added to the resource.';
+                if (isOmeka) msg = Omeka.jsTranslate(msg);
                 if (data.moderation) {
-                    msg += 'They will be displayed when approved.';
+                    var msgTmp = 'They will be displayed when approved.';
+                    msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
                 } else {
-                    msg += 'Reload page to see new tags.';
+                    var msgTmp = 'Reload page to see new tags.';
+                    msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
                 }
                 alert(msg);
                 form.find('input[type=text]').val(' ');
             })
-            .fail(function (data, errorString, error) {
-                if (errorString == 'timeout') {
-                    alert('Request too long to process.');
+            .fail(function(jqXHR, textStatus) {
+                var isOmeka = typeof Omeka !== 'undefined';
+                if (textStatus == 'timeout') {
+                    var msg = 'Request too long to process.';
+                    alert(isOmeka ? Omeka.jsTranslate(msg) : msg)
                 } else {
-                    alert(data.responseJSON.error);
+                    var msg = jqXHR.hasOwnProperty('responseJSON')
+                        && typeof jqXHR.responseJSON.error !== 'undefined'
+                        ? jqXHR.responseJSON.error
+                        : (isOmeka ? Omeka.jsTranslate('Something went wrong') : 'Something went wrong');
+                    alert(msg);
                 }
             })
-            .always(function (data, status) {
+            .always(function () {
                 button.removeClass('transmit');
                 button.find('span').addClass('fa-tag');
             });

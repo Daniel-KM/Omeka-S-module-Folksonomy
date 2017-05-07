@@ -28,14 +28,18 @@ class TaggingController extends AbstractActionController
 
     public function addAction()
     {
-        if ($this->settings('folksonomy_legal_text') && !$this->params()->fromQuery('legal_agreement')) {
+        if ($this->settings('folksonomy_legal_text')
+            && empty($this->params()->fromPost('legal_agreement'))
+        ) {
             return $this->jsonErrorLegalAgreement();
         }
 
         $tags = array_filter(
-            array_map(
-                'trim',
-                explode(',', $this->params()->fromQuery('o-module-folksonomy:tag-new'))
+            array_unique(
+                array_map(
+                    [$this, 'sanitizeString'],
+                    explode(',', $this->params()->fromPost('o-module-folksonomy:tag-new', ''))
+                )
             ),
             function ($v) { return strlen($v); }
         );
@@ -44,16 +48,8 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorEmpty();
         }
 
-        $id = $this->params()->fromQuery('resource_id');
+        $id = $this->params()->fromPost('resource_id');
         if (!$id) {
-            return $this->jsonErrorNotFound();
-        }
-
-        // Avoid to throw an error.
-        $resource = $this->api()
-            ->read('resources', $id, [], ['responseContent' => 'resource'])
-            ->getContent();
-        if (!$resource) {
             return $this->jsonErrorNotFound();
         }
 
@@ -61,12 +57,17 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorUnauthorized();
         }
 
+        $resource = $this->api()
+            ->read('resources', $id, [], ['responseContent' => 'resource'])
+            ->getContent();
+        if (!$resource) {
+            return $this->jsonErrorNotFound();
+        }
+
         $addedTags = $this->addTags($resource, $tags);
         if (empty($addedTags)) {
             return $this->jsonErrorExistingTags();
         }
-
-        $this->entityManager->flush();
 
         return new JsonModel([
             'content' => [
@@ -109,5 +110,23 @@ class TaggingController extends AbstractActionController
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_404);
         return new JsonModel(['error' => 'Resource not found.']); // @translate
+    }
+
+    /**
+     * Returns a sanitized string.
+     *
+     * @param string $string The string to sanitize.
+     * @return string The sanitized string.
+     */
+    protected function sanitizeString($string)
+    {
+        // Quote is allowed.
+        $string = strip_tags($string);
+        // The first character is a space and the last one is a no-break space.
+        $string = trim($string, ' /\\?<>:*%|"`&; ' . "\t\n\r");
+        $string = preg_replace('/[\(\{]/', '[', $string);
+        $string = preg_replace('/[\)\}]/', ']', $string);
+        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
+        return trim(preg_replace('/\s+/', ' ', $string));
     }
 }

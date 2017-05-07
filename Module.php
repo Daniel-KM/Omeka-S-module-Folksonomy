@@ -1080,9 +1080,11 @@ SQL;
         $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
         // Normalized new tags if any.
         $newTags = array_filter(
-            array_map(
-                'trim',
-                explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
+            array_unique(
+                array_map(
+                    [$this, 'sanitizeString'],
+                    explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
+                )
             ),
             function ($v) { return strlen($v); }
         );
@@ -1136,5 +1138,23 @@ SQL;
             $deleteTags = $controllerPlugins->get('deleteTags');
             $deleteTags($resource, $deletedTags);
         }
+    }
+
+    /**
+     * Returns a sanitized string.
+     *
+     * @param string $string The string to sanitize.
+     * @return string The sanitized string.
+     */
+    protected function sanitizeString($string)
+    {
+        // Quote is allowed.
+        $string = strip_tags($string);
+        // The first character is a space and the last one is a no-break space.
+        $string = trim($string, ' /\\?<>:*%|"`&; ' . "\t\n\r");
+        $string = preg_replace('/[\(\{]/', '[', $string);
+        $string = preg_replace('/[\)\}]/', ']', $string);
+        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
+        return trim(preg_replace('/\s+/', ' ', $string));
     }
 }
