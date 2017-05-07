@@ -450,6 +450,19 @@ SQL;
             }
         );
 
+        // Add the visibility filters.
+        $sharedEventManager->attach(
+            '*',
+            'sql_filter.resource_visibility',
+            function (Event $event) {
+                // Users can view taggings only if they have permission to view
+                // the attached resource.
+                $relatedEntities = $event->getParam('relatedEntities');
+                $relatedEntities['Folksonomy\Entity\Tagging'] = 'resource_id';
+                $event->setParam('relatedEntities', $relatedEntities);
+            }
+        );
+
         $sharedEventManager->attach(
             'Omeka\Api\Representation\ItemRepresentation',
             'rep.resource.json',
