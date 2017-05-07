@@ -55,6 +55,7 @@
         opacity: .5;
     }
 
+    .tags .resource-name::before,
     .taggings .status-toggle::before,
     .taggings .resource-name::before {
         display: inline-block;
@@ -63,18 +64,23 @@
         padding-right: 3px;
         width: 24px;
     }
+    .tags .resource-name.resource::before,
     .taggings .resource-name.resource::before {
         content: "";
     }
+    .tags .resource-name.no-resource::before,
     .taggings .resource-name.no-resource::before {
         content: "❌";
     }
+    .tags .resource-name.item-set::before,
     .taggings .resource-name.item-set::before {
         content: "";
     }
+    .tags .resource-name.item::before,
     .taggings .resource-name.item::before {
         content: "";
     }
+    .tags .resource-name.media::before,
     .taggings .resource-name.media::before {
         content: "";
     }

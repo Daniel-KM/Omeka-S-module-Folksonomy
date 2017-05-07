@@ -22,6 +22,12 @@ class TagAdapter extends AbstractEntityAdapter
         // "Tag" is an alias of "name".
         'name' => 'name',
         'tag' => 'name',
+        // For info.
+        // 'count' => 'count',
+        // 'item_sets' => 'item_sets',
+        // 'items' => 'items',
+        // 'media' => 'media',
+        // 'recent' => 'recent',
     ];
 
     public function getResourceName()
@@ -142,6 +148,77 @@ class TagAdapter extends AbstractEntityAdapter
                         )
                     )
                 );
+        }
+    }
+
+    public function sortQuery(QueryBuilder $qb, array $query)
+    {
+        if (is_string($query['sort_by'])) {
+            // TODO Use Doctrine native queries (here: ORM query builder).
+            switch ($query['sort_by']) {
+                case 'count':
+                    $taggingAlias = $this->createAlias();
+                    $orderAlias = $this->createAlias();
+                    $orderBy = 'COUNT(' . $taggingAlias . '.tag)';
+                    $qb
+                        ->leftJoin(
+                            'Folksonomy\Entity\Tagging',
+                            $taggingAlias,
+                            'WITH',
+                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                        )
+                        ->addSelect($orderBy . ' AS HIDDEN ' . $orderAlias)
+                        ->addOrderBy($orderAlias, $query['sort_order'])
+                    ;
+                    break;
+                case 'item_sets':
+                case 'items':
+                case 'media':
+                    $types = [
+                        'item_sets' => 'Omeka\Entity\ItemSet',
+                        'items' => 'Omeka\Entity\Item',
+                        'media' => 'Omeka\Entity\Media',
+                    ];
+                    $resourceType = $types[$query['sort_by']];
+                    $taggingAlias = $this->createAlias();
+                    $resourceAlias = $this->createAlias();
+                    $orderAlias = $this->createAlias();
+                    $orderBy = 'COUNT(' . $resourceAlias . '.id)';
+                    $qb
+                        ->leftJoin(
+                            'Folksonomy\Entity\Tagging',
+                            $taggingAlias,
+                            'WITH',
+                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                        )
+                        ->leftJoin(
+                            $resourceType,
+                            $resourceAlias,
+                            'WITH',
+                            $qb->expr()->eq($resourceAlias . '.id', $taggingAlias . '.resource')
+                        )
+                        ->addSelect($orderBy . ' AS HIDDEN ' . $orderAlias)
+                        ->addOrderBy($orderAlias, $query['sort_order'])
+                    ;
+                    break;
+                case 'recent':
+                    $taggingAlias = $this->createAlias();
+                    $orderAlias = $this->createAlias();
+                    $orderBy = $taggingAlias . '.created';
+                    $qb
+                        ->leftJoin(
+                            'Folksonomy\Entity\Tagging',
+                            $taggingAlias,
+                            'WITH',
+                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                        )
+                        ->addOrderBy($orderBy, $query['sort_order'])
+                    ;
+                    break;
+                default:
+                    parent::sortQuery($qb, $query);
+                    break;
+            }
         }
     }
 

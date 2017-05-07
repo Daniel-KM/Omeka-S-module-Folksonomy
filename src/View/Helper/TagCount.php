@@ -1,7 +1,9 @@
 <?php
 namespace Folksonomy\View\Helper;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Folksonomy\Entity\Tag;
 use PDO;
 use Zend\View\Helper\AbstractHelper;
 
@@ -20,17 +22,18 @@ class TagCount extends AbstractHelper
     /**
      * Return the count for a list of tags for a specified resource type.
      *
-     * @todo Use Doctrine native queries.
+     * @todo Use Doctrine native queries (here: DBAL query builder).
      *
      * @param array|string $tags If empty, return an array of all tags.
      * @param string $resourceName If empty returns the count of each resource
      * (item set, item and media), the total (resources).
      * @param array|string $statuses Filter these statuses.
-     * @param string $orderBy Sort column and direction (default: "tag.name").
+     * @param string $orderBy Sort column and direction, for example "tag.name"
+     * (default), "count asc", "item_sets", "items" or "media".
      * @param bool $usedOnly Returns only the used tags (default: all tags).
      * @param bool $keyPair Returns a flat array of names and counts when a
      * resource name is set.
-     * @return array
+     * @return array Associative array with names as keys.
      */
     public function __invoke(
         $tags = [],
@@ -128,8 +131,12 @@ class TagCount extends AbstractHelper
         }
 
         if ($tags) {
+            $tags = array_map(function ($v) {
+                return is_object($v) ? ($v instanceof Tag ? $v->getName() : $v->name()) : $v;
+            }, is_array($tags) || $tags instanceof ArrayCollection ? $tags : [$tags]);
+
             // TODO How to do a "WHERE IN" with doctrine and strings?
-            $tags = array_map([$this->connection, 'quote'], (array) $tags);
+            $tags = array_map([$this->connection, 'quote'], $tags);
             $qb
                 ->andWhere($qb->expr()->in('tag.name', $tags));
         }
@@ -167,7 +174,9 @@ class TagCount extends AbstractHelper
             ->orderBy($orderBy, $orderDir);
 
         $stmt = $this->connection->executeQuery($qb, $qb->getParameters());
-        $fetchMode = $keyPair && $resourceName ? PDO::FETCH_KEY_PAIR : PDO::FETCH_ASSOC;
+        $fetchMode = $keyPair && $resourceName
+            ? PDO::FETCH_KEY_PAIR
+            : (PDO::FETCH_GROUP | PDO::FETCH_UNIQUE);
         $result = $stmt->fetchAll($fetchMode);
         return $result;
     }

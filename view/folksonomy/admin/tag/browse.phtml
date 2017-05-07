@@ -1,0 +1,162 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
+$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+$this->htmlElement('body')->appendAttribute('class', 'folksonomy tags browse');
+$sortHeadings = [
+    [
+        'label' => $this->translate('Tag'),
+        'value' => 'name'
+    ],
+    [
+        'label' => $this->translate('Total Count'),
+        'value' => 'count'
+    ],
+    [
+        'label' => $this->translate('Total Item Sets'),
+        'value' => 'item_sets'
+    ],
+    [
+        'label' => $this->translate('Total Items'),
+        'value' => 'items'
+    ],
+    [
+        'label' => $this->translate('Total Media'),
+        'value' => 'media'
+    ],
+    [
+        'label' => $this->translate('Recent'),
+        'value' => 'recent'
+    ],
+];
+$updateRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'update');
+$deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete');
+?>
+
+<?php echo $this->pageTitle($this->translate('Tags')); ?>
+
+<?php echo $this->searchFilters(); ?>
+
+ <div class="browse-controls">
+    <?php echo $this->pagination(); ?>
+    <?php // echo $this->hyperlink($this->translate('Advanced search'), $this->url(null, ['action' => 'search'], ['query' => $this->params()->fromQuery()], true), ['class' => 'advanced-search']); ?>
+    <?php echo $this->sortSelector($sortHeadings); ?>
+</div>
+
+<form method="post" id="batch-form" class="disable-unsaved-warning">
+
+<div id="page-actions">
+    <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete')): ?>
+    <a href="#"
+        class="button delete batch-actions sidebar-content"
+        data-sidebar-content-url="<?php echo $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)); ?>"
+        aria-label="<?php echo $escape($this->translate('Delete')); ?>"
+        title="<?php echo $escape($this->translate('Delete')); ?>"><?php echo $escape($this->translate('Delete')); ?></a>
+    <?php endif; ?>
+</div>
+
+<?php $this->trigger('view.browse.before'); ?>
+<?php if (empty($tags)): ?>
+<div class="no-resources">
+    <p><?php echo $this->translate('There are no tags.'); ?></p>
+</div>
+<?php $this->trigger('view.browse.after'); ?>
+<?php else: ?>
+<table class="tablesaw <?php if ($deleteRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
+    <thead>
+        <tr>
+            <?php if ($deleteRight): ?>
+            <th><input type="checkbox" class="select-all"></th>
+            <?php endif; ?>
+            <th class="column-tag"><?php echo $this->translate('Tag'); ?></th>
+            <th><?php echo $this->translate('Total Count'); ?></th>
+            <th><?php echo $this->translate('Item Sets'); ?></th>
+            <th><?php echo $this->translate('Items'); ?></th>
+            <th><?php echo $this->translate('Media'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        foreach ($tags as $tag):
+            $name = $tag->name();
+        ?>
+        <tr>
+            <?php if ($deleteRight): ?>
+            <td>
+                <input type="checkbox" name="resource_ids[]" value="<?php echo $tag->id(); ?>">
+            </td>
+            <?php endif; ?>
+            <td>
+                <ul class="actions">
+                    <?php if ($updateRight): ?>
+                    <li><a href="#"
+                        class="o-icon-edit"
+                        data-update-url="<?php echo $escape($tag->url('update')); ?>"
+                        aria-label="<?php echo $escape($this->translate('Edit name')); ?>"
+                        title="<?php echo $escape($this->translate('Edit name')); ?>"></a></li>
+                    <?php endif; ?>
+                    <?php if ($deleteRight): ?>
+                    <li><a href="#"
+                        class="o-icon-delete sidebar-content"
+                        data-sidebar-content-url="<?php echo $escape($tag->url('delete-confirm')); ?>"
+                        aria-label="<?php echo $escape($this->translate('Delete')); ?>"
+                        title="<?php echo $escape($this->translate('Delete')); ?>"></a></li>
+                    <?php endif; ?>
+                </ul>
+                <?php echo $this->hyperlink($name, $tag->urlResources()); ?>
+            </td>
+            <td><?php if ($tagCount[$name]['count']) echo $tagCount[$name]['count']; ?></td>
+            <td><?php if ($tagCount[$name]['item_sets']) echo $this->hyperlink(
+                $tagCount[$name]['item_sets'],
+                $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $name])
+            ); ?></td>
+            <td><?php if ($tagCount[$name]['items']) echo $this->hyperlink(
+                $tagCount[$name]['items'],
+                $this->url('admin/tag-resource', ['resource' => 'item', 'id' => $name])
+            ); ?></td>
+            <td><?php if ($tagCount[$name]['media']) echo $this->hyperlink(
+                $tagCount[$name]['media'],
+                $this->url('admin/tag-resource', ['resource' => 'media', 'id' => $name])
+            ); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+</form>
+
+<?php $this->trigger('view.browse.after'); ?>
+<div class="browse-controls">
+    <?php echo $this->pagination(); ?>
+</div>
+
+<div class="sidebar">
+    <a href="#"
+        class="sidebar-close o-icon-close"
+        aria-label="<?php echo $escape($this->translate('Close')); ?>"
+        title="<?php echo $escape($this->translate('Close')); ?>"></a>
+    <div class="sidebar-content"></div>
+</div>
+
+<script>
+// Complete the batch delete form after confirmation.
+$('.sidebar').on('submit', '#batch-delete-confirm', function(e) {
+    var confirmForm = $(this);
+    if (confirmForm.hasClass('batch-delete-all')) {
+        confirmForm.append($('.batch-query').clone());
+    } else {
+        $('#batch-form').find('input:checked').each(function() {
+            confirmForm.append($(this).clone().attr('type', 'hidden'));
+        });
+    }
+});
+</script>
+<?php endif; ?>
+
+<?php if (!$this->setting('recaptcha_site_key') || $this->setting('recaptcha_secret_key')): ?>
+<p class="alert"><?php
+echo sprintf($this->translate('You have not entered your %s API keys under %ssecurity settings%s.'),
+    '<a href="http://recaptcha.net/">reCAPTCHA</a>', '<a href="' . $this->url('admin/default', ['controller' => 'setting'], ['anchor' => 'recaptcha_site_key']) . '">', '</a>');
+echo ' ' . $this->translate('We recommend adding these keys, or the tagging form will be vulnerable to spam.');
+?></p>
+<?php endif; ?>
