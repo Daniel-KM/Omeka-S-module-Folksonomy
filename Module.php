@@ -685,7 +685,7 @@ SQL;
             'Folksonomy\Controller\Site\Index',
             'view.advanced_search',
             function (Event $event) {
-                echo $event->getTarget()->partial('folksonomy/common/advanced-search.phtml');
+                echo $event->getTarget()->partial('common/site/advanced-search.phtml');
             }
         );
     }
@@ -719,7 +719,7 @@ SQL;
         // Allow to display fieldsets in config form.
         $vars = [];
         $vars['form'] = $form;
-        return $renderer->render('folksonomy/module/config.phtml', $vars);
+        return $renderer->render('module/config.phtml', $vars);
     }
 
     public function handleConfigForm(AbstractController $controller)
@@ -810,7 +810,7 @@ SQL;
         }
 
         echo $event->getTarget()->partial(
-            'folksonomy/admin/tagging-form.phtml'
+            'common/admin/tagging-form.phtml'
         );
     }
 
@@ -838,7 +838,7 @@ SQL;
         ]);
         $form->init();
         $view->vars()->offsetSet('taggingForm', $form);
-        echo $view->partial('folksonomy/site/tagging-form.phtml');
+        echo $view->partial('common/site/tagging-form.phtml');
     }
 
     /**
@@ -862,7 +862,7 @@ SQL;
         $resource = $event->getTarget()->resource;
         $tags = $this->listResourceTags($resource);
         echo $event->getTarget()->partial(
-            'folksonomy/site/tags-resource.phtml',
+            'common/site/tags-resource.phtml',
             [
                 'resource' => $resource,
                 'tags' => $tags,
@@ -892,8 +892,8 @@ SQL;
         $isViewDetails = $event->getName() == 'view.details';
         $tags = $this->listResourceTags($resource);
         $partial = $isViewDetails
-            ? 'folksonomy/admin/tags-resource.phtml'
-            : 'folksonomy/admin/tags-resource-list.phtml';
+            ? 'common/admin/tags-resource.phtml'
+            : 'common/admin/tags-resource-list.phtml';
         echo $event->getTarget()->partial(
             $partial,
             [
