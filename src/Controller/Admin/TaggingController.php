@@ -3,6 +3,7 @@ namespace Folksonomy\Controller\Admin;
 
 use Folksonomy\Entity\Tagging;
 use Omeka\Form\ConfirmForm;
+use Zend\Http\Headers;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -35,6 +36,8 @@ class TaggingController extends AbstractActionController
 
     public function addAction()
     {
+        $this->addJsonHeader();
+
         // TODO Validate via form.
         // $form = $this->getForm(TaggingForm::class);
 
@@ -137,7 +140,15 @@ class TaggingController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
-            $response = $this->api($form)->batchDelete('taggings', $resourceIds, [], ['continueOnError' => true]);
+            // TODO Remove this fix for Omeka S Beta 3.
+            $api = $this->api($form);
+            if (!method_exists($api, 'batchDelete')) {
+                foreach ($resourceIds as $resourceId) {
+                    $response = $this->api($form)->delete('taggings', $resourceId, [], ['continueOnError' => true]);
+                }
+            } else {
+                $response = $this->api($form)->batchDelete('taggings', $resourceIds, [], ['continueOnError' => true]);
+            }
             if ($response) {
                 $this->messenger()->addSuccess('Taggings successfully deleted.'); // @translate
             }
@@ -164,6 +175,8 @@ class TaggingController extends AbstractActionController
 
     public function toggleStatusAction()
     {
+        $this->addJsonHeader();
+
         $id = $this->params('id');
         $tagging = $this->api()->read('taggings', $id)->getContent();
         $status = $tagging->status() == Tagging::STATUS_APPROVED
@@ -192,6 +205,8 @@ class TaggingController extends AbstractActionController
             return $this->redirect()->toRoute(null, ['action' => 'browse'], true);
         }
 
+        $this->addJsonHeader();
+
         $resourceIds = $this->params()->fromPost('resource_ids', []);
         // Secure the input.
         $resourceIds = array_filter(array_map('intval', $resourceIds));
@@ -201,11 +216,22 @@ class TaggingController extends AbstractActionController
 
         $data = [];
         $data['o:status'] = $status;
-        $response = $this->api()
-            ->batchUpdate('taggings', $resourceIds, $data, ['continueOnError' => true]);
+        $api = $this->api();
+        // TODO Remove this fix for Omeka S Beta 3.
+        $api = $this->api();
+        if (!method_exists($api, 'batchUpdate')) {
+            foreach ($resourceIds as $resourceId) {
+                $response = $this->api()
+                    ->update('taggings', $resourceId, $data, ['continueOnError' => true]);
+            }
+        } else {
+            $response = $this->api()
+                ->batchUpdate('taggings', $resourceIds, $data, ['continueOnError' => true]);
+        }
         if (!$response) {
             return $this->jsonErrorUpdate();
         }
+
         return new JsonModel([
             'content' => [
                 'status' => $status,
@@ -247,5 +273,16 @@ class TaggingController extends AbstractActionController
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_500);
         return new JsonModel(['error' => 'An internal error occurred.']); // @translate
+    }
+
+    /**
+     * Make compatible with not up-to-date dependencies of Omeka S (json is
+     * returned as html in the Omeka S Beta 3 release).
+     */
+    protected function addJsonHeader()
+    {
+        $headers = new Headers();
+        $headers->addHeaderLine('Content-Type', 'application/json; charset=utf-8');
+        $this->getResponse()->setHeaders($headers);
     }
 }
