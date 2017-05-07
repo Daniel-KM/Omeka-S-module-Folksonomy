@@ -1,0 +1,9 @@
+<?php echo $this->partial('common/tag-cloud', [
+    'tags' => null,
+    'resourceName' => $block->dataValue('resource_name', ''),
+    'statuses' => ['allowed', 'approved'],
+    'orderBy' => 'tag.name',
+    'link' => true,
+    'maxClasses' => $block->dataValue('max_classes', null),
+    'tagNumbers' => $block->dataValue('tag_numbers', false),
+]); ?>
