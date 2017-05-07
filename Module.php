@@ -33,18 +33,12 @@ class Module extends AbstractModule
      * @var array
      */
     protected $settings = [
-        'folksonomy_form_class' => '',
-        'folksonomy_max_length_total' => 400,
-        'folksonomy_max_length_tag' => 40,
+        'folksonomy_public_allow_tag' => true,
+        'folksonomy_public_require_moderation' => false,
+        'folksonomy_max_length_tag' => 190,
+        'folksonomy_max_length_total' => 1000,
         'folksonomy_message' => '+',
         'folksonomy_legal_text' => '',
-        // Without roles.
-        'folksonomy_public_allow_tag' => true,
-        'folksonomy_public_require_moderation' => true,
-        // With roles.
-        'folksonomy_tag_roles' => [],
-        'folksonomy_require_moderation_roles' => [],
-        'folksonomy_moderate_roles' => [],
     ];
 
     public function getConfig()
@@ -326,16 +320,32 @@ SQL;
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
+        $formElementManager = $services->get('FormElementManager');
 
         $data = [];
         foreach ($this->settings as $name => $value) {
             $data[$name] = $settings->get($name);
         }
+        $formData = [];
+        $formData['folksonomy_tagging_form'] = [
+            'folksonomy_message' => $data['folksonomy_message'],
+            'folksonomy_max_length_tag' => $data['folksonomy_max_length_tag'],
+            'folksonomy_max_length_total' => $data['folksonomy_max_length_total'],
+        ];
+        $formData['folksonomy_public_rights'] = [
+            'folksonomy_legal_text' => $data['folksonomy_legal_text'],
+            'folksonomy_public_allow_tag' => $data['folksonomy_public_allow_tag'],
+            'folksonomy_public_require_moderation' => $data['folksonomy_public_require_moderation'],
+        ];
 
-        $form = new ConfigForm;
+        $form = $formElementManager->get(ConfigForm::class);
         $form->init();
-        $form->setData($data);
-        return $renderer->formCollection($form, false);
+        $form->setData($formData);
+
+        // Allow to display fieldsets in config form.
+        $vars = [];
+        $vars['form'] = $form;
+        return $renderer->render('folksonomy/module/config.phtml', $vars);
     }
 
     public function handleConfigForm(AbstractController $controller)
@@ -343,21 +353,31 @@ SQL;
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
-        $form = new ConfigForm;
-        $form->init();
-        $form->setData($controller->params()->fromPost());
-        if (!$form->isValid()) {
-            $controller->messenger()->addErrors($form->getMessages());
-            return false;
-        }
+        $params = $controller->getRequest()->getPost();
 
-        $data = $form->getData();
-        foreach ($this->settings as $settingKey => $settingValue) {
-            if (isset($post[$settingKey])) {
-                $settings->set($settingKey, $post[$settingKey]);
+        // TODO Check ckeditor.
+        // $form = new ConfigForm;
+        // $form->init();
+        // $form->setData($params);
+        // if (!$form->isValid()) {
+        //     $controller->messenger()->addErrors($form->getMessages());
+        //     return false;
+        // }
+
+        // $params = $form->getData();
+
+        // Manage fieldsets of params automatically (only used for the view).
+        foreach ($params as $name => $value) {
+            if (isset($this->settings[$name])) {
+                $settings->set($name, $value);
+            } elseif (is_array($value)) {
+                foreach ($value as $subname => $subvalue) {
+                    if (isset($this->settings[$subname])) {
+                        $settings->set($subname, $subvalue);
+                    }
+                }
             }
         }
-        return true;
     }
 
     /**

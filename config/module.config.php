@@ -62,6 +62,8 @@ return [
             'Folksonomy\Controller\Admin\Tag' => 'Folksonomy\Controller\Admin\TagController',
             'Folksonomy\Controller\Site\Tagging' => 'Folksonomy\Controller\Site\TaggingController',
             'Folksonomy\Controller\Site\Tag' => 'Folksonomy\Controller\Site\TagController',
+            'Folksonomy\Controller\Tagging' => 'Folksonomy\Controller\TaggingController',
+            'Folksonomy\Controller\Tag' => 'Folksonomy\Controller\TagController',
         ],
     ],
     'router' => [
