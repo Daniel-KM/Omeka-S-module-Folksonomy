@@ -69,11 +69,11 @@ jQuery(window).load(function () {
                 <?php echo $this->formTextarea(
                     'tagging_legal_text',
                     get_option('tagging_legal_text'),
-                    array(
+                    [
                         'rows' => 5,
                         'cols' => 60,
-                        'class' => array('textinput', 'html-editor'),
-                     )
+                        'class' => ['textinput', 'html-editor'],
+                     ]
                 ); ?>
                 <p class="explanation">
                     <?php echo __('This text will be shown beside the legal checkbox.'); ?>
@@ -88,7 +88,7 @@ jQuery(window).load(function () {
         </div>
         <div class="inputs five columns omega">
             <?php echo $this->formCheckbox('tagging_public_allow_tag', true,
-                array('checked'=>(boolean) get_option('tagging_public_allow_tag'))); ?>
+                ['checked' => (boolean) get_option('tagging_public_allow_tag')]); ?>
             <p class="explanation">
                 <?php echo __('Allow public to tag'); ?>
             </p>
@@ -100,7 +100,7 @@ jQuery(window).load(function () {
         </div>
         <div class="inputs five columns omega">
             <?php echo $this->formCheckbox('tagging_public_require_moderation', true,
-                array('checked'=>(boolean) get_option('tagging_public_require_moderation'))); ?>
+                ['checked' => (boolean) get_option('tagging_public_require_moderation')]); ?>
             <p class="explanation">
                 <?php echo __('Require approbation for public tags'); ?>
             </p>
@@ -116,15 +116,15 @@ jQuery(window).load(function () {
         <div class="inputs five columns omega">
             <div class="input-block">
                 <?php
-                    $currentRoles = unserialize(get_option('tagging_tag_roles')) ?: array();
+                    $currentRoles = unserialize(get_option('tagging_tag_roles')) ?: [];
                     $userRoles = get_user_roles();
                     unset($userRoles['super']);
                     echo '<ul>';
                     foreach ($userRoles as $role => $label) {
                         echo '<li>';
-                        echo $this->formCheckbox('tagging_tag_roles[]', $role, array(
-                            'checked'=> in_array($role, $currentRoles) ? 'checked' : '',
-                        ));
+                        echo $this->formCheckbox('tagging_tag_roles[]', $role, [
+                            'checked' => in_array($role, $currentRoles) ? 'checked' : '',
+                        ]);
                         echo $label;
                         echo '</li>';
                     }
@@ -141,15 +141,15 @@ jQuery(window).load(function () {
         <div class="inputs five columns omega">
             <div class="input-block">
                 <?php
-                    $currentRoles = unserialize(get_option('tagging_require_moderation_roles')) ?: array();
+                    $currentRoles = unserialize(get_option('tagging_require_moderation_roles')) ?: [];
                     $userRoles = get_user_roles();
                     unset($userRoles['super']);
                     echo '<ul>';
                     foreach ($userRoles as $role => $label) {
                         echo '<li>';
-                        echo $this->formCheckbox('tagging_require_moderation_roles[]', $role, array(
-                            'checked'=> in_array($role, $currentRoles) ? 'checked' : '',
-                        ));
+                        echo $this->formCheckbox('tagging_require_moderation_roles[]', $role, [
+                            'checked' => in_array($role, $currentRoles) ? 'checked' : '',
+                        ]);
                         echo $label;
                         echo '</li>';
                     }
@@ -166,15 +166,15 @@ jQuery(window).load(function () {
         <div class="inputs five columns omega">
             <div class="input-block">
                 <?php
-                    $currentRoles = unserialize(get_option('tagging_moderate_roles')) ?: array();
+                    $currentRoles = unserialize(get_option('tagging_moderate_roles')) ?: [];
                     $userRoles = get_user_roles();
                     unset($userRoles['super']);
                     echo '<ul>';
                     foreach ($userRoles as $role => $label) {
                         echo '<li>';
-                        echo $this->formCheckbox('tagging_moderate_roles[]', $role, array(
-                            'checked'=> in_array($role, $currentRoles) ? 'checked' : '',
-                        ));
+                        echo $this->formCheckbox('tagging_moderate_roles[]', $role, [
+                            'checked' => in_array($role, $currentRoles) ? 'checked' : '',
+                        ]);
                         echo $label;
                         echo '</li>';
                     }

@@ -3,10 +3,10 @@ $pageTitle = __('Taggings (%d total)', $total_results);
 queue_css_file('tagging');
 queue_js_file('tagging');
 queue_js_file('tagging-browse');
-echo head(array(
+echo head([
     'title' => $pageTitle,
     'bodyclass' => 'taggings browse',
-));
+]);
 ?>
 <?php echo flash(); ?>
 <?php if (!Omeka_Captcha::isConfigured()): ?>
@@ -45,7 +45,7 @@ echo head(array(
                 $browseHeadings[__('Status')] = 'status';
                 $browseHeadings[__('User')] = 'user_id';
                 $browseHeadings[__('Date Added')] = 'added';
-                echo browse_sort_links($browseHeadings, array('link_tag' => 'th scope="col"', 'list_tag' => ''));
+                echo browse_sort_links($browseHeadings, ['link_tag' => 'th scope="col"', 'list_tag' => '']);
                 ?>
             </tr>
         </thead>
@@ -53,7 +53,11 @@ echo head(array(
             <?php $key = 0; ?>
             <?php foreach (loop('taggings') as $tagging): ?>
                 <?php $record = get_record_by_id($tagging->record_type, $tagging->record_id); ?>
-            <tr class="tagging <?php if(++$key%2==1) echo 'odd'; else echo 'even'; ?>">
+            <tr class="tagging <?php if (++$key % 2 == 1) {
+                    echo 'odd';
+                } else {
+                    echo 'even';
+                } ?>">
                 <?php if (is_allowed('Tagging_Tagging', 'update')): ?>
                 <td class="batch-edit-check" scope="row">
                     <input type="checkbox" name="taggings[]" value="<?php echo $tagging->id; ?>" />
@@ -62,7 +66,7 @@ echo head(array(
                 <td class="record-info">
                     <?php // Currently, taggable records are items in Omeka.
                     // echo link_to($record, 'show', metadata($record, array('Dublin Core', 'Title')));
-                    echo link_to_item(null, array(), 'show', $record); ?>
+                    echo link_to_item(null, [], 'show', $record); ?>
                 </td>
                 <td class="tagging-name">
                     <?php echo html_escape($tagging->name); ?>

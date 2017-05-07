@@ -2,7 +2,6 @@
 
 class Tagging_View_Helper_GetTaggingForm extends Zend_View_Helper_Abstract
 {
-
     public function getTaggingForm($record = null)
     {
         if (get_view()->isTaggingAllowed()) {
@@ -11,7 +10,7 @@ class Tagging_View_Helper_GetTaggingForm extends Zend_View_Helper_Abstract
             if ($taggingSession->post) {
                 $form->isValid(unserialize($taggingSession->post));
             }
-            unset ($taggingSession->post);
+            unset($taggingSession->post);
 
             return $form;
         }

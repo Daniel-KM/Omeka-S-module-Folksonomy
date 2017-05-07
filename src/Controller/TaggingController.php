@@ -61,8 +61,7 @@ class Tagging_IndexController extends Omeka_Controller_AbstractActionController
             if (empty($user)) {
                 $user_id = 0;
                 $requireModeration = (boolean) get_option('tagging_public_require_moderation');
-            }
-            else {
+            } else {
                 $user_id = $user->id;
                 $requireModerationRoles = unserialize(get_option('tagging_require_moderation_roles'));
                 $requireModeration = in_array($user->role, $requireModerationRoles);
@@ -86,8 +85,8 @@ class Tagging_IndexController extends Omeka_Controller_AbstractActionController
         $recordTaggingsNames = $this->_getTagsNames($recordTaggings);
 
         // There is one tagging by tag to simplify management.
-        $tagsToAdd = array();
-        $approvedExistingTags = array();
+        $tagsToAdd = [];
+        $approvedExistingTags = [];
         foreach ($proposedTaggingsNames as $proposedTag) {
             // Name sanitization is done later, in beforeSave().
             $data['name'] = $proposedTag;
@@ -140,19 +139,15 @@ class Tagging_IndexController extends Omeka_Controller_AbstractActionController
         }
         if (count($tagsToAdd) == 0 && count($approvedExistingTags) == 0) {
             $this->_helper->flashMessenger(__('Your proposition "%s"  is already proposed or is not correctly formatted.', $userTagging), 'warning');
-        }
-        else {
+        } else {
             if ($requireModeration) {
                 $this->_helper->flashMessenger(__('Your proposition "%s" is awaiting approbation.', $userTagging), 'success');
-            }
-            else {
+            } else {
                 if (count($tagsToAdd) == 0) {
                     // In that case, this is approved existing tags.
-                }
-                elseif (count($tagsToAdd) == 1) {
+                } elseif (count($tagsToAdd) == 1) {
                     $this->_helper->flashMessenger(__('Your tag "%s" have been added.', implode(', ', $tagsToAdd)), 'success');
-                }
-                else {
+                } else {
                     $this->_helper->flashMessenger(__('Your tags "%s" have been added.', implode(', ', $tagsToAdd)), 'success');
                 }
             }
@@ -170,7 +165,7 @@ class Tagging_IndexController extends Omeka_Controller_AbstractActionController
      */
     protected function _getTagsNames($tags)
     {
-        $result = array();
+        $result = [];
         foreach ($tags as $tag) {
             $result[] = $tag->name;
         }
@@ -195,7 +190,7 @@ class Tagging_IndexController extends Omeka_Controller_AbstractActionController
      * This can be modified as a query parameter provided that a user is
      * actually logged in.
      *
-     * @return integer
+     * @return int
      */
     protected function _getBrowseRecordsPerPage($pluralName = null)
     {

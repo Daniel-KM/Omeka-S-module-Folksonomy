@@ -29,7 +29,7 @@ class Tagging_AjaxController extends Omeka_Controller_AbstractActionController
         // Handle action.
         try {
             $status = $this->_getParam('status');
-            if (!in_array($status, array('proposed', 'allowed', 'approved', 'rejected'))) {
+            if (!in_array($status, ['proposed', 'allowed', 'approved', 'rejected'])) {
                 $this->getResponse()->setHttpResponseCode(400);
                 return;
             }

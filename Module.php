@@ -1,6 +1,8 @@
 <?php
 namespace Tagging;
+
 use Omeka\Module\AbstractModule;
+
 /**
  * Tagging
  *
@@ -22,7 +24,7 @@ class Module extends AbstractModule
     /**
      * @var array Hooks for the plugin.
      */
-    protected $_hooks = array(
+    protected $_hooks = [
         'install',
         'upgrade',
         'uninstall',
@@ -39,19 +41,19 @@ class Module extends AbstractModule
         'public_items_show',
         'after_delete_item',
         'remove_item_tag',
-    );
+    ];
 
     /**
      * @var array Filters for the plugin.
      */
-    protected $_filters = array(
+    protected $_filters = [
         'admin_navigation_main',
-    );
+    ];
 
     /**
      * @var array Options and their default values.
      */
-    protected $_options = array(
+    protected $_options = [
         'tagging_form_class' => '',
         'tagging_max_length_total' => 400,
         'tagging_max_length_tag' => 40,
@@ -65,7 +67,7 @@ class Module extends AbstractModule
         'tagging_tag_roles' => 'a:0:{}',
         'tagging_require_moderation_roles' => 'a:0:{}',
         'tagging_moderate_roles' => 'a:0:{}',
-    );
+    ];
 
     /**
      * Install the plugin.
@@ -156,19 +158,17 @@ class Module extends AbstractModule
 
     /**
      * Processes the configuration form.
-     *
-     * @return void
      */
     public function hookConfig($args)
     {
         $post = $args['post'];
         foreach ($this->_options as $optionKey => $optionValue) {
-            if (in_array($optionKey, array(
+            if (in_array($optionKey, [
                     'tagging_tag_roles',
                     'tagging_require_moderation_roles',
                     'tagging_moderate_roles',
-                ))) {
-               $post[$optionKey] = serialize($post[$optionKey]) ?: serialize(array());
+                ])) {
+                $post[$optionKey] = serialize($post[$optionKey]) ?: serialize([]);
             }
             if (isset($post[$optionKey])) {
                 set_option($optionKey, $post[$optionKey]);
@@ -185,12 +185,11 @@ class Module extends AbstractModule
     {
         $acl = $args['acl'];
         $acl->addResource('Tagging_Tagging');
-        $acl->allow(null, 'Tagging_Tagging', array('show', 'flag'));
+        $acl->allow(null, 'Tagging_Tagging', ['show', 'flag']);
 
         if (get_option('tagging_public_allow_tag')) {
-            $acl->allow(null, 'Tagging_Tagging', array('add'));
-        }
-        else {
+            $acl->allow(null, 'Tagging_Tagging', ['add']);
+        } else {
             $roles = unserialize(get_option('tagging_tag_roles'));
             // Check that all the roles exist, in case a plugin-added role has
             // been removed (e.g. GuestUser).
@@ -208,11 +207,11 @@ class Module extends AbstractModule
         $moderateRoles = unserialize(get_option('tagging_moderate_roles'));
         foreach ($moderateRoles as $role) {
             if ($acl->hasRole($role)) {
-                $acl->allow($role, 'Tagging_Tagging', array(
+                $acl->allow($role, 'Tagging_Tagging', [
                     'browse',
                     'delete',
                     'update',
-                ));
+                ]);
             }
         }
     }
@@ -238,7 +237,8 @@ class Module extends AbstractModule
     }
 
     public function hookAdminItemsBrowse($args)
-    { ?>
+    {
+        ?>
 <script type="text/javascript">
     Omeka.messages = jQuery.extend(Omeka.messages,
         {'tagging':{
@@ -250,6 +250,7 @@ class Module extends AbstractModule
     );
 </script>
     <?php
+
     }
 
     public function hookAdminItemsBrowseSimpleEach($args)
@@ -260,8 +261,7 @@ class Module extends AbstractModule
         $taggings = $this->_db->getTable('Tagging')->findByRecord($item);
         if (!count($taggings)) {
             echo __('No proposed taggings');
-        }
-        else {
+        } else {
             $moderatedTaggings = $this->_db->getTable('Tagging')->findModeratedByRecord($item);
             echo __('Taggings: %d proposed (%d not moderated)', count($taggings), count($taggings) - count($moderatedTaggings));
         }
@@ -285,8 +285,7 @@ class Module extends AbstractModule
                 $html .= $this->_displayTaggingForModeration($tagging);
             }
             $html .= '</ul>';
-        }
-        else {
+        } else {
             $html .= __('No taggings.');
         }
         return $html;
@@ -298,7 +297,7 @@ class Module extends AbstractModule
         $html .= '<span href="" id="tagging-edit-%d" class="tag-edit-tag">%s</span>';
         $html .= '<a href="' . ADMIN_BASE_URL . '" id="tagging-%d" class="tagging toggle-status status %s"></a>';
         $html .= '</li>';
-        $args = array();
+        $args = [];
         $args[] = $tagging->id;
         $args[] = html_escape($tagging->name);
         $args[] = $tagging->id;
@@ -323,10 +322,10 @@ class Module extends AbstractModule
     {
         $view = $args['view'];
         $item = $args['item'];
-        echo $view->partial('common/tagging.php', array(
+        echo $view->partial('common/tagging.php', [
             'item' => $item,
             'tagging_message' => get_option('tagging_message'),
-        ));
+        ]);
     }
 
     /**
@@ -360,10 +359,10 @@ class Module extends AbstractModule
     public function filterAdminNavigationMain($nav)
     {
         if (is_allowed('Tagging_Tagging', 'browse')) {
-            $nav[] = array(
+            $nav[] = [
                 'label' => __('Taggings'),
                 'uri' => url('tagging'),
-            );
+            ];
         }
 
         return $nav;

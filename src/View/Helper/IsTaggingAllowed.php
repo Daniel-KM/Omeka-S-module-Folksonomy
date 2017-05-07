@@ -2,7 +2,6 @@
 
 class Tagging_View_Helper_IsTaggingAllowed extends Zend_View_Helper_Abstract
 {
-
     /**
      * Helper to determine if tagging is enabled on current page or not.
      */
@@ -19,8 +18,7 @@ class Tagging_View_Helper_IsTaggingAllowed extends Zend_View_Helper_Abstract
                     || is_allowed('Tagging_Tagging', 'add'))
                 ) {
                 $isAllowed = true;
-            }
-            else {
+            } else {
                 $isAllowed = false;
             }
         }
