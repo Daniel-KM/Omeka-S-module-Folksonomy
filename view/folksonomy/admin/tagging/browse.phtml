@@ -108,13 +108,18 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
             <?php endif; ?>
             <td>
                 <ul class="actions">
-                    <?php if ($editRightTag = ($tag && $tagging->userIsAllowed('update'))): ?>
+                <?php $editRightTagging = $tagging->userIsAllowed('update'); ?>
+                    <?php if ($editRightTagging): ?>
+                        <?php if ($tag): ?>
                     <li><a href="#"
                         class="status-toggle o-icon-<?php echo $status; ?>"
                         data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
                         data-status="<?php echo $status; ?>"
                         aria-label="<?php echo $escape($this->translate('Toggle status')); ?>"
                         title="<?php echo $escape($this->translate('Toggle status')); ?>"></a></li>
+                        <?php else: ?>
+                    <li><span class="status-toggle o-icon-none"></span></li>
+                        <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($tagging->userIsAllowed('delete')): ?>
                     <li><a href="#"
@@ -133,7 +138,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
                 <?php endif;?>
             </td>
             <td class="status-label"><?php
-            if (!$editRightTag):
+            if (!$editRightTagging):
             ?><span class="no-action o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"></span><?php
             endif;
             echo $escape($tagging->statusLabel());

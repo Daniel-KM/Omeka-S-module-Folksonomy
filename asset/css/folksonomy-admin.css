@@ -123,6 +123,10 @@
         color: #FF0000;
         content: "";
     }
+    .folksonomy .o-icon-none::before {
+        color: #FFFFFF;
+        content: "";
+    }
     .folksonomy .o-icon-transmit::before {
         background: url('../img/waiting-mini.gif') no-repeat scroll 12px 3px transparent !important;
         color: #000000;
