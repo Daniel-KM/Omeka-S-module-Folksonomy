@@ -15,6 +15,10 @@ class TaggingController extends AbstractActionController
         // TODO Validate via form.
         // $form = $this->getForm(TaggingForm::class);
 
+        if (!empty($this->params()->fromPost('o-module-folksonomy:check'))) {
+            return $this->jsonErrorUnauthorized();
+        }
+
         $legalText = $this->settings()->get('folksonomy_legal_text', '');
         if ($legalText && empty($this->params()->fromPost('legal_agreement'))) {
             return $this->jsonErrorLegalAgreement();

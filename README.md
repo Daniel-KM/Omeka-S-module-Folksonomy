@@ -33,6 +33,11 @@ The plugin will add tagging form automatically on each resource edit admin and
 public view, if the current user has right to use it. The forms are customizable
 in the theme. Rights and visibility are automatically managed.
 
+* Important *
+
+The form uses jquery. It’s enabled by default in the admin view, but may be not
+available in some themes.
+
 
 Internal Notes
 --------------

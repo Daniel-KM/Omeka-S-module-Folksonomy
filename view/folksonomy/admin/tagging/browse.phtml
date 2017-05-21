@@ -188,11 +188,3 @@ $('.sidebar').on('submit', '#batch-delete-confirm', function(e) {
 });
 </script>
 <?php endif; ?>
-
-<?php if (!$this->setting('recaptcha_site_key') || $this->setting('recaptcha_secret_key')): ?>
-<p class="alert"><?php
-echo sprintf($this->translate('You have not entered your %s API keys under %ssecurity settings%s.'),
-    '<a href="http://recaptcha.net/">reCAPTCHA</a>', '<a href="' . $this->url('admin/default', ['controller' => 'setting'], ['anchor' => 'recaptcha_site_key']) . '">', '</a>');
-echo ' ' . $this->translate('We recommend adding these keys, or the tagging form will be vulnerable to spam.');
-?></p>
-<?php endif; ?>

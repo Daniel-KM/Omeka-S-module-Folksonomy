@@ -10,14 +10,22 @@ $formElement = $this->plugin('formElement');
     <?php echo $this->form()->openTag($taggingForm); ?>
     <?php $element = $taggingForm->get('o-module-folksonomy:tag-new'); ?>
     <div class="field">
-        <div class='inputs'>
+        <div class="inputs">
             <?php echo $this->formText($element); ?>
         </div>
     </div>
     <?php if ($taggingForm->has('recaptcha')): ?>
     <?php $element = $taggingForm->get('recaptcha'); ?>
     <div class="field">
-        <div class='inputs' required="required">
+        <div class="inputs" required="required">
+            <?php echo $this->formElement($element); ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php if ($taggingForm->has('o-module-folksonomy:check')): /* honeyspot */ ?>
+    <?php $element = $taggingForm->get('o-module-folksonomy:check'); ?>
+    <div class="field">
+        <div class="inputs" required="required">
             <?php echo $this->formElement($element); ?>
         </div>
     </div>
@@ -25,7 +33,7 @@ $formElement = $this->plugin('formElement');
     <?php if ($taggingForm->has('legal_agreement')): ?>
     <?php $element = $taggingForm->get('legal_agreement'); ?>
     <div class="field">
-        <div class='inputs' required="required">
+        <div class="inputs" required="required">
             <?php echo $this->setting('folksonomy_legal_text'); ?>
             <?php echo $this->formCheckbox($element); ?>
         </div>

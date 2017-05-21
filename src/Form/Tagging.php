@@ -95,8 +95,8 @@ class Tagging extends Form
             }
         }
 
-        // The legal agreement is checked by default for logged users.
         if ($isPublic) {
+            // The legal agreement is checked by default for logged users.
             $legalText = $settingHelper('folksonomy_legal_text');
             if ($legalText) {
                 // TODO Allow html legal agreement in the tagging form help from here.
@@ -125,6 +125,26 @@ class Tagging extends Form
                     ],
                 ]);
             }
+
+            // An honeypot for anti-spam. It’s hidden, so only bots fill it.
+            $this->add([
+                'type' => 'Text',
+                'name' => 'o-module-folksonomy:check',
+                'options' => [
+                    'label' => 'String to check', // @translate
+                ],
+                'attributes' => [
+                    'placeholder' => 'Set the string to check', // @translate
+                    'required' => false,
+                    'style' => 'display: none;',
+                ],
+                'validators' => [
+                    ['validator' => 'StringLength', 'options' => [
+                        'min' => 0,
+                        'max' => 0,
+                    ]],
+                ],
+            ]);
         }
 
         $this->add([
