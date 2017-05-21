@@ -23,21 +23,23 @@
         font-size: 0.7em;
     }
 
-    .folksonomy.browse .batch-edit th:first-child,
-    .folksonomy.browse .batch-edit td:first-child {
-        width: 32px;
-    }
-    .tags.browse table:not(.batch-edit) th:nth-child(1n+2),
-    .tags.browse table:not(.batch-edit) td:nth-child(1n+2),
-    .tags.browse table.batch-edit th:nth-child(1n+3),
-    .tags.browse table.batch-edit td:nth-child(1n+3) {
-        text-align: right;
-    }
-    .taggings.browse table:not(.batch-edit) th:nth-child(1),
-    .taggings.browse table:not(.batch-edit) td:nth-child(1),
-    .taggings.browse table.batch-edit th:nth-child(2),
-    .taggings.browse table.batch-edit td:nth-child(2) {
-        max-width: 40%;
+    @media (min-width:641px) {
+        .tags.browse table td:nth-child(1n+2) {
+            text-align: right;
+        }
+        .tags.browse table td:nth-child(1n+2) * {
+            text-align: right;
+            float: right;
+        }
+
+        .taggings.browse table th:first-child,
+        .taggings.browse table td:first-child {
+            max-width: 40%;
+        }
+        .taggings.browse table th:last-child,
+        .taggings.browse table td:last-child {
+            min-width: 10%;
+        }
     }
 
     .folksonomy table .resource-name {

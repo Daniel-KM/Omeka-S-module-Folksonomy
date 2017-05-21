@@ -75,10 +75,12 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
 <table class="tablesaw <?php if ($editRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
     <thead>
         <tr>
-            <?php if ($editRight): ?>
-            <th><input type="checkbox" class="select-all"></th>
-            <?php endif; ?>
-            <th class="column-tag"><?php echo $this->translate('Tag'); ?></th>
+            <th class="column-tag">
+                <?php if ($editRight): ?>
+                <input type="checkbox" class="select-all">
+                <?php endif; ?>
+                <?php echo $this->translate('Tag'); ?>
+            </th>
             <th><?php echo $this->translate('Status'); ?></th>
             <th><?php echo $this->translate('Resource'); ?></th>
             <th><?php echo $this->translate('Tagger'); ?></th>
@@ -101,12 +103,17 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
         }
         ?>
         <tr>
-            <?php if ($editRight): ?>
             <td>
-                <input type="checkbox" name="resource_ids[]" value="<?php echo $tagging->id(); ?>">
-            </td>
-            <?php endif; ?>
-            <td>
+                <?php if ($editRight): ?>
+                    <input type="checkbox" name="resource_ids[]" value="<?php echo $tagging->id(); ?>">
+                <?php endif; ?>
+                <?php if ($tag): ?>
+                <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
+                <span class="is-public-or-not <?php if (!$tagging->isPublic()) echo 'o-icon-private'; ?>"></span>
+                <?php else: ?>
+                <span class="tag-name no-tag">[<?php echo $this->translate('Removed'); ?>]</span>
+                <span class="is-public-or-not o-icon-private"></span>
+                <?php endif;?>
                 <ul class="actions">
                 <?php $editRightTagging = $tagging->userIsAllowed('update'); ?>
                     <?php if ($editRightTagging): ?>
@@ -129,13 +136,6 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
                         title="<?php echo $escape($this->translate('Delete')); ?>"></a></li>
                     <?php endif; ?>
                 </ul>
-                <?php if ($tag): ?>
-                <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
-                <span class="is-public-or-not <?php if (!$tagging->isPublic()) echo 'o-icon-private'; ?>"></span>
-                <?php else: ?>
-                <span class="tag-name no-tag">[<?php echo $this->translate('Removed'); ?>]</span>
-                <span class="is-public-or-not o-icon-private"></span>
-                <?php endif;?>
             </td>
             <td class="status-label"><?php
             if (!$editRightTagging):

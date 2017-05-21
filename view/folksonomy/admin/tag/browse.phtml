@@ -65,10 +65,12 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
 <table class="tablesaw <?php if ($deleteRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
     <thead>
         <tr>
-            <?php if ($deleteRight): ?>
-            <th><input type="checkbox" class="select-all"></th>
-            <?php endif; ?>
-            <th class="column-tag"><?php echo $this->translate('Tag'); ?></th>
+            <th class="column-tag">
+                <?php if ($deleteRight): ?>
+                <input type="checkbox" class="select-all">
+                <?php endif; ?>
+                <?php echo $this->translate('Tag'); ?>
+            </th>
             <th><?php echo $this->translate('Total Count'); ?></th>
             <th><?php echo $this->translate('Item Sets'); ?></th>
             <th><?php echo $this->translate('Items'); ?></th>
@@ -81,12 +83,15 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
             $name = $tag->name();
         ?>
         <tr>
-            <?php if ($deleteRight): ?>
             <td>
-                <input type="checkbox" name="resource_ids[]" value="<?php echo $tag->id(); ?>">
-            </td>
-            <?php endif; ?>
-            <td>
+                <?php if ($deleteRight): ?>
+                    <input type="checkbox" name="resource_ids[]" value="<?php echo $tag->id(); ?>">
+                <?php endif; ?>
+                <span class="tag-name"<?php
+                    if ($updateRight) echo ' contenteditable="true" data-update-url="' . $tag->url('update') . '"';
+                ?>><?php
+                    echo $name;
+                ?></span>
                 <ul class="actions">
                     <?php if ($updateRight): ?>
                     <li><a href="#"
@@ -102,11 +107,6 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
                         title="<?php echo $escape($this->translate('Delete')); ?>"></a></li>
                     <?php endif; ?>
                 </ul>
-                <span class="tag-name"<?php
-                    if ($updateRight) echo ' contenteditable="true" data-update-url="' . $tag->url('update') . '"';
-                ?>><?php
-                    echo $name;
-                ?></span>
             </td>
             <td><?php if ($tagCount[$name]['count']) echo $tagCount[$name]['count']; ?></td>
             <td><?php if ($tagCount[$name]['item_sets']) echo $this->hyperlink(
