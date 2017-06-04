@@ -1308,9 +1308,16 @@ SQL;
 
         // Updated resource.
         if ($resourceId) {
-            $representation = $resourceAdapter->getRepresentation($resource);
-            $resourceTags = $this->listResourceTags($representation);
-            $currentTaggings = $this->listResourceTaggings($representation);
+            // It is impossible to call $resource->jsonSerialize() when there is
+            // a resource template, so do a direct call. We need existing tags
+            // to know which ones are deleted (and to avoid hacking).
+            // $representation = $resourceAdapter->getRepresentation($resource);
+            // $resourceTags = $this->listResourceTags($representation);
+            // // $currentTaggings = $this->listResourceTaggings($representation);
+            $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+            $resourceTags = $api
+                ->search('tags', ['resource_id' => $resourceId])
+                ->getContent();
             $currentTags = array_map(function ($v) { return $v->name(); }, $resourceTags);
             $addedTags = array_diff($submittedTags, $currentTags);
             $unchangedTags = array_intersect($currentTags, $submittedTags);
@@ -1320,7 +1327,7 @@ SQL;
         else {
             $representation = null;
             $resourceTags = [];
-            $currentTaggings = [];
+            // $currentTaggings = [];
             $currentTags = [];
             $addedTags = $submittedTags;
             $unchangedTags = [];
