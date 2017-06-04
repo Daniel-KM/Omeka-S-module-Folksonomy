@@ -45,6 +45,7 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
 
 <form method="post" id="batch-form" class="disable-unsaved-warning">
 
+<?php if ($tags): ?>
 <div id="page-actions">
     <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete')): ?>
     <a href="#"
@@ -54,6 +55,7 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
         title="<?php echo $escape($this->translate('Delete')); ?>"><?php echo $escape($this->translate('Delete')); ?></a>
     <?php endif; ?>
 </div>
+<?php endif; ?>
 
 <?php $this->trigger('view.browse.before'); ?>
 <?php if (empty($tags)): ?>

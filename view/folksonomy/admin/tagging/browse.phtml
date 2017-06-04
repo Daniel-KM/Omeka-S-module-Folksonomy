@@ -41,6 +41,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
 
 <form method="post" id="batch-form" class="disable-unsaved-warning">
 
+<?php if ($taggings): ?>
 <div id="page-actions">
     <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'update')): ?>
     <a href="#"
@@ -64,6 +65,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
         title="<?php echo $escape($this->translate('Delete')); ?>"><?php echo $escape($this->translate('Delete')); ?></a>
     <?php endif; ?>
 </div>
+<?php endif; ?>
 
 <?php $this->trigger('view.browse.before'); ?>
 <?php if (empty($taggings)): ?>
