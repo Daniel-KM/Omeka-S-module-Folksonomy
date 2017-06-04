@@ -52,6 +52,7 @@ class Module extends AbstractModule
     protected $settings = [
         'folksonomy_public_allow_tag' => true,
         'folksonomy_public_require_moderation' => false,
+        'folksonomy_public_notification' => true,
         'folksonomy_max_length_tag' => 190,
         'folksonomy_max_length_total' => 1000,
         'folksonomy_message' => '+',
@@ -807,6 +808,7 @@ SQL;
         $formData['folksonomy_public_rights'] = [
             'folksonomy_public_allow_tag' => $data['folksonomy_public_allow_tag'],
             'folksonomy_public_require_moderation' => $data['folksonomy_public_require_moderation'],
+            'folksonomy_public_notification' => $data['folksonomy_public_notification'],
         ];
         $formData['folksonomy_tagging_form'] = [
             'folksonomy_max_length_tag' => $data['folksonomy_max_length_tag'],

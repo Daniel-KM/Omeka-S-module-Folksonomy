@@ -30,6 +30,13 @@ class Config extends Form
                 'label' => 'Require approbation for public tags', // @translate
             ],
         ]);
+        $publicRightsFieldset->add([
+            'name' => 'folksonomy_public_notification',
+            'type' => 'Checkbox',
+            'options' => [
+                'label' => 'Notify by email for public tagging', // @translate
+            ],
+        ]);
 
         $this->add([
             'type' => 'Fieldset',

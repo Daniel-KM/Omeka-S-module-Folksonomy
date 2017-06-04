@@ -52,6 +52,10 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorExistingTags();
         }
 
+        if ($this->settings()->get('folksonomy_public_notification')) {
+            $this->notifyEmail($resourceId, $addedTags);
+        }
+
         return new JsonModel([
             'content' => [
                 'resource_id' => $resourceId,
@@ -60,6 +64,37 @@ class TaggingController extends AbstractActionController
                     || !$this->userIsAllowed(Tagging::class, 'update'),
             ],
         ]);
+    }
+
+    /**
+     * Notify by email for taggings on a resource.
+     *
+     * @param int $resourceId
+     * @param array $tags
+     */
+    protected function notifyEmail($resourceId, $tags)
+    {
+        $site = @$_SERVER['SERVER_NAME'] ?: sprintf('Server (%s)', @$_SERVER['SERVER_ADDR']); // @translate
+        $subject = sprintf('[%s] New public tags', $site); // @translate
+
+        $total = count($tags);
+        $stringTags = implode('", "', $tags);
+        $body = $total <= 1
+            ? sprintf('%d tag added to resource #%d: "%s".', // @translate
+                $total, $resourceId, $stringTags)
+            : sprintf('%d tags added to resource #%d: "%s".', // @translate
+                $total, $resourceId, $stringTags);
+        $body .= "\r\n\r\n";
+
+        $adminEmail = $this->settings()->get('administrator_email');
+
+        $mailer = $this->mailer();
+        $message = $mailer->createMessage();
+        $message
+            ->addTo($adminEmail)
+            ->setSubject($subject)
+            ->setBody($body);
+        $mailer->send($message);
     }
 
     protected function jsonErrorLegalAgreement()
