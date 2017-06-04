@@ -22,7 +22,6 @@ $tagTemplate = '
         <thead>
         <tr>
             <th><?php echo $this->translate('Tag'); ?></th>
-            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -36,9 +35,7 @@ $tagTemplate = '
         <?php $tagging = $taggings[$tag->name()]; ?>
         <tr>
             <td>
-                <?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?>
-           </td>
-            <td>
+                <span><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></span>
                 <ul class="actions">
                     <li>
                     <?php if ($updateRight): ?>

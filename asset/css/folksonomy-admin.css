@@ -5,6 +5,9 @@
     .folksonomy .no-resources:before {
         content:"";
     }
+    #resource-tags .actions {
+        float: right;
+    }
     #resource-tags.empty,
     #resource-tags+.no-resources {
         display:none;
@@ -50,7 +53,7 @@
     }
 
     .folksonomy .single.actions {
-        float: inherit;
+        float: right;
     }
     .folksonomy .single.actions a::before {
         text-align: inherit;
