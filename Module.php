@@ -1114,7 +1114,7 @@ SQL;
         $form->init();
 
         $view = $event->getTarget();
-        $query = $event->getParam('query');
+        $query = $event->getParam('query', []);
         $resourceType = $event->getParam('resourceType');
 
         $hasTags = !empty($query['has_tags']);
@@ -1138,7 +1138,7 @@ SQL;
     {
         $translate = $event->getTarget()->plugin('translate');
         $filters = $event->getParam('filters');
-        $query = $event->getParam('query');
+        $query = $event->getParam('query', []);
         if (!empty($query['has_tags'])) {
             $filterLabel = $translate('Has tags');
             $filterValue = $translate('true');
