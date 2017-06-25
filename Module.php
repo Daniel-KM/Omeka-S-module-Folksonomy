@@ -1118,9 +1118,7 @@ SQL;
         $resourceType = $event->getParam('resourceType');
 
         $hasTags = !empty($query['has_tags']);
-        $tags = array_key_exists('tag', $query)
-            ? (is_array($query['tag']) ? implode(', ', $query['tag']) : $query['tag'])
-            : '';
+        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanTags($query['tag']));
 
         $formData = [];
         $formData['has_tags'] = $hasTags;
@@ -1145,11 +1143,9 @@ SQL;
             $filters[$filterLabel][] = $filterValue;
         }
         if (!empty($query['tag'])) {
-            $tags = is_array($query['tag']) ? $query['tag'] : explode(',', $query['tag']);
             $filterLabel = $translate('Tag');
-            foreach ($tags as $tag) {
-                $filters[$filterLabel][] = trim($tag);
-            }
+            $filterValue = $this->cleanTags($query['tag']);
+            $filters[$filterLabel] = $filterValue;
         }
         $event->setParam('filters', $filters);
     }
@@ -1184,8 +1180,8 @@ SQL;
             );
         }
 
-        if (array_key_exists('tag', $query)) {
-            $tags = is_array($query['tag']) ? $query['tag'] : [$query['tag']];
+        if (!empty($query['tag'])) {
+            $tags = $this->cleanTags($query['tag']);
             $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
             $resourceAlias = $adapter->getEntityClass();
@@ -1364,6 +1360,20 @@ SQL;
             $deleteTags = $controllerPlugins->get('deleteTags');
             $deleteTags($resource, $deletedTags);
         }
+    }
+
+    /**
+     * Clean a list of tags.
+     *
+     * @param array|string $tags
+     * @return array
+     */
+    protected function cleanTags($tags)
+    {
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+        return array_filter(array_map('trim', $tags));
     }
 
     /**
