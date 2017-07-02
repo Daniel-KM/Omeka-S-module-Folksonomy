@@ -3,7 +3,6 @@ namespace Folksonomy\Controller\Admin;
 
 use Folksonomy\Entity\Tagging;
 use Omeka\Form\ConfirmForm;
-use Zend\Http\Headers;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -36,8 +35,6 @@ class TaggingController extends AbstractActionController
 
     public function addAction()
     {
-        $this->addJsonHeader();
-
         // TODO Validate via form.
         // $form = $this->getForm(TaggingForm::class);
 
@@ -273,16 +270,5 @@ class TaggingController extends AbstractActionController
         $response = $this->getResponse();
         $response->setStatusCode(Response::STATUS_CODE_500);
         return new JsonModel(['error' => 'An internal error occurred.']); // @translate
-    }
-
-    /**
-     * Make compatible with not up-to-date dependencies of Omeka S (json is
-     * returned as html in the Omeka S Beta 3 release).
-     */
-    protected function addJsonHeader()
-    {
-        $headers = new Headers();
-        $headers->addHeaderLine('Content-Type', 'application/json; charset=utf-8');
-        $this->getResponse()->setHeaders($headers);
     }
 }

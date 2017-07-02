@@ -1,3 +1,0 @@
-<?php
-// Make compatible with not up-to-date dependencies of Omeka S (json is returned as html in the Omeka S Beta 3 release).
-echo json_encode(empty($error) ? ['content' => $content] : ['error' => $error]);
