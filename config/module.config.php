@@ -29,9 +29,11 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'showTags' => View\Helper\ShowTags::class,
             'tagSelector' => View\Helper\TagSelector::class,
         ],
         'factories' => [
+            'showTaggingForm' => Service\ViewHelper\ShowTaggingFormFactory::class,
             'tagCount' => Service\ViewHelper\TagCountFactory::class,
             'tagSelect' => Service\ViewHelper\TagSelectFactory::class,
         ],

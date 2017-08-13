@@ -76,10 +76,31 @@ class Config extends Form
             'options' => [
                 'label' => 'Legal agreement', // @translate
                 'info' => 'This text will be shown beside the legal checkbox.' // @translate
-                . ' ' . 'Let empty if you don’t want to use a legal agreement.', // @translate
+                    . ' ' . 'Let empty if you don’t want to use a legal agreement.', // @translate
             ],
             'attributes' => [
                 'id' => 'folksonomy-legal-text',
+            ],
+        ]);
+        $taggingFormFieldset->add([
+            'name' => 'folksonomy_append_item_set_show',
+            'type' => 'Checkbox',
+            'options' => [
+                'label' => 'Append to public item set page automatically', // @translate
+            ],
+        ]);
+        $taggingFormFieldset->add([
+            'name' => 'folksonomy_append_item_show',
+            'type' => 'Checkbox',
+            'options' => [
+                'label' => 'Append to public item page automatically', // @translate
+            ],
+        ]);
+        $taggingFormFieldset->add([
+            'name' => 'folksonomy_append_media_show',
+            'type' => 'Checkbox',
+            'options' => [
+                'label' => 'Append to public media page automatically', // @translate
             ],
         ]);
     }

@@ -15,7 +15,6 @@ use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
 use Folksonomy\Form\Search as SearchForm;
-use Folksonomy\Form\Tagging as TaggingForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
@@ -48,6 +47,10 @@ class Module extends AbstractModule
         'folksonomy_max_length_total' => 1000,
         'folksonomy_message' => '+',
         'folksonomy_legal_text' => '',
+        // TODO Move to site settings.
+        'folksonomy_append_item_set_show' => true,
+        'folksonomy_append_item_show' => true,
+        'folksonomy_append_media_show' => true,
     ];
 
     public function getConfig()
@@ -121,6 +124,19 @@ SQL;
         $settings = $serviceLocator->get('Omeka\Settings');
         foreach ($this->settings as $name => $value) {
             $settings->delete($name);
+        }
+    }
+
+    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $serviceLocator)
+    {
+        if (version_compare($oldVersion, '3.3.3', '<')) {
+            $settings = $serviceLocator->get('Omeka\Settings');
+            $settings->set('folksonomy_append_item_set_show',
+                $this->settings['folksonomy_append_item_set_show']);
+            $settings->set('folksonomy_append_item_show',
+                $this->settings['folksonomy_append_item_show']);
+            $settings->set('folksonomy_append_media_show',
+                $this->settings['folksonomy_append_media_show']);
         }
     }
 
@@ -770,21 +786,27 @@ SQL;
         );
 
         // Add the tags to the resource show public pages.
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\Item',
-            'view.show.after',
-            [$this, 'displayViewResourceTagsPublic']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\ItemSet',
-            'view.show.after',
-            [$this, 'displayViewResourceTagsPublic']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Controller\Site\Media',
-            'view.show.after',
-            [$this, 'displayViewResourceTagsPublic']
-        );
+        if ($settings->get('folksonomy_append_item_show')) {
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\Item',
+                'view.show.after',
+                [$this, 'displayViewResourceTagsPublic']
+            );
+        }
+        if ($settings->get('folksonomy_append_item_set_show')) {
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\ItemSet',
+                'view.show.after',
+                [$this, 'displayViewResourceTagsPublic']
+            );
+        }
+        if ($settings->get('folksonomy_append_media_show')) {
+            $sharedEventManager->attach(
+                'Omeka\Controller\Site\Media',
+                'view.show.after',
+                [$this, 'displayViewResourceTagsPublic']
+            );
+        }
     }
 
     public function getConfigForm(PhpRenderer $renderer)
@@ -808,6 +830,9 @@ SQL;
             'folksonomy_max_length_total' => $data['folksonomy_max_length_total'],
             'folksonomy_message' => $data['folksonomy_message'],
             'folksonomy_legal_text' => $data['folksonomy_legal_text'],
+            'folksonomy_append_item_set_show' => $data['folksonomy_append_item_set_show'],
+            'folksonomy_append_item_show' => $data['folksonomy_append_item_show'],
+            'folksonomy_append_media_show' => $data['folksonomy_append_media_show'],
         ];
 
         $form = $formElementManager->get(ConfigForm::class);
@@ -924,22 +949,11 @@ SQL;
      *
      * @param Event $event
      */
-    public function displayQuickTaggingForm(Event $event)
+    public function displayTaggingQuickForm(Event $event)
     {
         $view = $event->getTarget();
-        $services = $this->getServiceLocator();
-        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
-        $viewHelperManager = $services->get('ViewHelperManager');
-
-        $form = $services->get('FormElementManager')->get(TaggingForm::class);
-        $form->setOptions([
-            'site-slug' => $view->params()->fromRoute('site-slug'),
-            'resource_id' => $view->vars()->resource->id(),
-            'is_identified' => !empty($user),
-        ]);
-        $form->init();
-        $view->vars()->offsetSet('taggingForm', $form);
-        echo $view->partial('folksonomy/common/tagging-quick-form.phtml');
+        $resource = $event->getTarget()->resource;
+        echo $view->showTaggingForm($resource);
     }
 
     /**
@@ -956,7 +970,7 @@ SQL;
         $resource = $event->getTarget()->resource;
         $this->displayResourceFolksonomy($event, $resource);
         if ($allowed) {
-            $this->displayQuickTaggingForm($event);
+            $this->displayTaggingQuickForm($event);
         }
         echo '</div>';
     }
@@ -968,23 +982,11 @@ SQL;
      */
     public function displayViewResourceTagsPublic(Event $event)
     {
+        $view = $event->getTarget();
         $resource = $event->getTarget()->resource;
-        $tags = $this->listResourceTags($resource);
-        $taggings = $this->listResourceTaggings($resource);
-        echo $event->getTarget()->partial(
-            'folksonomy/common/site/tags-resource.phtml',
-            [
-                'resource' => $resource,
-                'tags' => $tags,
-                'taggings' => $taggings,
-            ]
-        );
+        echo $view->showTags($resource);
 
-        $services = $this->getServiceLocator();
-        $acl = $services->get('Omeka\Acl');
-        if ($acl->userIsAllowed(Tagging::class, 'create')) {
-            $this->displayQuickTaggingForm($event);
-        }
+        $this->displayTaggingQuickForm($event);
     }
 
     /**
