@@ -5,6 +5,9 @@
     .folksonomy .no-resources:before {
         content:"";
     }
+    #tags .property {
+        display: inherit;
+    }
     #resource-tags .actions {
         float: right;
     }
