@@ -8,7 +8,7 @@
         </div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $escape($this->translate('Internal Id')); ?></h4>
+        <h4><?php echo $escape($this->translate('Internal id')); ?></h4>
         <div class="value">
             <span class="tag-internal-id"><?php echo $tag->internalId(); ?></span>
         </div>
@@ -21,7 +21,7 @@
             );
         ?></div>
         <div class="value"><?php echo sprintf('%s: %s',
-            $escape($this->translate('Item Sets')),
+            $escape($this->translate('Item sets')),
             $this->hyperlink(
                 $tagCount['item_sets'],
                 $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $tag->name()])

@@ -13,7 +13,7 @@ class TagCloud extends AbstractBlockLayout
 {
     public function getLabel()
     {
-        return 'Tag Cloud'; // @translate
+        return 'Tag cloud'; // @translate
     }
 
     public function form(PhpRenderer $view, SiteRepresentation $site,
@@ -26,12 +26,12 @@ class TagCloud extends AbstractBlockLayout
             'name' => 'o:block[__blockIndex__][o:data][resource_name]',
             'type' => 'Select',
             'options' => [
-                'label' => 'Select Resource', // @translate
+                'label' => 'Select resource', // @translate
                 'info' => 'Browse links are available only for item sets and items.',
                 'value_options' => [
                     '' => 'All resources (separately)', // @translate
-                    'resources' => 'All Resources (together)',  // @translate
-                    'item_sets' => 'Item Sets',  // @translate
+                    'resources' => 'All resources (together)',  // @translate
+                    'item_sets' => 'Item sets',  // @translate
                     'items' => 'Items',  // @translate
                     'media' => 'Media',  // @translate
                 ],
@@ -41,7 +41,7 @@ class TagCloud extends AbstractBlockLayout
             'name' => 'o:block[__blockIndex__][o:data][max_classes]',
             'type' => 'Number',
             'options' => [
-                'label' => 'Max Classes', // @translate
+                'label' => 'Max classes', // @translate
             ],
         ]);
         $form->add([

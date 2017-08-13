@@ -9,7 +9,7 @@ class BrowseTags implements LinkInterface
 {
     public function getName()
     {
-        return 'Browse Tags'; // @translate
+        return 'Browse tags'; // @translate
     }
 
     public function getFormTemplate()

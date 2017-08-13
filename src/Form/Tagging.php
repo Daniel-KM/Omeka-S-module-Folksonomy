@@ -105,7 +105,7 @@ class Tagging extends Form
                     'type' => 'checkbox',
                     'name' => 'legal_agreement',
                     'options' => [
-                        'label' => 'Terms of Service', // @translate
+                        'label' => 'Terms of service', // @translate
                         'info' => $legalText,
                         'label_options' => [
                             'disable_html_escape' => true,

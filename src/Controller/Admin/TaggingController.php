@@ -112,7 +112,7 @@ class TaggingController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $routeAction = $this->params()->fromQuery('all') ? 'batch-delete-all' : 'batch-delete';
         $form->setAttribute('action', $this->url()->fromRoute(null, ['action' => $routeAction], true));
-        $form->setButtonLabel('Confirm Delete'); // @translate
+        $form->setButtonLabel('Confirm delete'); // @translate
         $form->setAttribute('id', 'batch-delete-confirm');
         $form->setAttribute('class', $routeAction);
 

@@ -12,7 +12,7 @@ class Config extends Form
             'type' => 'Fieldset',
             'name' => 'folksonomy_public_rights',
             'options' => [
-                'label' => 'Public Rights', // @translate
+                'label' => 'Public rights', // @translate
             ],
         ]);
         $publicRightsFieldset = $this->get('folksonomy_public_rights');
@@ -42,7 +42,7 @@ class Config extends Form
             'type' => 'Fieldset',
             'name' => 'folksonomy_tagging_form',
             'options' => [
-                'label' => 'Tagging Form', // @translate
+                'label' => 'Tagging form', // @translate
             ],
         ]);
         $taggingFormFieldset = $this->get('folksonomy_tagging_form');
