@@ -1,6 +1,7 @@
 <?php
 namespace Folksonomy\Controller\Site;
 
+use Folksonomy\Entity\Tagging;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;

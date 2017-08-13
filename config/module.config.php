@@ -157,12 +157,12 @@ return [
                             'route' => '/tagging[/:action]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'resource-id' => '\d*',
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
                                 'controller' => 'Tagging',
                                 'action' => 'add',
-                                'resource-id' => '\d+',
                             ],
                         ],
                     ],

@@ -172,8 +172,6 @@ class TaggingController extends AbstractActionController
 
     public function toggleStatusAction()
     {
-        $this->addJsonHeader();
-
         $id = $this->params('id');
         $tagging = $this->api()->read('taggings', $id)->getContent();
         $status = $tagging->status() == Tagging::STATUS_APPROVED
@@ -201,8 +199,6 @@ class TaggingController extends AbstractActionController
         if (!$this->getRequest()->isPost()) {
             return $this->redirect()->toRoute(null, ['action' => 'browse'], true);
         }
-
-        $this->addJsonHeader();
 
         $resourceIds = $this->params()->fromPost('resource_ids', []);
         // Secure the input.

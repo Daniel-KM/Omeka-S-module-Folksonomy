@@ -41,21 +41,33 @@ class TaggingAdapter extends AbstractEntityAdapter
         Tagging::STATUS_REJECTED,
     ];
 
+    /**
+     * {@inheritdoc}
+     */
     public function getResourceName()
     {
         return 'taggings';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getRepresentationClass()
     {
         return 'Folksonomy\Api\Representation\TaggingRepresentation';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getEntityClass()
     {
         return 'Folksonomy\Entity\Tagging';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
     ) {
@@ -96,13 +108,17 @@ class TaggingAdapter extends AbstractEntityAdapter
             }
         }
 
-        if (Request::UPDATE == $request->getOperation()) {
+        // Only update status.
+        elseif (Request::UPDATE == $request->getOperation()) {
             if ($this->shouldHydrate($request, 'o:status')) {
                 $entity->setStatus($data['o:status']);
             }
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateRequest(Request $request, ErrorStore $errorStore)
     {
         $data = $request->getContent();
@@ -125,6 +141,9 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
         $this->validateStatus($entity->getStatus(), $errorStore);
@@ -160,6 +179,9 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildQuery(QueryBuilder $qb, array $query)
     {
         // TODO Check status according to admin/public.
@@ -208,6 +230,9 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function sortQuery(QueryBuilder $qb, array $query)
     {
         if (is_string($query['sort_by'])) {

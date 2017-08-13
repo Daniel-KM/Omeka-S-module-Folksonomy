@@ -1,7 +1,5 @@
 <?php
-namespace Folksonomy;
-
-/*
+/**
  * Folksonomy
  *
  * Add tags and tagging form to any resource to create uncontrolled vocabularies
@@ -10,6 +8,8 @@ namespace Folksonomy;
  * @copyright Daniel Berthereau, 2013-2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
+
+namespace Folksonomy;
 
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
@@ -28,15 +28,6 @@ use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Renderer\PhpRenderer;
 
-/**
- * Folksonomy
- *
- * Add tags and tagging form to any resource to create uncontrolled vocabularies
- * and tag clouds.
- *
- * @copyright Daniel Berthereau, 2013-2017
- * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
- */
 class Module extends AbstractModule
 {
     /**
@@ -513,6 +504,7 @@ SQL;
             }
         );
 
+        // Add the tagging part to the resource representation.
         $sharedEventManager->attach(
             'Omeka\Api\Representation\ItemRepresentation',
             'rep.resource.json',
@@ -585,6 +577,7 @@ SQL;
             [$this, 'cacheResourceTaggingData']
         );
 
+        // Handle hydration after hydration of resource.
         $sharedEventManager->attach(
             'Omeka\Api\Adapter\ItemAdapter',
             'api.hydrate.post',
@@ -969,7 +962,7 @@ SQL;
     }
 
     /**
-     * Display the tags for a resource.
+     * Display the tags for a resource in public.
      *
      * @param Event $event
      */

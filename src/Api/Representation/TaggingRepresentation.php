@@ -18,16 +18,25 @@ class TaggingRepresentation extends AbstractEntityRepresentation
         Tagging::STATUS_REJECTED => 'Rejected', // @translate
     ];
 
+    /**
+     * {@inheritdoc}
+     */
     public function getControllerName()
     {
         return 'tagging';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getJsonLdType()
     {
         return 'o-module-folksonomy:Tagging';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getJsonLd()
     {
         $tag = null;
@@ -78,6 +87,7 @@ class TaggingRepresentation extends AbstractEntityRepresentation
     public function statusLabel()
     {
         $status = $this->resource->getStatus();
+        // May avoid a notice.
         return isset($this->statusLabels[$status])
             ? $this->statusLabels[$status]
             : 'Undefined'; // @translate

@@ -39,7 +39,7 @@ class Tagging extends AbstractEntity
     protected $id;
 
     /**
-     * @internal Doctrine doesn't recommand enums.
+     * Note: Doctrine doesn't recommand enums.
      * @Column(type="string", length=190)
      */
     protected $status;
@@ -154,7 +154,7 @@ class Tagging extends AbstractEntity
         return $this->created;
     }
 
-    public function setModified(DateTime $dateTime)
+    public function setModified(DateTime $dateTime = null)
     {
         $this->modified = $dateTime;
     }

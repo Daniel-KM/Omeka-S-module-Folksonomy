@@ -42,7 +42,7 @@ $(document).ready(function() {
                 alert(isOmeka ? Omeka.jsTranslate(msg) : msg)
             } else if (jqXHR.status == 404) {
                 var msg = 'The resource or the tag doesn’t exist.';
-                alert(isOmeka ? Omeka.jsTranslate(msg) : msg)
+                alert(isOmeka ? Omeka.jsTranslate(msg) : msg);
             } else {
                 var msg = jqXHR.hasOwnProperty('responseJSON')
                     && typeof jqXHR.responseJSON.error !== 'undefined'
