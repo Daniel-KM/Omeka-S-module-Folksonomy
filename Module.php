@@ -32,7 +32,10 @@ class Module extends AbstractModule
     /**
      * @var array Cache of tags and taggings by resource.
      */
-    protected $cache = ['tags' => [], 'taggings' => []];
+    protected $cache = [
+        'tags' => [],
+        'taggings' => [],
+    ];
 
     /**
      * Settings and their default values.
@@ -940,7 +943,7 @@ SQL;
         }
 
         echo $event->getTarget()->partial(
-            'folksonomy/common/admin/tagging-form.phtml'
+            'common/admin/tagging-form.phtml'
         );
     }
 
@@ -1012,8 +1015,8 @@ SQL;
         $tags = $this->listResourceTagsByName($resource);
         $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $isViewDetails
-            ? 'folksonomy/common/admin/tags-resource.phtml'
-            : 'folksonomy/common/admin/tags-resource-list.phtml';
+            ? 'common/admin/tags-resource.phtml'
+            : 'common/admin/tags-resource-list.phtml';
         echo $event->getTarget()->partial(
             $partial,
             [
@@ -1124,7 +1127,7 @@ SQL;
         $vars->offsetSet('searchTagForm', $form);
 
         echo $event->getTarget()
-            ->partial('folksonomy/common/advanced-search.phtml');
+            ->partial('common/tags-advanced-search.phtml');
     }
 
     public function filterSearchFilters(Event $event)

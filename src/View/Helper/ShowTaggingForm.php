@@ -36,6 +36,6 @@ class ShowTaggingForm extends AbstractHelper
         ]);
         $form->init();
         $view->vars()->offsetSet('taggingForm', $form);
-        return $view->partial('folksonomy/common/tagging-quick-form.phtml');
+        return $view->partial('common/tagging-quick-form.phtml');
     }
 }

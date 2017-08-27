@@ -7,7 +7,7 @@
 </div>
 <?php else: ?>
 <?php $this->trigger('view.browse.before'); ?>
-<?php echo $this->partial('folksonomy/common/tag-cloud', [
+<?php echo $this->partial('common/tags-cloud', [
     'tags' => $tags,
     'resourceName' => '',
     // Never display "rejected" tags in public view, in all cases.
