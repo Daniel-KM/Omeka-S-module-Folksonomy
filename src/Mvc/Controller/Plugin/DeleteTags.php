@@ -51,7 +51,13 @@ class DeleteTags extends AbstractPlugin
         }
 
         $resourceId = $resource->getId();
-        $tagsToDelete = $this->api->search('tags', ['name' => $tags])->getContent();
+
+        // This search is "or".
+        $tagsToDelete = $this->api->search('tags', [
+            // The search on "name" is "OR".
+            'name' => $tags,
+        ])->getContent();
+
         $deletedTags = [];
         foreach ($tagsToDelete as $tag) {
             $tagName = $tag->name();

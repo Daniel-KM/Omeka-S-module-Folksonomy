@@ -26,11 +26,11 @@ class TagCount extends AbstractHelper
      *
      * @param array|string $tags If empty, return an array of all tags.
      * @param string $resourceName If empty returns the count of each resource
-     * (item set, item and media), the total (resources).
+     * (item set, item and media), and the total (resources).
      * @param array|string $statuses Filter these statuses.
+     * @param bool $usedOnly Returns only the used tags (default: all tags).
      * @param string $orderBy Sort column and direction, for example "tag.name"
      * (default), "count asc", "item_sets", "items" or "media".
-     * @param bool $usedOnly Returns only the used tags (default: all tags).
      * @param bool $keyPair Returns a flat array of names and counts when a
      * resource name is set.
      * @return array Associative array with names as keys.

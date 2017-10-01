@@ -118,6 +118,7 @@ SQL;
     public function uninstall(ServiceLocatorInterface $serviceLocator)
     {
         $sql = <<<'SQL'
+SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS tagging;
 DROP TABLE IF EXISTS tag;
 SQL;
@@ -835,6 +836,7 @@ SQL;
     /**
      * Add the taggings data to the resource JSON-LD.
      *
+     * @todo Use tag and tagging reference, not representation.
      * @param Event $event
      */
     public function filterResourceJsonLd(Event $event)
@@ -1143,7 +1145,7 @@ SQL;
                     'Folksonomy\Entity\Tagging',
                     $taggingAlias,
                     'WITH',
-                    $qb->expr()->eq( $taggingAlias . '.resource', $resourceAlias . '.id')
+                    $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id')
                 )
                 ->innerJoin(
                     'Folksonomy\Entity\Tag',
@@ -1153,8 +1155,8 @@ SQL;
                 )
                 ->andWhere($qb->expr()->in($tagAlias . '.name', $tags));
             */
-            // All resources with all tag ("AND").
-            foreach ($tags as $key => $tag) {
+            // All resources with all tags ("AND").
+            foreach ($tags as $tag) {
                 $tagAlias = $adapter->createAlias();
                 $taggingAlias = $adapter->createAlias();
                 $qb
@@ -1242,7 +1244,7 @@ SQL;
         $resource = $event->getParam('entity');
         $errorStore = $event->getParam('errorStore');
 
-        $submittedTags = $request->getValue('o-module-folksonomy:tag', []);
+        $submittedTags = $request->getValue('o-module-folksonomy:tag') ?: [];
         // Normalized new tags if any.
         $newTags = array_filter(
             array_unique(

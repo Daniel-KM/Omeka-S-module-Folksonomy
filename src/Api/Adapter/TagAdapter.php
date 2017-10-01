@@ -87,6 +87,7 @@ class TagAdapter extends AbstractEntityAdapter
      */
     protected function validateTagName($name, ErrorStore $errorStore)
     {
+        $result = true;
         $sanitized = $this->sanitizeLightString($name);
         if (is_string($name) && $sanitized !== '') {
             $name = $sanitized;
@@ -96,13 +97,13 @@ class TagAdapter extends AbstractEntityAdapter
                     'The tag "%s" contains forbidden characters.', // @translate
                     $name
                 ));
-                return false;
+                $result = false;
             }
         } else {
             $errorStore->addError('o:name', 'A tag must have a name.'); // @translate
-            return false;
+            $result = false;
         }
-        return true;
+        return $result;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query)

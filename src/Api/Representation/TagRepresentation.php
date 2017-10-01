@@ -82,7 +82,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the resources associated with this tag.
      *
-     * @return array Array of ItemSetRepresentations
+     * @return array Array of ResourceRepresentations
      */
     public function resources()
     {
@@ -101,7 +101,7 @@ class TagRepresentation extends AbstractEntityRepresentation
                 $resources[$resource->id()] = $resource;
             }
         }
-        return array_values($resources);
+        return $resources;
     }
 
     /**
@@ -126,7 +126,7 @@ class TagRepresentation extends AbstractEntityRepresentation
                 $owners[$owner->id()] = $owner;
             }
         }
-        return array_values($owners);
+        return $owners;
     }
 
     /**
@@ -154,7 +154,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * Get the total of resource for this tag.
+     * Get the total of resources for this tag.
      *
      * @todo Use a NamedNativeQueries.
      */

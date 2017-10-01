@@ -137,7 +137,7 @@ $('#content').on('click', 'a.status-batch', function(e) {
 
 /* Update tags. */
 
-//Update the name of a tag.
+// Update the name of a tag.
 $('.folksonomy .o-icon-edit.contenteditable')
     .on('click', function(e) {
         e.preventDefault();

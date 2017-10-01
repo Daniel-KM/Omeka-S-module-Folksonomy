@@ -18,8 +18,8 @@ class Tag extends AbstractEntity
     protected $id;
 
     /**
-     * @internal The limit of 190 is related to the format of the base (utf8mb4)
-     * and to the fact that there is an index: the max index size is 767, so
+     * Note: The limit of 190 is related to the format of the base (utf8mb4) and
+     * to the fact that there is an index and the max index size is 767, so
      * 190 x 4 = 760.
      * @Column(length=190, unique=true)
      */
