@@ -1070,7 +1070,7 @@ SQL;
         $resourceType = $event->getParam('resourceType');
 
         $hasTags = !empty($query['has_tags']);
-        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanTags($query['tag']));
+        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanStrings($query['tag']));
 
         $formData = [];
         $formData['has_tags'] = $hasTags;
@@ -1096,7 +1096,7 @@ SQL;
         }
         if (!empty($query['tag'])) {
             $filterLabel = $translate('Tag');
-            $filterValue = $this->cleanTags($query['tag']);
+            $filterValue = $this->cleanStrings($query['tag']);
             $filters[$filterLabel] = $filterValue;
         }
         $event->setParam('filters', $filters);
@@ -1133,7 +1133,10 @@ SQL;
         }
 
         if (!empty($query['tag'])) {
-            $tags = $this->cleanTags($query['tag']);
+            $tags = $this->cleanStrings($query['tag']);
+            if (empty($tags)) {
+                return;
+            }
             $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
             $resourceAlias = $adapter->getEntityClass();
@@ -1315,17 +1318,17 @@ SQL;
     }
 
     /**
-     * Clean a list of tags.
+     * Clean a list of alphanumeric strings, separated by a comma.
      *
-     * @param array|string $tags
+     * @param array|string $strings
      * @return array
      */
-    protected function cleanTags($tags)
+    protected function cleanStrings($strings)
     {
-        if (!is_array($tags)) {
-            $tags = explode(',', $tags);
+        if (!is_array($strings)) {
+            $strings = explode(',', $strings);
         }
-        return array_filter(array_map('trim', $tags));
+        return array_filter(array_map('trim', $strings));
     }
 
     /**
