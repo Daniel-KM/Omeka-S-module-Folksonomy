@@ -989,6 +989,9 @@ SQL;
      */
     protected function listResourceTags(AbstractResourceRepresentation $resource)
     {
+        if (empty($resource->id())) {
+            return [];
+        }
         $resourceJson = $resource->jsonSerialize();
         return empty($resourceJson['o-module-folksonomy:tag'])
             ? []
@@ -1003,6 +1006,9 @@ SQL;
      */
     protected function listResourceTaggings(AbstractResourceRepresentation $resource)
     {
+        if (empty($resource->id())) {
+            return [];
+        }
         $resourceJson = $resource->jsonSerialize();
         return empty($resourceJson['o-module-folksonomy:tagging'])
             ? []
