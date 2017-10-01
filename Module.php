@@ -149,9 +149,10 @@ SQL;
     protected function addEntityManagerFilters()
     {
         $services = $this->getServiceLocator();
+        $acl = $services->get('Omeka\Acl');
         $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
         $entityManagerFilters->enable('tagging_visibility');
-        $entityManagerFilters->getFilter('tagging_visibility')->setAcl($services->get('Omeka\Acl'));
+        $entityManagerFilters->getFilter('tagging_visibility')->setAcl($acl);
     }
 
     /**
@@ -525,23 +526,14 @@ SQL;
 
         // Add the tagging part to the resource representation.
         $sharedEventManager->attach(
-            'Omeka\Api\Representation\ItemRepresentation',
-            'rep.resource.json',
-            [$this, 'filterResourceJsonLd']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Representation\ItemSetRepresentation',
-            'rep.resource.json',
-            [$this, 'filterResourceJsonLd']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Representation\MediaRepresentation',
+            \Omeka\Api\Representation\AbstractResourceEntityRepresentation::class,
             'rep.resource.json',
             [$this, 'filterResourceJsonLd']
         );
 
         // Add the tag field to the admin and public advanced search page.
         $sharedEventManager->attach(
+            // TODO Replace this joker.
             '*',
             'view.advanced_search',
             [$this, 'displayAdvancedSearch']
@@ -549,66 +541,26 @@ SQL;
 
         // Add the tagging and tag filters to resource search.
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.search.query',
-            [$this, 'searchQuery']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.search.query',
-            [$this, 'searchQuery']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\MediaAdapter',
+            \Omeka\Api\Adapter\AbstractResourceEntityAdapter::class,
             'api.search.query',
             [$this, 'searchQuery']
         );
 
         // Cache some resources after a search.
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
+            \Omeka\Api\Adapter\AbstractResourceEntityAdapter::class,
             'api.search.post',
             [$this, 'cacheResourceTaggingData']
         );
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.read.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.search.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.read.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\MediaAdapter',
-            'api.search.post',
-            [$this, 'cacheResourceTaggingData']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\MediaAdapter',
+            \Omeka\Api\Adapter\AbstractResourceEntityAdapter::class,
             'api.read.post',
             [$this, 'cacheResourceTaggingData']
         );
 
         // Handle hydration after hydration of resource.
         $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemAdapter',
-            'api.hydrate.post',
-            [$this, 'handleTagging']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\ItemSetAdapter',
-            'api.hydrate.post',
-            [$this, 'handleTagging']
-        );
-        $sharedEventManager->attach(
-            'Omeka\Api\Adapter\MediaAdapter',
+            \Omeka\Api\Adapter\AbstractResourceEntityAdapter::class,
             'api.hydrate.post',
             [$this, 'handleTagging']
         );
