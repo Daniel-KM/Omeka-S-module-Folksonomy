@@ -114,19 +114,13 @@ $deleteRight = $this->userIsAllowed(TagAdapter::class, 'delete');
             </td>
             <td><?php if ($tagCount[$name]['count']) echo $tagCount[$name]['count']; ?></td>
             <td><?php if ($tagCount[$name]['item_sets']) echo $this->hyperlink(
-                $tagCount[$name]['item_sets'],
-                $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $name]),
-                ['class' => 'tag-browse-item-sets']
+                $tagCount[$name]['item_sets'], $tag->urlResources('item-set'), ['class' => 'tag-browse-item-sets']
             ); ?></td>
             <td><?php if ($tagCount[$name]['items']) echo $this->hyperlink(
-                $tagCount[$name]['items'],
-                $this->url('admin/tag-resource', ['resource' => 'item', 'id' => $name]),
-                ['class' => 'tag-browse-items']
+                $tagCount[$name]['items'], $tag->urlResources('item'), ['class' => 'tag-browse-items']
             ); ?></td>
             <td><?php if ($tagCount[$name]['media']) echo $this->hyperlink(
-                $tagCount[$name]['media'],
-                $this->url('admin/tag-resource', ['resource' => 'media', 'id' => $name]),
-                ['class' => 'tag-browse-media']
+                $tagCount[$name]['media'], $tag->urlResources('media'), ['class' => 'tag-browse-media']
             ); ?></td>
         </tr>
         <?php endforeach; ?>

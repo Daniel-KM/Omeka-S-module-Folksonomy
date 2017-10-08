@@ -4,6 +4,9 @@ namespace Folksonomy\View\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Folksonomy\Entity\Tag;
+use Omeka\Entity\Item;
+use Omeka\Entity\ItemSet;
+use Omeka\Entity\Media;
 use PDO;
 use Zend\View\Helper\AbstractHelper;
 
@@ -14,6 +17,9 @@ class TagCount extends AbstractHelper
      */
     protected $connection;
 
+    /**
+     * @param Connection $connection
+     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -22,9 +28,13 @@ class TagCount extends AbstractHelper
     /**
      * Return the count for a list of tags for a specified resource type.
      *
-     * @todo Use Doctrine native queries (here: DBAL query builder).
+     * The stats are available directly as method of Tag, so this helper is
+     * mainly used for performance.
      *
-     * @param array|string $tags If empty, return an array of all tags.
+     * @todo Use Doctrine native queries (here: DBAL query builder) or repositories.
+     *
+     * @param array|string $tags If empty, return an array of all the tags. The
+     * tag may be an entity, a representation or a name.
      * @param string $resourceName If empty returns the count of each resource
      * (item set, item and media), and the total (resources).
      * @param array|string $statuses Filter these statuses.
@@ -48,11 +58,23 @@ class TagCount extends AbstractHelper
         $select = [];
         $select['name'] = 'tag.name';
 
-        $eqTagTagging = $qb->expr()->eq('tagging.tag_id', 'tag.id');
+        $types = [
+            'item_sets' => ItemSet::class,
+            'items' => Item::class,
+            'media' => Media::class,
+            'item_set' => ItemSet::class,
+            'item' => Item::class,
+            ItemSet::class => ItemSet::class,
+            Item::class => Item::class,
+            Media::class => Media::class,
+        ];
+        $resourceType = isset($types[$resourceName]) ? $types[$resourceName] : '';
+
+        $eqTagTagging = $qb->expr()->eq('tag.id', 'tagging.tag_id');
         $eqResourceTagging = $qb->expr()->eq('resource.id', 'tagging.resource_id');
 
         // Select all types of resource separately and together.
-        if (empty($resourceName)) {
+        if (empty($resourceType)) {
             $select['count'] = 'COUNT(resource.resource_type) AS "count"';
             $select['item_sets'] = 'SUM(CASE WHEN resource.resource_type = "Omeka\\\\Entity\\\\ItemSet" THEN 1 ELSE 0 END) AS "item_sets"';
             $select['items'] = 'SUM(CASE WHEN resource.resource_type = "Omeka\\\\Entity\\\\Item" THEN 1 ELSE 0 END) AS "items"';
@@ -69,7 +91,7 @@ class TagCount extends AbstractHelper
         }
 
         // Select all resources together.
-        elseif (in_array($resourceName, ['resources', 'resource', 'Omeka\Entity\Resource'])) {
+        elseif ($resourceType === Resource::class) {
             $select['count'] = 'COUNT(tagging.tag_id) AS "count"';
             if ($usedOnly) {
                 $qb
@@ -89,17 +111,6 @@ class TagCount extends AbstractHelper
 
         // Select one type of resource.
         else {
-            $types = [
-                'item_sets' => 'Omeka\Entity\ItemSet',
-                'items' => 'Omeka\Entity\Item',
-                'media' => 'Omeka\Entity\Media',
-                'item_set' => 'Omeka\Entity\ItemSet',
-                'item' => 'Omeka\Entity\Item',
-                'Omeka\Entity\ItemSet' => 'Omeka\Entity\ItemSet',
-                'Omeka\Entity\Item' => 'Omeka\Entity\Item',
-                'Omeka\Entity\Media' => 'Omeka\Entity\Media',
-            ];
-            $resourceType = isset($types[$resourceName]) ? $types[$resourceName] : '';
             $eqResourceType = $qb->expr()->eq('resource.resource_type', ':resource_type');
             $qb
                 ->setParameter('resource_type', $resourceType);
@@ -131,9 +142,11 @@ class TagCount extends AbstractHelper
         }
 
         if ($tags) {
-            $tags = array_map(function ($v) {
+            // Get a list of tag names from a various list of tags (entity,
+            // representation, names).
+            $tags = array_unique(array_map(function ($v) {
                 return is_object($v) ? ($v instanceof Tag ? $v->getName() : $v->name()) : $v;
-            }, is_array($tags) || $tags instanceof ArrayCollection ? $tags : [$tags]);
+            }, is_array($tags) || $tags instanceof ArrayCollection ? $tags : [$tags]));
 
             // TODO How to do a "WHERE IN" with doctrine and strings?
             $tags = array_map([$this->connection, 'quote'], $tags);
@@ -174,7 +187,7 @@ class TagCount extends AbstractHelper
             ->orderBy($orderBy, $orderDir);
 
         $stmt = $this->connection->executeQuery($qb, $qb->getParameters());
-        $fetchMode = $keyPair && $resourceName
+        $fetchMode = $keyPair && $resourceType
             ? PDO::FETCH_KEY_PAIR
             : (PDO::FETCH_GROUP | PDO::FETCH_UNIQUE);
         $result = $stmt->fetchAll($fetchMode);

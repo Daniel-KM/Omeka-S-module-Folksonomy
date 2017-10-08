@@ -16,30 +16,20 @@
     <div class="meta-group">
         <h4><?php echo $escape($this->translate('Stats')); ?></h4>
         <div class="value"><?php echo sprintf('%s: %s',
-                $escape($this->translate('Total')),
-                $tagCount['count']
-            );
+            $escape($this->translate('Total')),
+            $tagCount['count']);
         ?></div>
         <div class="value"><?php echo sprintf('%s: %s',
             $escape($this->translate('Item sets')),
-            $this->hyperlink(
-                $tagCount['item_sets'],
-                $this->url('admin/tag-resource', ['resource' => 'item-set', 'id' => $tag->name()])
-            ));
+            $this->hyperlink($tagCount['item_sets'], $tag->urlResources('item-set')));
         ?></div>
         <div class="value"><?php echo sprintf('%s: %s',
             $escape($this->translate('Items')),
-            $this->hyperlink(
-                $tagCount['items'],
-                $this->url('admin/tag-resource', ['resource' => 'item', 'id' => $tag->name()])
-            ));
+            $this->hyperlink($tagCount['items'], $tag->urlResources('item')));
         ?></div>
         <div class="value"><?php echo sprintf('%s: %s',
             $escape($this->translate('Medias')),
-            $this->hyperlink(
-                $tagCount['media'],
-                $this->url('admin/tag-resource', ['resource' => 'media', 'id' => $tag->name()])
-            ));
+            $this->hyperlink($tagCount['media'], $tag->urlResources('media')));
         ?></div>
     </div>
 </div>

@@ -8,6 +8,9 @@ use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
+use Omeka\Entity\Item;
+use Omeka\Entity\ItemSet;
+use Omeka\Entity\Media;
 use Omeka\Entity\Resource;
 use Omeka\Entity\User;
 use Omeka\Stdlib\ErrorStore;
@@ -227,6 +230,52 @@ class TaggingAdapter extends AbstractEntityAdapter
         ] as $queryKey => $column) {
             if (array_key_exists($queryKey, $query)) {
                 $this->buildQueryIds($qb, $query[$queryKey], $column, 'id');
+            }
+        }
+
+        if (array_key_exists('has_resource', $query)) {
+            // An empty string means true in order to manage get/post query.
+            if (in_array($query['has_resource'], [false, 'false', 0, '0'], true)) {
+                $qb
+                    ->andWhere($qb->expr()->isNull($this->getEntityClass() . '.resource'));
+            } else {
+                $qb
+                    ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.resource'));
+            }
+        }
+
+        if (array_key_exists('resource_type', $query)) {
+            $mapResourceTypes = [
+                // 'users' => User::class,
+                'resources' => Resource::class,
+                'item_sets' => ItemSet::class,
+                'items' => Item::class,
+                'media' => Media::class,
+            ];
+            if ($query['resource_type'] === 'resources') {
+                $qb
+                     ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.resource'));
+             // TODO Distinct users, else there may be x times the same tagger.
+             // The issue doesn't occur for resource, since there is a check
+             // before.
+             // } elseif ($query['resource_type'] === 'users') {
+             //     $qb
+             //         ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.owner'));
+             } elseif (isset($mapResourceTypes[$query['resource_type']])) {
+                $entityAlias = $this->createAlias();
+                $qb
+                    ->innerJoin(
+                        $mapResourceTypes[$query['resource_type']],
+                        $entityAlias,
+                        'WITH',
+                        $qb->expr()->eq(
+                            $this->getEntityClass() . '.resource',
+                            $entityAlias . '.id'
+                        )
+                    );
+            } elseif ($query['resource_type'] !== '') {
+                $qb
+                    ->andWhere('1 = 0');
             }
         }
     }

@@ -17,6 +17,17 @@ use Omeka\Api\ResourceInterface;
  */
 class TagRepresentation extends AbstractEntityRepresentation
 {
+    /**
+     * Cache for the counts of resources.
+     *
+     * @var array
+     */
+    protected $cacheCounts = [];
+
+    /**
+     * @param ResourceInterface $resource
+     * @param AdapterInterface $adapter
+     */
     public function __construct(ResourceInterface $resource, AdapterInterface $adapter)
     {
         parent::__construct($resource, $adapter);
@@ -134,46 +145,20 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get this tag's specific resource count.
      *
-     * @param string $resourceName
+     * @param string $resourceType
      * @return int
      */
-    public function count($resourceName = 'resources')
+    public function count($resourceType = 'resources')
     {
-        static $counts = [];
-        if (!isset($counts[$resourceName])) {
-            if ($resourceName == 'resources') {
-                $counts[$resourceName] = $this->resourceCount();
-            } else {
-                $response = $this->getServiceLocator()->get('Omeka\ApiManager')
-                    ->search($resourceName, [
-                        'internal_id' => $this->internalId(),
-                        'limit' => 0,
-                    ]);
-                $counts[$resourceName] = $response->getTotalResults();
-            }
+        if (!isset($this->cacheCounts[$resourceType])) {
+            $response = $this->getServiceLocator()->get('Omeka\ApiManager')
+                ->search('taggings', [
+                    'tag' => $this->id(),
+                    'resource_type' => $resourceType,
+                ]);
+            $this->cacheCounts[$resourceType] = $response->getTotalResults();
         }
-        return $counts[$resourceName];
-    }
-
-    /**
-     * Get the total of resources for this tag.
-     *
-     * @todo Use a NamedNativeQueries.
-     */
-    protected function resourceCount()
-    {
-        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-        $conn = $entityManager->getConnection();
-        $qb = $conn->createQueryBuilder();
-        $qb
-            ->select('COUNT(tagging.tag_id)')
-            ->from('tagging', 'tagging')
-            ->where($qb->expr()->eq('tagging.tag_id', ':tag'))
-            ->setParameter('tag', $this->internalId())
-            ->groupBy('tagging.tag_id');
-        $stmt = $conn->executeQuery($qb, $qb->getParameters());
-        $result = $stmt->fetch(\PDO::FETCH_COLUMN);
-        return $result;
+        return $this->cacheCounts[$resourceType];
     }
 
     public function adminUrl($action = null, $canonical = false)
