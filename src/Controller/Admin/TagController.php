@@ -109,15 +109,7 @@ class TagController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
-            // TODO Remove this fix for Omeka S Beta 3.
-            $api = $this->api($form);
-            if (!method_exists($api, 'batchDelete')) {
-                foreach ($resourceIds as $resourceId) {
-                    $response = $this->api($form)->delete('tags', $resourceId, [], ['continueOnError' => true]);
-                }
-            } else {
-                $response = $this->api($form)->batchDelete('tags', $resourceIds, [], ['continueOnError' => true]);
-            }
+            $response = $this->api($form)->batchDelete('tags', $resourceIds, [], ['continueOnError' => true]);
             if ($response) {
                 $this->messenger()->addSuccess('Tags successfully deleted.'); // @translate
             }

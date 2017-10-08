@@ -137,15 +137,7 @@ class TaggingController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
-            // TODO Remove this fix for Omeka S Beta 3.
-            $api = $this->api($form);
-            if (!method_exists($api, 'batchDelete')) {
-                foreach ($resourceIds as $resourceId) {
-                    $response = $this->api($form)->delete('taggings', $resourceId, [], ['continueOnError' => true]);
-                }
-            } else {
-                $response = $this->api($form)->batchDelete('taggings', $resourceIds, [], ['continueOnError' => true]);
-            }
+            $response = $this->api($form)->batchDelete('taggings', $resourceIds, [], ['continueOnError' => true]);
             if ($response) {
                 $this->messenger()->addSuccess('Taggings successfully deleted.'); // @translate
             }
@@ -209,18 +201,8 @@ class TaggingController extends AbstractActionController
 
         $data = [];
         $data['o:status'] = $status;
-        $api = $this->api();
-        // TODO Remove this fix for Omeka S Beta 3.
-        $api = $this->api();
-        if (!method_exists($api, 'batchUpdate')) {
-            foreach ($resourceIds as $resourceId) {
-                $response = $this->api()
-                    ->update('taggings', $resourceId, $data, ['continueOnError' => true]);
-            }
-        } else {
-            $response = $this->api()
-                ->batchUpdate('taggings', $resourceIds, $data, ['continueOnError' => true]);
-        }
+        $response = $this->api()
+            ->batchUpdate('taggings', $resourceIds, $data, ['continueOnError' => true]);
         if (!$response) {
             return $this->jsonErrorUpdate();
         }
