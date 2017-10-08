@@ -2,10 +2,16 @@
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
+use Folksonomy\Api\Representation\TagRepresentation;
+use Folksonomy\Entity\Tag;
+use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Api\Response;
 use Omeka\Entity\EntityInterface;
+use Omeka\Entity\Item;
+use Omeka\Entity\ItemSet;
+use Omeka\Entity\Media;
 use Omeka\Stdlib\ErrorStore;
 use Omeka\Stdlib\Message;
 use Zend\EventManager\Event;
@@ -37,12 +43,12 @@ class TagAdapter extends AbstractEntityAdapter
 
     public function getRepresentationClass()
     {
-        return 'Folksonomy\Api\Representation\TagRepresentation';
+        return TagRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return 'Folksonomy\Entity\Tag';
+        return Tag::class;
     }
 
     public function hydrate(Request $request, EntityInterface $entity,
@@ -120,7 +126,8 @@ class TagAdapter extends AbstractEntityAdapter
             $this->buildQueryValuesItself($qb, $query['name'], 'name');
         }
 
-        // All tags for these entities ("OR"). If multiple, mixed with "AND".
+        // All tags for these entities ("OR"). If multiple, mixed with "AND",
+        // so, for mixed resources, use "resource_id".
         $subQueryKeys = array_intersect_key(
             [
                 'tagging_id' => 'id',
@@ -138,7 +145,7 @@ class TagAdapter extends AbstractEntityAdapter
             $taggingAlias = $this->createAlias();
             $qb
                 ->innerJoin(
-                    'Folksonomy\Entity\Tagging',
+                    Tagging::class,
                     $taggingAlias,
                     'WITH',
                     $qb->expr()->andX(
@@ -163,10 +170,10 @@ class TagAdapter extends AbstractEntityAdapter
                     $orderBy = 'COUNT(' . $taggingAlias . '.tag)';
                     $qb
                         ->leftJoin(
-                            'Folksonomy\Entity\Tagging',
+                            Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->addSelect($orderBy . ' AS HIDDEN ' . $orderAlias)
                         ->addOrderBy($orderAlias, $query['sort_order'])
@@ -176,9 +183,9 @@ class TagAdapter extends AbstractEntityAdapter
                 case 'items':
                 case 'media':
                     $types = [
-                        'item_sets' => 'Omeka\Entity\ItemSet',
-                        'items' => 'Omeka\Entity\Item',
-                        'media' => 'Omeka\Entity\Media',
+                        'item_sets' => ItemSet::class,
+                        'items' => Item::class,
+                        'media' => Media::class,
                     ];
                     $resourceType = $types[$query['sort_by']];
                     $taggingAlias = $this->createAlias();
@@ -187,10 +194,10 @@ class TagAdapter extends AbstractEntityAdapter
                     $orderBy = 'COUNT(' . $resourceAlias . '.id)';
                     $qb
                         ->leftJoin(
-                            'Folksonomy\Entity\Tagging',
+                            Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->leftJoin(
                             $resourceType,
@@ -208,10 +215,10 @@ class TagAdapter extends AbstractEntityAdapter
                     $orderBy = $taggingAlias . '.created';
                     $qb
                         ->leftJoin(
-                            'Folksonomy\Entity\Tagging',
+                            Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', 'Folksonomy\Entity\Tag')
+                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->addOrderBy($orderBy, $query['sort_order'])
                     ;

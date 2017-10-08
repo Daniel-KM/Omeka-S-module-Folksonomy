@@ -48,7 +48,7 @@ class TaggingVisibilityFilter extends SQLFilter
      */
     protected function getTaggingConstraint($alias)
     {
-        if ($this->acl->userIsAllowed('Folksonomy\Entity\Tagging', 'view-all')) {
+        if ($this->acl->userIsAllowed(Tagging::class, 'view-all')) {
             return '';
         }
 

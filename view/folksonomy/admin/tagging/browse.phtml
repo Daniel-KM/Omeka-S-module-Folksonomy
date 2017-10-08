@@ -1,4 +1,6 @@
 <?php
+use Folksonomy\Api\Adapter\TaggingAdapter;
+
 $escape = $this->plugin('escapeHtml');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
@@ -25,8 +27,8 @@ $sortHeadings = [
         'value' => 'created'
     ],
 ];
-$editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'update')
-    || $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'delete');
+$editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
+    || $this->userIsAllowed(TaggingAdapter::class, 'delete');
 ?>
 
 <?php echo $this->pageTitle($this->translate('Taggings')); ?>
@@ -43,7 +45,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
 
 <?php if ($taggings): ?>
 <div id="page-actions">
-    <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'update')): ?>
+    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'update')): ?>
     <a href="#"
         class="button batch-actions status-batch"
         data-status-batch-url="<?php echo $escape($this->url(null, ['action' => 'batch-approve'], true)); ?>"
@@ -57,7 +59,7 @@ $editRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'upda
         aria-label="<?php echo $escape($this->translate('Reject')); ?>"
         title="<?php echo $escape($this->translate('Reject')); ?>"><?php echo $escape($this->translate('Reject')); ?></a>
     <?php endif; ?>
-    <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TaggingAdapter', 'delete')): ?>
+    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'delete')): ?>
     <a href="#"
         class="button delete batch-actions sidebar-content"
         data-sidebar-content-url="<?php echo $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)); ?>"

@@ -3,6 +3,8 @@ namespace Folksonomy\Api\Representation;
 
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
+use Omeka\Api\Representation\UserRepresentation;
 use Omeka\Api\ResourceInterface;
 
 /**
@@ -82,7 +84,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the resources associated with this tag.
      *
-     * @return array Array of ResourceRepresentations
+     * @return array Array of AbstractResourceEntityRepresentation
      */
     public function resources()
     {
@@ -107,7 +109,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the owners associated with this tag.
      *
-     * @return array Array of UserRepresentations
+     * @return array Array of UserRepresentation
      */
     public function owners()
     {

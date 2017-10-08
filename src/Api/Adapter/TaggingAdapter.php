@@ -2,6 +2,7 @@
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
+use Folksonomy\Api\Representation\TaggingRepresentation;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
@@ -54,7 +55,7 @@ class TaggingAdapter extends AbstractEntityAdapter
      */
     public function getRepresentationClass()
     {
-        return 'Folksonomy\Api\Representation\TaggingRepresentation';
+        return TaggingRepresentation::class;
     }
 
     /**
@@ -62,7 +63,7 @@ class TaggingAdapter extends AbstractEntityAdapter
      */
     public function getEntityClass()
     {
-        return 'Folksonomy\Entity\Tagging';
+        return Tagging::class;
     }
 
     /**
@@ -202,7 +203,7 @@ class TaggingAdapter extends AbstractEntityAdapter
             $tagAlias = $this->createAlias();
             $qb
                 ->innerJoin(
-                    'Folksonomy\Entity\Tag',
+                   Tag::class,
                     $tagAlias,
                     'WITH',
                     $qb->expr()->andX(
@@ -239,7 +240,7 @@ class TaggingAdapter extends AbstractEntityAdapter
             switch ($query['sort_by']) {
                 case 'tag_name':
                     $alias = $this->createAlias();
-                    $qb->leftJoin('Folksonomy\Entity\Tagging.tag', $alias)
+                    $qb->leftJoin(Tagging::class . '.tag', $alias)
                         ->addOrderBy($alias . '.name', $query['sort_order']);
                     break;
                 // case 'resource_title':
@@ -249,7 +250,7 @@ class TaggingAdapter extends AbstractEntityAdapter
                 //     break;
                 case 'owner_name':
                     $alias = $this->createAlias();
-                    $qb->leftJoin('Folksonomy\Entity\Tagging.owner', $alias)
+                    $qb->leftJoin(Tagging::class . '.owner', $alias)
                         ->addOrderBy($alias . '.name', $query['sort_order']);
                     break;
                 default:

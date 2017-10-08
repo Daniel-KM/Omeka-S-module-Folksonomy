@@ -1,4 +1,6 @@
 <?php
+use Folksonomy\Api\Adapter\TagAdapter;
+
 $escape = $this->plugin('escapeHtml');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
@@ -29,8 +31,8 @@ $sortHeadings = [
         'value' => 'recent'
     ],
 ];
-$updateRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'update');
-$deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete');
+$updateRight = $this->userIsAllowed(TagAdapter::class, 'update');
+$deleteRight = $this->userIsAllowed(TagAdapter::class, 'delete');
 ?>
 
 <?php echo $this->pageTitle($this->translate('Tags')); ?>
@@ -47,7 +49,7 @@ $deleteRight = $this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete
 
 <?php if ($tags): ?>
 <div id="page-actions">
-    <?php if ($this->userIsAllowed('Folksonomy\Api\Adapter\TagAdapter', 'delete')): ?>
+    <?php if ($this->userIsAllowed(TagAdapter::class, 'delete')): ?>
     <a href="#"
         class="button delete batch-actions sidebar-content"
         data-sidebar-content-url="<?php echo $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)); ?>"

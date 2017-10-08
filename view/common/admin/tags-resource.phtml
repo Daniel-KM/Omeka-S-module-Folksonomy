@@ -1,8 +1,10 @@
 <?php
+use Folksonomy\Entity\Tagging;
+
 if ($tags):
     $escape = $this->plugin('escapeHtml');
     $resourceName = $resource->getControllerName();
-    $updateRight = $this->userIsAllowed('Folksonomy\Entity\Tagging', 'update');
+    $updateRight = $this->userIsAllowed(Tagging::class, 'update');
 ?>
 <div class="meta-group folksonomy">
     <h4><?php echo $this->translate('Tags'); ?></h4>
