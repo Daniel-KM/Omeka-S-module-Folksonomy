@@ -196,26 +196,34 @@ class TagRepresentation extends AbstractEntityRepresentation
      *
      * Similar to url(), but with the type of resource.
      *
-     * @param string|null $resource May be "resource" (unsupported), "item-set",
+     * @param string|null $resourceType May be "resource" (unsupported), "item-set",
      * "item" or "media" (unsupported in public view).
      * @param bool $canonical Whether to return an absolute URL
      * @return string
      */
-    public function urlResources($resource = null, $canonical = false)
+    public function urlResources($resourceType = null, $canonical = false)
     {
+        $mapResource = [
+            'resources' => 'resource',
+            'items' => 'item',
+            'item_sets' => 'item-set',
+        ];
+        if (isset($mapResource[$resourceType])) {
+            $resourceType = $mapResource[$resourceType];
+        }
         $routeMatch = $this->getServiceLocator()->get('Application')
             ->getMvcEvent()->getRouteMatch();
         $url = null;
         if ($routeMatch->getParam('__ADMIN__')) {
             $url = $this->getViewHelper('Url');
-            if (is_null($resource)) {
-                $resource = 'item';
+            if (is_null($resourceType)) {
+                $resourceType = 'item';
             }
             return $url(
                 'admin/tag-resource',
                 [
                     'id' => $this->name(),
-                    'resource' => $resource,
+                    'resource' => $resourceType,
                 ],
                 ['force_canonical' => $canonical]
             );
@@ -224,11 +232,11 @@ class TagRepresentation extends AbstractEntityRepresentation
                 ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
             $url = $this->getViewHelper('Url');
             return $url(
-                is_null($resource) ? 'site/tag-id' : 'site/tag-resource',
+                is_null($resourceType) ? 'site/tag-id' : 'site/tag-resource',
                 [
                     'site-slug' => $siteSlug,
                     'id' => $this->name(),
-                    'resource' => $resource,
+                    'resource' => $resourceType,
                 ],
                 ['force_canonical' => $canonical]
             );
