@@ -26,6 +26,11 @@ class DeleteTags extends AbstractPlugin
      */
     protected $entityManager;
 
+    /**
+     * @param Api $api
+     * @param Acl $acl
+     * @param EntityManager $entityManager
+     */
     public function __construct(Api $api, Acl $acl, EntityManager $entityManager)
     {
         $this->api = $api;
@@ -43,7 +48,7 @@ class DeleteTags extends AbstractPlugin
     public function __invoke(Resource $resource, array $tags)
     {
         if (empty($tags)) {
-            return;
+            return [];
         }
 
         if (!$this->acl->userIsAllowed(Tagging::class, 'delete')) {
@@ -59,6 +64,7 @@ class DeleteTags extends AbstractPlugin
         ])->getContent();
 
         $deletedTags = [];
+
         foreach ($tagsToDelete as $tag) {
             $tagName = $tag->name();
             $taggings = $this->api
@@ -73,6 +79,7 @@ class DeleteTags extends AbstractPlugin
             }
             $deletedTags[] = $tagName;
         }
+
         return $deletedTags;
     }
 }

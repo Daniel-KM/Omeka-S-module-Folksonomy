@@ -29,7 +29,7 @@ class TagCount extends AbstractHelper
      * Return the count for a list of tags for a specified resource type.
      *
      * The stats are available directly as method of Tag, so this helper is
-     * mainly used for performance.
+     * mainly used for performance (one query for all stats).
      *
      * @todo Use Doctrine native queries (here: DBAL query builder) or repositories.
      *
@@ -149,9 +149,9 @@ class TagCount extends AbstractHelper
             }, is_array($tags) || $tags instanceof ArrayCollection ? $tags : [$tags]));
 
             // TODO How to do a "WHERE IN" with doctrine and strings?
-            $tags = array_map([$this->connection, 'quote'], $tags);
+            $quotedTags = array_map([$this->connection, 'quote'], $tags);
             $qb
-                ->andWhere($qb->expr()->in('tag.name', $tags));
+                ->andWhere($qb->expr()->in('tag.name', $quotedTags));
         }
 
         if ($statuses) {

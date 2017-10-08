@@ -39,6 +39,13 @@ class AddTags extends AbstractPlugin
      */
     protected $entityManagerFilters;
 
+    /**
+     * @param Api $api
+     * @param Acl $acl
+     * @param Settings $settings
+     * @param ApiAdapterManager $apiAdapterManager
+     * @param FilterCollection $entityManagerFilters
+     */
     public function __construct(
         Api $api,
         Acl $acl,
@@ -72,6 +79,12 @@ class AddTags extends AbstractPlugin
 
     protected function addTagsToResource(Resource $resource, array $tags)
     {
+        $acl = $this->acl;
+        $add = $acl->userIsAllowed(Tagging::class, 'create');
+        if (!$add) {
+            return;
+        }
+
         // A quick cleaning (and "0" may be a valid tag).
         $tags = array_filter(
             array_unique(
@@ -83,12 +96,6 @@ class AddTags extends AbstractPlugin
             function ($v) { return strlen($v); }
         );
         if (empty($tags)) {
-            return;
-        }
-
-        $acl = $this->acl;
-        $add = $acl->userIsAllowed(Tagging::class, 'create');
-        if (!$add) {
             return;
         }
 
@@ -142,6 +149,7 @@ class AddTags extends AbstractPlugin
 
         // Add tags to the resource and update the status if needed.
         $addedTags = [];
+
         foreach ($tagsToAdd as $tagName => $tag) {
             $taggings = $resourceId
                 ? $api

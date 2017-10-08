@@ -37,7 +37,7 @@ class TagController extends AbstractActionController
 
         $view = new ViewModel;
         $view->setTerminal(true);
-        $view->setVariable('tag', $tag);
+        $view->setVariable('resource', $tag);
         $view->setVariable('tagCount', $tagCount);
         return $view;
     }

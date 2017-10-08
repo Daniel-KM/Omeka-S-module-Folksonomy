@@ -29,7 +29,7 @@ class TaggingController extends AbstractActionController
 
         $view = new ViewModel;
         $view->setTerminal(true);
-        $view->setVariable('tagging', $tagging);
+        $view->setVariable('resource', $tagging);
         return $view;
     }
 

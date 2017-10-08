@@ -15,7 +15,7 @@ use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\Config as ConfigForm;
 use Folksonomy\Form\Search as SearchForm;
-use Omeka\Api\Representation\AbstractResourceRepresentation;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
@@ -622,7 +622,7 @@ SQL;
             $sharedEventManager->attach(
                 $controller,
                 'view.show.after',
-                [$this, 'displayViewResourceTags']
+                [$this, 'viewShowAfter']
             );
 
             // Add the show tags to the resource browse admin pages (details).
@@ -634,7 +634,7 @@ SQL;
             $sharedEventManager->attach(
                 $controller,
                 'view.details',
-                [$this, 'displayViewEntityTags']
+                [$this, 'viewDetails']
             );
 
             // Filter the search filters for the advanced search pages.
@@ -663,7 +663,7 @@ SQL;
                 $sharedEventManager->attach(
                     $controller,
                     'view.show.after',
-                    [$this, 'displayViewResourceTagsPublic']
+                    [$this, 'viewShowAfterPublic']
                 );
             }
         }
@@ -738,6 +738,40 @@ SQL;
     }
 
     /**
+     * Cache taggings and tags for resource API search/read.
+     *
+     * @internal The cache avoids self::filterItemJsonLd() to make multiple
+     * queries to the database during one request.
+     *
+     * @param Event $event
+     */
+    public function cacheResourceTaggingData(Event $event)
+    {
+        $content = $event->getParam('response')->getContent();
+        // Check if this is an api search or api read to get the list of ids.
+        $resourceIds = is_array($content)
+            ? array_map(function ($v) { return $v->getId(); }, $content)
+            : [$content->getId()];
+        if (empty($resourceIds)) {
+            return;
+        }
+
+        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+        $taggings = $api
+            ->search('taggings', ['resource_id' => $resourceIds])
+            ->getContent();
+        foreach ($taggings as $tagging) {
+            $resourceId = $tagging->resource()->id();
+            // Cache tags.
+            if (!is_null($tagging->tag())) {
+                $this->cache['tags'][$resourceId][$tagging->tag()->id()] = $tagging->tag();
+            }
+            // Cache taggings.
+            $this->cache['taggings'][$resourceId][$tagging->id()] = $tagging;
+        }
+    }
+
+    /**
      * Add the taggings data to the resource JSON-LD.
      *
      * @todo Use tag and tagging reference, not representation.
@@ -745,271 +779,15 @@ SQL;
      */
     public function filterResourceJsonLd(Event $event)
     {
-        $resource = $event->getTarget();
+        $resourceId = $event->getTarget()->id();
         $jsonLd = $event->getParam('jsonLd');
-        if (isset($this->cache['tags'][$resource->id()])) {
-            $jsonLd['o-module-folksonomy:tag'] = array_values($this->cache['tags'][$resource->id()]);
+        if (isset($this->cache['tags'][$resourceId])) {
+            $jsonLd['o-module-folksonomy:tag'] = array_values($this->cache['tags'][$resourceId]);
         }
-        if (isset($this->cache['taggings'][$resource->id()])) {
-            $jsonLd['o-module-folksonomy:tagging'] = array_values($this->cache['taggings'][$resource->id()]);
+        if (isset($this->cache['taggings'][$resourceId])) {
+            $jsonLd['o-module-folksonomy:tagging'] = array_values($this->cache['taggings'][$resourceId]);
         }
         $event->setParam('jsonLd', $jsonLd);
-    }
-
-    public function addHeadersAdmin(Event $event)
-    {
-        $view = $event->getTarget();
-        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
-        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
-    }
-
-    /**
-     * Add the tagging tab to section navigations.
-     *
-     * @param Event $event
-     */
-    public function addTaggingTab(Event $event)
-    {
-        $sectionNav = $event->getParam('section_nav');
-        $sectionNav['tags'] = 'Tags'; // @translate
-        $event->setParam('section_nav', $sectionNav);
-    }
-
-    /**
-     * Display the tagging form.
-     *
-     * @param Event $event
-     */
-    public function displayTaggingForm(Event $event)
-    {
-        $vars = $event->getTarget()->vars();
-        // Manage add/edit form.
-        if (isset($vars->item)) {
-            $vars->offsetSet('resource', $vars->item);
-        } elseif (isset($vars->itemSet)) {
-            $vars->offsetSet('resource', $vars->itemSet);
-        } elseif (isset($vars->media)) {
-            $vars->offsetSet('resource', $vars->media);
-        } else {
-            $vars->offsetSet('resource', null);
-            $vars->offsetSet('tags', []);
-            $vars->offsetSet('taggings', []);
-        }
-        if ($vars->resource) {
-            $vars->offsetSet('tags', $this->listResourceTagsByName($vars->resource));
-            $vars->offsetSet('taggings', $this->listResourceTaggingsByName($vars->resource));
-        }
-
-        echo $event->getTarget()->partial(
-            'common/admin/tagging-form.phtml'
-        );
-    }
-
-    /**
-     * Display the quick tagging form.
-     *
-     * @param Event $event
-     */
-    public function displayTaggingQuickForm(Event $event)
-    {
-        $view = $event->getTarget();
-        $resource = $event->getTarget()->resource;
-        echo $view->showTaggingForm($resource);
-    }
-
-    /**
-     * Display the tags for a resource.
-     *
-     * @param Event $event
-     */
-    public function displayViewResourceTags(Event $event)
-    {
-        $acl = $this->getServiceLocator()->get('Omeka\Acl');
-        $allowed = $acl->userIsAllowed(Tagging::class, 'create');
-
-        echo '<div id="tags" class="section">';
-        $resource = $event->getTarget()->resource;
-        $this->displayResourceFolksonomy($event, $resource);
-        if ($allowed) {
-            $this->displayTaggingQuickForm($event);
-        }
-        echo '</div>';
-    }
-
-    /**
-     * Display the tags for a resource in public.
-     *
-     * @param Event $event
-     */
-    public function displayViewResourceTagsPublic(Event $event)
-    {
-        $view = $event->getTarget();
-        $resource = $event->getTarget()->resource;
-        echo $view->showTags($resource);
-
-        $this->displayTaggingQuickForm($event);
-    }
-
-    /**
-     * Display the tags for a resource.
-     *
-     * @param Event $event
-     */
-    public function displayViewEntityTags(Event $event)
-    {
-        $representation = $event->getParam('entity');
-        $this->displayResourceFolksonomy($event, $representation);
-    }
-
-    /**
-     * Helper to display the tags for a resource.
-     *
-     * @param Event $event
-     * @param AbstractResourceRepresentation $resource
-     */
-    protected function displayResourceFolksonomy(Event $event, AbstractResourceRepresentation $resource)
-    {
-        $isViewDetails = $event->getName() == 'view.details';
-        $tags = $this->listResourceTagsByName($resource);
-        $taggings = $this->listResourceTaggingsByName($resource);
-        $partial = $isViewDetails
-            ? 'common/admin/tags-resource.phtml'
-            : 'common/admin/tags-resource-list.phtml';
-        echo $event->getTarget()->partial(
-            $partial,
-            [
-                'resource' => $resource,
-                'tags' => $tags,
-                'taggings' => $taggings,
-            ]
-        );
-    }
-
-    /**
-     * Helper to return tags of a resource.
-     *
-     * @param AbstractResourceRepresentation $resource
-     * @return array
-     */
-    protected function listResourceTags(AbstractResourceRepresentation $resource)
-    {
-        if (empty($resource->id())) {
-            return [];
-        }
-        $resourceJson = $resource->jsonSerialize();
-        return empty($resourceJson['o-module-folksonomy:tag'])
-            ? []
-            : $resourceJson['o-module-folksonomy:tag'];
-    }
-
-    /**
-     * Helper to return taggings of a resource.
-     *
-     * @param AbstractResourceRepresentation $resource
-     * @return array
-     */
-    protected function listResourceTaggings(AbstractResourceRepresentation $resource)
-    {
-        if (empty($resource->id())) {
-            return [];
-        }
-        $resourceJson = $resource->jsonSerialize();
-        return empty($resourceJson['o-module-folksonomy:tagging'])
-            ? []
-            : $resourceJson['o-module-folksonomy:tagging'];
-    }
-
-    /**
-     * Helper to return tags of a resource by name.
-     *
-     * @param AbstractResourceRepresentation $resource
-     * @return array
-     */
-    protected function listResourceTagsByName(AbstractResourceRepresentation $resource)
-    {
-        $result = [];
-        $tags = $this->listResourceTags($resource);
-        foreach ($tags as $tag) {
-            $result[$tag->name()] = $tag;
-        }
-        return $result;
-    }
-
-    /**
-     * Helper to return a list of taggings of a resource by tag name.
-     *
-     * @param AbstractResourceRepresentation $resource
-     * @return array
-     */
-    protected function listResourceTaggingsByName(AbstractResourceRepresentation $resource)
-    {
-        $result = [];
-        $taggings = $this->listResourceTaggings($resource);
-        foreach ($taggings as $tagging) {
-            $tag = $tagging->tag();
-            $result[$tag ? $tag->name() : ''] = $tagging;
-        }
-        return $result;
-    }
-
-    /**
-     * Helper to return a flat list of tags by id.
-     *
-     * @param AbstractResourceRepresentation $resource
-     * @return array
-     */
-    protected function listFlatResourceTags(AbstractResourceRepresentation $resource)
-    {
-        $result = [];
-        $tags = $this->listResourceTags($resource);
-        foreach ($tags as $tag) {
-            $result[$tag->internalId()] = $tag->name();
-        }
-        return $result;
-    }
-
-    public function displayAdvancedSearch(Event $event)
-    {
-        $services = $this->getServiceLocator();
-        $formElementManager = $services->get('FormElementManager');
-        $form = $formElementManager->get(SearchForm::class);
-        $form->init();
-
-        $view = $event->getTarget();
-        $query = $event->getParam('query', []);
-        $resourceType = $event->getParam('resourceType');
-
-        $hasTags = !empty($query['has_tags']);
-        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanStrings($query['tag']));
-
-        $formData = [];
-        $formData['has_tags'] = $hasTags;
-        $formData['tag'] = $tags;
-        $form->setData($formData);
-
-        $vars = $event->getTarget()->vars();
-        $vars->offsetSet('searchTagForm', $form);
-
-        echo $event->getTarget()
-            ->partial('common/tags-advanced-search.phtml');
-    }
-
-    public function filterSearchFilters(Event $event)
-    {
-        $translate = $event->getTarget()->plugin('translate');
-        $filters = $event->getParam('filters');
-        $query = $event->getParam('query', []);
-        if (!empty($query['has_tags'])) {
-            $filterLabel = $translate('Has tags');
-            $filterValue = $translate('true');
-            $filters[$filterLabel][] = $filterValue;
-        }
-        if (!empty($query['tag'])) {
-            $filterLabel = $translate('Tag');
-            $filterValue = $this->cleanStrings($query['tag']);
-            $filters[$filterLabel] = $filterValue;
-        }
-        $event->setParam('filters', $filters);
     }
 
     /**
@@ -1031,15 +809,16 @@ SQL;
             $adapter = $event->getTarget();
             $taggingAlias = $adapter->createAlias();
             $resourceAlias = $adapter->getEntityClass();
-            $qb->innerJoin(
-                Tagging::class,
-                $taggingAlias,
-                'WITH',
-                $qb->expr()->andX(
-                    $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
-                    $qb->expr()->isNotNull($taggingAlias . '.tag')
-                )
-            );
+            $qb
+                ->innerJoin(
+                    Tagging::class,
+                    $taggingAlias,
+                    'WITH',
+                    $qb->expr()->andX(
+                        $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                        $qb->expr()->isNotNull($taggingAlias . '.tag')
+                    )
+                );
         }
 
         if (!empty($query['tag'])) {
@@ -1093,40 +872,6 @@ SQL;
                         $adapter->createNamedParameter($qb, $tag)
                     ));
             }
-        }
-    }
-
-    /**
-     * Cache taggings and tags for resource API search/read.
-     *
-     * @internal The cache avoids self::filterItemJsonLd() to make multiple
-     * queries to the database during one request.
-     *
-     * @param Event $event
-     */
-    public function cacheResourceTaggingData(Event $event)
-    {
-        $content = $event->getParam('response')->getContent();
-        // Check if this is an api search or api read to get the list of ids.
-        $resourceIds = is_array($content)
-            ? array_map(function ($v) { return $v->getId(); }, $content)
-            : [$content->getId()];
-        if (empty($resourceIds)) {
-            return;
-        }
-
-        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
-        $taggings = $api
-            ->search('taggings', ['resource_id' => $resourceIds])
-            ->getContent();
-        foreach ($taggings as $tagging) {
-            $resourceId = $tagging->resource()->id();
-            // Cache tags.
-            if (!is_null($tagging->tag())) {
-                $this->cache['tags'][$resourceId][$tagging->tag()->id()] = $tagging->tag();
-            }
-            // Cache taggings.
-            $this->cache['taggings'][$resourceId][$tagging->id()] = $tagging;
         }
     }
 
@@ -1226,6 +971,265 @@ SQL;
             $deleteTags = $controllerPlugins->get('deleteTags');
             $deleteTags($resource, $deletedTags);
         }
+    }
+
+    public function addHeadersAdmin(Event $event)
+    {
+        $view = $event->getTarget();
+        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
+        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+    }
+
+    /**
+     * Add the tagging tab to section navigations.
+     *
+     * @param Event $event
+     */
+    public function addTaggingTab(Event $event)
+    {
+        $sectionNav = $event->getParam('section_nav');
+        $sectionNav['tags'] = 'Tags'; // @translate
+        $event->setParam('section_nav', $sectionNav);
+    }
+
+    /**
+     * Display the tagging form.
+     *
+     * @param Event $event
+     */
+    public function displayTaggingForm(Event $event)
+    {
+        $vars = $event->getTarget()->vars();
+        // Manage add/edit form.
+        if (isset($vars->item)) {
+            $vars->offsetSet('resource', $vars->item);
+        } elseif (isset($vars->itemSet)) {
+            $vars->offsetSet('resource', $vars->itemSet);
+        } elseif (isset($vars->media)) {
+            $vars->offsetSet('resource', $vars->media);
+        } else {
+            $vars->offsetSet('resource', null);
+            $vars->offsetSet('tags', []);
+            $vars->offsetSet('taggings', []);
+        }
+        if ($vars->resource) {
+            $vars->offsetSet('tags', $this->listResourceTagsByName($vars->resource));
+            $vars->offsetSet('taggings', $this->listResourceTaggingsByName($vars->resource));
+        }
+
+        echo $event->getTarget()->partial(
+            'common/admin/tagging-form.phtml'
+        );
+    }
+
+    /**
+     * Display the quick tagging form.
+     *
+     * @param Event $event
+     */
+    public function displayTaggingQuickForm(Event $event)
+    {
+        $view = $event->getTarget();
+        $resource = $event->getTarget()->resource;
+        echo $view->showTaggingForm($resource);
+    }
+
+    /**
+     * Display the tags for a resource.
+     *
+     * @param Event $event
+     */
+    public function viewShowAfter(Event $event)
+    {
+        $acl = $this->getServiceLocator()->get('Omeka\Acl');
+        $allowed = $acl->userIsAllowed(Tagging::class, 'create');
+
+        echo '<div id="tags" class="section">';
+        $resource = $event->getTarget()->resource;
+        $this->displayResourceFolksonomy($event, $resource, false);
+        if ($allowed) {
+            $this->displayTaggingQuickForm($event);
+        }
+        echo '</div>';
+    }
+
+    /**
+     * Display the tags for a resource in public.
+     *
+     * @param Event $event
+     */
+    public function viewShowAfterPublic(Event $event)
+    {
+        $view = $event->getTarget();
+        $resource = $event->getTarget()->resource;
+        echo $view->showTags($resource);
+
+        $this->displayTaggingQuickForm($event);
+    }
+
+    /**
+     * Display the tags for a resource (details).
+     *
+     * @param Event $event
+     */
+    public function viewDetails(Event $event)
+    {
+        $representation = $event->getParam('entity');
+        $this->displayResourceFolksonomy($event, $representation, true);
+    }
+
+    /**
+     * Helper to display the tags for a resource.
+     *
+     * @param Event $event
+     * @param AbstractResourceEntityRepresentation $resource
+     * @param bool $listAsDiv Return the list with div, not ul.
+     */
+    protected function displayResourceFolksonomy(
+        Event $event,
+        AbstractResourceEntityRepresentation $resource,
+        $listAsDiv = false
+    ) {
+        $tags = $this->listResourceTagsByName($resource);
+        $taggings = $this->listResourceTaggingsByName($resource);
+        $partial = $listAsDiv
+            ? 'common/admin/tags-resource.phtml'
+            : 'common/admin/tags-resource-list.phtml';
+        echo $event->getTarget()->partial(
+            $partial,
+            [
+                'resource' => $resource,
+                'tags' => $tags,
+                'taggings' => $taggings,
+            ]
+        );
+    }
+
+    public function displayAdvancedSearch(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $formElementManager = $services->get('FormElementManager');
+        $form = $formElementManager->get(SearchForm::class);
+        $form->init();
+
+        $view = $event->getTarget();
+        $query = $event->getParam('query', []);
+        $resourceType = $event->getParam('resourceType');
+
+        $hasTags = !empty($query['has_tags']);
+        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanStrings($query['tag']));
+
+        $formData = [];
+        $formData['has_tags'] = $hasTags;
+        $formData['tag'] = $tags;
+        $form->setData($formData);
+
+        $vars = $event->getTarget()->vars();
+        $vars->offsetSet('searchTagForm', $form);
+
+        echo $event->getTarget()
+            ->partial('common/tags-advanced-search.phtml');
+    }
+
+    public function filterSearchFilters(Event $event)
+    {
+        $translate = $event->getTarget()->plugin('translate');
+        $filters = $event->getParam('filters');
+        $query = $event->getParam('query', []);
+        if (!empty($query['has_tags'])) {
+            $filterLabel = $translate('Has tags'); // @translate
+            $filterValue = $translate('true');
+            $filters[$filterLabel][] = $filterValue;
+        }
+        if (!empty($query['tag'])) {
+            $filterLabel = $translate('Tag'); // @translate
+            $filterValue = $this->cleanStrings($query['tag']);
+            $filters[$filterLabel] = $filterValue;
+        }
+        $event->setParam('filters', $filters);
+    }
+
+    /**
+     * Helper to return tags of a resource.
+     *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTags(AbstractResourceEntityRepresentation $resource)
+    {
+        if (empty($resource->id())) {
+            return [];
+        }
+        $resourceJson = $resource->jsonSerialize();
+        return empty($resourceJson['o-module-folksonomy:tag'])
+            ? []
+            : $resourceJson['o-module-folksonomy:tag'];
+    }
+
+    /**
+     * Helper to return taggings of a resource.
+     *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTaggings(AbstractResourceEntityRepresentation $resource)
+    {
+        if (empty($resource->id())) {
+            return [];
+        }
+        $resourceJson = $resource->jsonSerialize();
+        return empty($resourceJson['o-module-folksonomy:tagging'])
+            ? []
+            : $resourceJson['o-module-folksonomy:tagging'];
+    }
+
+    /**
+     * Helper to return tags of a resource by name.
+     *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTagsByName(AbstractResourceEntityRepresentation $resource)
+    {
+        $result = [];
+        $tags = $this->listResourceTags($resource);
+        foreach ($tags as $tag) {
+            $result[$tag->name()] = $tag;
+        }
+        return $result;
+    }
+
+    /**
+     * Helper to return a list of taggings of a resource by tag name.
+     *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @return array
+     */
+    protected function listResourceTaggingsByName(AbstractResourceEntityRepresentation $resource)
+    {
+        $result = [];
+        $taggings = $this->listResourceTaggings($resource);
+        foreach ($taggings as $tagging) {
+            $tag = $tagging->tag();
+            $result[$tag ? $tag->name() : ''] = $tagging;
+        }
+        return $result;
+    }
+
+    /**
+     * Helper to return a flat list of tags by id.
+     *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @return array
+     */
+    protected function listFlatResourceTags(AbstractResourceEntityRepresentation $resource)
+    {
+        $result = [];
+        $tags = $this->listResourceTags($resource);
+        foreach ($tags as $tag) {
+            $result[$tag->internalId()] = $tag->name();
+        }
+        return $result;
     }
 
     /**

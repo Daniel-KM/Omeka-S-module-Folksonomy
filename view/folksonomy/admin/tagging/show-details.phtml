@@ -1,4 +1,5 @@
 <?php $escape = $this->plugin('escapeHtml'); ?>
+<?php $tagging = $resource; ?>
 <div class="resource-details" data-resource-values="<?php //echo $escape($values); ?>">
     <h3 class="o-module-folksonomy-tagging"><?php echo $tagging->link(sprintf($this->translate('Tagging #%d'), $tagging->id())); ?></h3>
     <div class="meta-group">
@@ -16,7 +17,7 @@
         <?php $resource = $tagging->resource(); ?>
         <h4><?php echo $escape($this->translate('Resource')); ?> <span class="fa resource-name <?php echo $resource ? $resource->getControllerName() : 'no-resource'; ?>"></span></h4>
         <div class="value">
-        <?php if ($resource = $tagging->resource()): ?>
+        <?php if ($resource): ?>
         <span class="resource-name">
             <?php echo $resource->link($resource->displayTitle()); ?>
         </span>
