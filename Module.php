@@ -539,14 +539,6 @@ SQL;
             );
         }
 
-        // Add the tag field to the admin and public advanced search page.
-        $sharedEventManager->attach(
-            // TODO Replace this joker.
-            '*',
-            'view.advanced_search',
-            [$this, 'displayAdvancedSearch']
-        );
-
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
             \Omeka\Api\Adapter\ItemSetAdapter::class,
@@ -577,6 +569,23 @@ SQL;
                 $adapter,
                 'api.hydrate.post',
                 [$this, 'handleTagging']
+            );
+        }
+
+        // Add the tag field to the admin and public advanced search page.
+        $controllers = [
+            'Omeka\Controller\Admin\Item',
+            'Omeka\Controller\Admin\ItemSet',
+            'Omeka\Controller\Admin\Media',
+            'Omeka\Controller\Site\Item',
+            'Omeka\Controller\Site\ItemSet',
+            'Omeka\Controller\Site\Media',
+        ];
+        foreach ($controllers as $controller) {
+            $sharedEventManager->attach(
+                $controller,
+                'view.advanced_search',
+                [$this, 'displayAdvancedSearch']
             );
         }
 
