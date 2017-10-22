@@ -34,7 +34,7 @@ class ItemSetSelect extends Select
                 }
             }
             $owner = $itemSetOwner['owner'];
-            if ($owner instanceof UserRepresentation) {
+            if ($owner && $owner instanceof UserRepresentation) {
                 $label = sprintf('%s (%s)', $owner->name(), $owner->email());
             } else {
                 $label = '[No owner]';
