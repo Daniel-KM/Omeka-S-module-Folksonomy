@@ -255,13 +255,13 @@ class TaggingAdapter extends AbstractEntityAdapter
             if ($query['resource_type'] === 'resources') {
                 $qb
                      ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.resource'));
-             // TODO Distinct users, else there may be x times the same tagger.
-             // The issue doesn't occur for resource, since there is a check
-             // before.
-             // } elseif ($query['resource_type'] === 'users') {
-             //     $qb
-             //         ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.owner'));
-             } elseif (isset($mapResourceTypes[$query['resource_type']])) {
+            // TODO Distinct users, else there may be x times the same tagger.
+            // The issue doesn't occur for resource, since there is a check
+            // before.
+            // } elseif ($query['resource_type'] === 'users') {
+            //     $qb
+            //         ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.owner'));
+            } elseif (isset($mapResourceTypes[$query['resource_type']])) {
                 $entityAlias = $this->createAlias();
                 $qb
                     ->innerJoin(

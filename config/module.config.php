@@ -64,20 +64,20 @@ return [
             [
                 'label' => 'Folksonomy', // @translate
                 'route' => 'admin/tag',
+                'controller' => Controller\Admin\TagController::class,
                 'action' => 'browse',
-                'resource' => Controller\Admin\Tag::class,
-                'privilege' => 'browse',
-                'useRouteMatch' => true,
                 'pages' => [
                     [
                         'label' => 'Tags', // @translate
                         'route' => 'admin/tag',
-                        'visible' => true,
+                        'controller' => Controller\Admin\TagController::class,
+                        'action' => 'browse',
                     ],
                     [
                         'label' => 'Taggings', // @translate
                         'route' => 'admin/tagging',
-                        'visible' => true,
+                        'controller' => Controller\Admin\TaggingController::class,
+                        'action' => 'browse',
                     ],
                 ],
             ],
@@ -85,10 +85,10 @@ return [
     ],
     'controllers' => [
         'invokables' => [
-            'Folksonomy\Controller\Admin\Tag' => Controller\Admin\TagController::class,
-            'Folksonomy\Controller\Admin\Tagging' => Controller\Admin\TaggingController::class,
-            'Folksonomy\Controller\Site\Tag' => Controller\Site\TagController::class,
-            'Folksonomy\Controller\Site\Tagging' => Controller\Site\TaggingController::class,
+            Controller\Admin\TagController::class => Controller\Admin\TagController::class,
+            Controller\Admin\TaggingController::class => Controller\Admin\TaggingController::class,
+            Controller\Site\TagController::class => Controller\Site\TagController::class,
+            Controller\Site\TaggingController::class => Controller\Site\TaggingController::class,
         ],
     ],
     'controller_plugins' => [
@@ -107,7 +107,7 @@ return [
                             'route' => '/tag',
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Site\TagController::class,
                                 'action' => 'browse',
                             ],
                         ],
@@ -120,7 +120,7 @@ return [
                             'route' => '/tag/:id',
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Site\TagController::class,
                                 'action' => 'browse-resources',
                                 'resource' => 'item',
                             ],
@@ -135,7 +135,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Site\TagController::class,
                                 'resource' => 'item',
                                 'action' => 'browse-resources',
                             ],
@@ -148,7 +148,7 @@ return [
                             'route' => '/tags',
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Site\TagController::class,
                                 'action' => 'browse',
                             ],
                         ],
@@ -163,7 +163,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Site',
-                                'controller' => 'Tagging',
+                                'controller' => Controller\Site\TaggingController::class,
                                 'action' => 'add',
                             ],
                         ],
@@ -181,7 +181,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Admin\TagController::class,
                                 'action' => 'browse',
                             ],
                         ],
@@ -197,7 +197,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Admin\TagController::class,
                                 'action' => 'browse-resources',
                             ],
                         ],
@@ -211,7 +211,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tag',
+                                'controller' => Controller\Admin\TagController::class,
                                 'resource' => 'item',
                                 'action' => 'browse-resources',
                             ],
@@ -226,7 +226,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tagging',
+                                'controller' => Controller\Admin\TaggingController::class,
                                 'action' => 'browse',
                             ],
                         ],
@@ -241,7 +241,7 @@ return [
                             ],
                             'defaults' => [
                                 '__NAMESPACE__' => 'Folksonomy\Controller\Admin',
-                                'controller' => 'Tagging',
+                                'controller' => Controller\Admin\TaggingController::class,
                                 'action' => 'show',
                             ],
                         ],

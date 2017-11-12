@@ -61,7 +61,9 @@ trait QueryBuilderTrait
     protected function buildQueryMultipleValues(QueryBuilder $qb, array $values, $column, $target)
     {
         $hasNull = in_array(null, $values, true);
-        $values = array_filter($values, function ($v) { return !is_null($v); });
+        $values = array_filter($values, function ($v) {
+            return !is_null($v);
+        });
         if ($values) {
             $valueAlias = $this->createAlias();
             $qb->innerJoin(
@@ -180,7 +182,9 @@ trait QueryBuilderTrait
     protected function buildQueryMultipleValuesItself(QueryBuilder $qb, array $values, $target)
     {
         $hasNull = in_array(null, $values, true);
-        $values = array_filter($values, function ($v) { return !is_null($v); });
+        $values = array_filter($values, function ($v) {
+            return !is_null($v);
+        });
         if ($values) {
             $valueAlias = $this->createAlias();
             $qb

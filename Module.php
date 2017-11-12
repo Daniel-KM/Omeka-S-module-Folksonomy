@@ -8,7 +8,6 @@
  * @copyright Daniel Berthereau, 2013-2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
-
 namespace Folksonomy;
 
 use Folksonomy\Entity\Tag;
@@ -81,10 +80,10 @@ CREATE TABLE `tag` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE `tagging` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `status` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tag_id` int(11) DEFAULT NULL,
   `resource_id` int(11) DEFAULT NULL,
   `owner_id` int(11) DEFAULT NULL,
+  `status` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created` datetime NOT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -177,13 +176,13 @@ SQL;
         $acl->allow(
             null,
             [
-                'Folksonomy\Controller\Admin\Tagging',
-                'Folksonomy\Controller\Site\Tagging',
+                Controller\Admin\TaggingController::class,
+                Controller\Site\TaggingController::class,
             ]
         );
         $acl->allow(
             null,
-            \Folksonomy\Api\Adapter\TaggingAdapter::class,
+            Api\Adapter\TaggingAdapter::class,
             $publicAdapterRights
         );
         $acl->allow(
@@ -194,7 +193,7 @@ SQL;
 
         $acl->allow(
             'researcher',
-            'Folksonomy\Controller\Admin\Tagging',
+            Controller\Admin\TaggingController::class,
             [
                 'add',
                 'index',
@@ -207,7 +206,7 @@ SQL;
         );
         $acl->allow(
             'researcher',
-            \Folksonomy\Api\Adapter\TaggingAdapter::class,
+            Api\Adapter\TaggingAdapter::class,
             [
                 'create',
             ]
@@ -230,7 +229,7 @@ SQL;
 
         $acl->allow(
             'author',
-            \Folksonomy\Controller\Admin\Tagging::class,
+            Controller\Admin\TaggingController::class,
             [
                 'add',
                 'index',
@@ -243,7 +242,7 @@ SQL;
         );
         $acl->allow(
             'author',
-            \Folksonomy\Api\Adapter\TaggingAdapter::class,
+            Api\Adapter\TaggingAdapter::class,
             [
                 'create',
             ]
@@ -266,7 +265,7 @@ SQL;
 
         $acl->allow(
             'reviewer',
-            'Folksonomy\Controller\Admin\Tagging',
+            Controller\Admin\TaggingController::class,
             [
                 'add',
                 'edit',
@@ -281,7 +280,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            \Folksonomy\Api\Adapter\TaggingAdapter::class,
+            Api\Adapter\TaggingAdapter::class,
             [
                 'create',
                 'update',
@@ -301,7 +300,7 @@ SQL;
 
         $acl->allow(
             'editor',
-            'Folksonomy\Controller\Admin\Tagging',
+            Controller\Admin\TaggingController::class,
             [
                 'add',
                 'edit',
@@ -316,7 +315,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            \Folksonomy\Api\Adapter\TaggingAdapter::class,
+            Api\Adapter\TaggingAdapter::class,
             [
                 'create',
                 'update',
@@ -338,13 +337,13 @@ SQL;
         $acl->allow(
             null,
             [
-                'Folksonomy\Controller\Admin\Tag',
-                'Folksonomy\Controller\Site\Tag',
+                Controller\Admin\TagController::class,
+                Controller\Site\TagController::class,
             ]
         );
         $acl->allow(
             null,
-            \Folksonomy\Api\Adapter\TagAdapter::class,
+            Api\Adapter\TagAdapter::class,
             $publicAdapterRights
         );
         $acl->allow(
@@ -355,7 +354,7 @@ SQL;
 
         $acl->allow(
             'researcher',
-            'Folksonomy\Controller\Admin\Tag',
+            Controller\Admin\TagController::class,
             [
                 'add',
                 'index',
@@ -368,7 +367,7 @@ SQL;
         );
         $acl->allow(
             'researcher',
-            \Folksonomy\Api\Adapter\TagAdapter::class,
+            Api\Adapter\TagAdapter::class,
             [
                 'create',
             ]
@@ -391,7 +390,7 @@ SQL;
 
         $acl->allow(
             'author',
-            'Folksonomy\Controller\Admin\Tag',
+            Controller\Admin\TagController::class,
             [
                 'add',
                 'index',
@@ -404,7 +403,7 @@ SQL;
         );
         $acl->allow(
             'author',
-            \Folksonomy\Api\Adapter\TagAdapter::class,
+            Api\Adapter\TagAdapter::class,
             [
                 'create',
             ]
@@ -427,7 +426,7 @@ SQL;
 
         $acl->allow(
             'reviewer',
-            'Folksonomy\Controller\Admin\Tag',
+            Controller\Admin\TagController::class,
             [
                 'add',
                 'edit',
@@ -442,7 +441,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            \Folksonomy\Api\Adapter\TagAdapter::class,
+            Api\Adapter\TagAdapter::class,
             [
                 'create',
                 'update',
@@ -462,7 +461,7 @@ SQL;
 
         $acl->allow(
             'editor',
-            'Folksonomy\Controller\Admin\Tag',
+            Controller\Admin\TagController::class,
             [
                 'add',
                 'edit',
@@ -477,7 +476,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            \Folksonomy\Api\Adapter\TagAdapter::class,
+            Api\Adapter\TagAdapter::class,
             [
                 'create',
                 'update',
@@ -759,7 +758,9 @@ SQL;
         $content = $event->getParam('response')->getContent();
         // Check if this is an api search or api read to get the list of ids.
         $resourceIds = is_array($content)
-            ? array_map(function ($v) { return $v->getId(); }, $content)
+            ? array_map(function ($v) {
+                return $v->getId();
+            }, $content)
             : [$content->getId()];
         if (empty($resourceIds)) {
             return;
@@ -921,14 +922,18 @@ SQL;
                     explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
                 )
             ),
-            function ($v) { return strlen($v); }
+            function ($v) {
+                return strlen($v);
+            }
         );
 
         // Updated resource.
         if ($resourceId) {
             $representation = $resourceAdapter->getRepresentation($resource);
             $resourceTags = $this->listResourceTags($representation);
-            $currentTags = array_map(function ($v) { return $v->name(); }, $resourceTags);
+            $currentTags = array_map(function ($v) {
+                return $v->name();
+            }, $resourceTags);
             $addedTags = array_diff($submittedTags, $currentTags);
             $unchangedTags = array_intersect($currentTags, $submittedTags);
             $deletedTags = array_diff($currentTags, $unchangedTags);

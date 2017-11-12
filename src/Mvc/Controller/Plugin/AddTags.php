@@ -93,7 +93,9 @@ class AddTags extends AbstractPlugin
                     $tags
                 )
             ),
-            function ($v) { return strlen($v); }
+            function ($v) {
+                return strlen($v);
+            }
         );
         if (empty($tags)) {
             return;
