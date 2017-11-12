@@ -1113,28 +1113,14 @@ SQL;
 
     public function displayAdvancedSearch(Event $event)
     {
-        $services = $this->getServiceLocator();
-        $formElementManager = $services->get('FormElementManager');
-        $form = $formElementManager->get(SearchForm::class);
-        $form->init();
-
-        $view = $event->getTarget();
         $query = $event->getParam('query', []);
-        $resourceType = $event->getParam('resourceType');
+        $query['has_tags'] = !empty($query['tag']);
+        $query['tag'] = isset($query['tag']) ? $this->cleanStrings($query['tag']) : [];
+        $event->setParam('query', $query);
 
-        $hasTags = !empty($query['has_tags']);
-        $tags = empty($query['tag']) ? '' : implode(', ', $this->cleanStrings($query['tag']));
-
-        $formData = [];
-        $formData['has_tags'] = $hasTags;
-        $formData['tag'] = $tags;
-        $form->setData($formData);
-
-        $vars = $event->getTarget()->vars();
-        $vars->offsetSet('searchTagForm', $form);
-
-        echo $event->getTarget()
-            ->partial('common/tag-advanced-search.phtml');
+        $partials = $event->getParam('partials', []);
+        $partials[] = 'common/tag-advanced-search';
+        $event->setParam('partials', $partials);
     }
 
     public function filterSearchFilters(Event $event)

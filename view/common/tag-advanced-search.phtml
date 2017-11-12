@@ -1,6 +1,17 @@
 <?php
-$searchTagForm->prepare();
-$element = $searchTagForm->get('has_tags');
+$this->headLink()->prependStylesheet($this->assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('js/chosen-options.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'));
+
+$hasTags = !empty($query['has_tags']);
+$tags = empty($query['tag']) ? [] : $query['tag'];
+$form = $this->searchTagForm();
+$form->setData([
+    'has_tags' => $hasTags,
+    'tag' => $tags,
+]);
+
+$element = $form->get('has_tags');
 echo $this->formRow($element);
-$element = $searchTagForm->get('tag');
+$element = $form->get('tag');
 echo $this->formRow($element);

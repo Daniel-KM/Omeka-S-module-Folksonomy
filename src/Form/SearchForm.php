@@ -1,6 +1,8 @@
 <?php
 namespace Folksonomy\Form;
 
+use Folksonomy\Form\Element\TagSelect;
+use Zend\Form\Element\Checkbox;
 use Zend\Form\Form;
 
 class SearchForm extends Form
@@ -8,19 +10,22 @@ class SearchForm extends Form
     public function init()
     {
         $this->add([
-            'type' => 'checkbox',
             'name' => 'has_tags',
+            'type' => Checkbox::class,
             'options' => [
                 'label' => 'Has tags', // @translate
             ],
         ]);
 
         $this->add([
-            'type' => 'Text',
             'name' => 'tag',
+            'type' => TagSelect::class,
             'options' => [
                 'label' => 'Search by tag', // @translate
-                'info' => 'Multiple tags may be comma-separated.', // @translate
+                'chosen' => true,
+            ],
+            'attributes' => [
+                'multiple' => true,
             ],
         ]);
     }

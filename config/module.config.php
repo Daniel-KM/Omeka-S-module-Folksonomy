@@ -33,6 +33,7 @@ return [
             'tagSelector' => View\Helper\TagSelector::class,
         ],
         'factories' => [
+            'searchTagForm' => Service\ViewHelper\SearchTagFormFactory::class,
             'showTaggingForm' => Service\ViewHelper\ShowTaggingFormFactory::class,
             'tagCount' => Service\ViewHelper\TagCountFactory::class,
             'tagSelect' => Service\ViewHelper\TagSelectFactory::class,
@@ -51,10 +52,10 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\ConfigForm::class => Form\ConfigForm::class,
-            Form\Element\TagSelect::class => Service\Form\Element\TagSelectFactory::class,
             Form\SearchForm::class => Form\SearchForm::class,
         ],
         'factories' => [
+            Form\Element\TagSelect::class => Service\Form\Element\TagSelectFactory::class,
             Form\TaggingForm::class => Service\Form\TaggingFormFactory::class,
         ],
     ],
