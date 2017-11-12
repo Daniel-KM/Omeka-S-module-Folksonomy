@@ -1099,8 +1099,8 @@ SQL;
         $tags = $this->listResourceTagsByName($resource);
         $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $listAsDiv
-            ? 'common/admin/tags-resource.phtml'
-            : 'common/admin/tags-resource-list.phtml';
+            ? 'common/admin/tag-resource.phtml'
+            : 'common/admin/tag-resource-list.phtml';
         echo $event->getTarget()->partial(
             $partial,
             [
@@ -1134,7 +1134,7 @@ SQL;
         $vars->offsetSet('searchTagForm', $form);
 
         echo $event->getTarget()
-            ->partial('common/tags-advanced-search.phtml');
+            ->partial('common/tag-advanced-search.phtml');
     }
 
     public function filterSearchFilters(Event $event)

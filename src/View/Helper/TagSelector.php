@@ -15,7 +15,7 @@ class TagSelector extends AbstractHelper
         $response = $this->getView()->api()->search('tags', ['sort_by' => 'name']);
         $tags = $response->getContent();
         return $this->getView()->partial(
-            'common/tags-selector',
+            'common/tag-selector',
             [
                 'tags' => $tags,
                 'totalTagCount' => $response->getTotalResults(),

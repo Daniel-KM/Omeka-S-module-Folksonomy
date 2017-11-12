@@ -17,7 +17,7 @@ class ShowTags extends AbstractHelper
         $tags = $this->listResourceTags($resource);
         $taggings = $this->listResourceTaggings($resource);
         return $view->partial(
-            'common/site/tags-resource.phtml',
+            'common/site/tag-resource.phtml',
             [
                 'resource' => $resource,
                 'tags' => $tags,
