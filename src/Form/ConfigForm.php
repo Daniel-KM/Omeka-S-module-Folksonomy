@@ -4,7 +4,7 @@ namespace Folksonomy\Form;
 use Omeka\Form\Element\Ckeditor as Ckeditorinline;
 use Zend\Form\Form;
 
-class Config extends Form
+class ConfigForm extends Form
 {
     public function init()
     {

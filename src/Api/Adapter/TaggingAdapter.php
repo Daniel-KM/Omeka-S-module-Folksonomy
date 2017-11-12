@@ -45,84 +45,72 @@ class TaggingAdapter extends AbstractEntityAdapter
         Tagging::STATUS_REJECTED,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResourceName()
     {
         return 'taggings';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRepresentationClass()
     {
         return TaggingRepresentation::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityClass()
     {
         return Tagging::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
     ) {
         $data = $request->getContent();
 
         // The owner, tag and resource can be null.
-        if (Request::CREATE == $request->getOperation()) {
-            $entity->setStatus($data['o:status']);
-
-            $this->hydrateOwner($request, $entity);
-
-            if (isset($data['o-module-folksonomy:tag'])) {
-                if (is_object($data['o-module-folksonomy:tag'])) {
-                    $tag = $data['o-module-folksonomy:tag'] instanceof Tag
-                        ? $data['o-module-folksonomy:tag']
-                        : null;
-                } elseif (strlen($data['o-module-folksonomy:tag'])) {
-                    $tag = $this->getAdapter('tags')
-                        ->findEntity(['name' => $data['o-module-folksonomy:tag']]);
-                } else {
-                    $tag = null;
-                }
-                $entity->setTag($tag);
-            }
-
-            if (isset($data['o:resource'])) {
-                if (is_object($data['o:resource'])) {
-                    $resource = $data['o:resource'] instanceof Resource
-                        ? $data['o:resource']
-                        : null;
-                } elseif (is_numeric($data['o:resource']['o:id'])) {
-                    $resource = $this->getAdapter('resources')
-                        ->findEntity($data['o:resource']['o:id']);
-                } else {
-                    $resource = null;
-                }
-                $entity->setResource($resource);
-            }
-        }
-
-        // Only update status.
-        elseif (Request::UPDATE == $request->getOperation()) {
-            if ($this->shouldHydrate($request, 'o:status')) {
+        switch ($request->getOperation()) {
+            case Request::CREATE:
                 $entity->setStatus($data['o:status']);
-            }
+
+                $this->hydrateOwner($request, $entity);
+
+                if (isset($data['o-module-folksonomy:tag'])) {
+                    if (is_object($data['o-module-folksonomy:tag'])) {
+                        $tag = $data['o-module-folksonomy:tag'] instanceof Tag
+                            ? $data['o-module-folksonomy:tag']
+                            : null;
+                    } elseif (strlen($data['o-module-folksonomy:tag'])) {
+                        $tag = $this->getAdapter('tags')
+                            ->findEntity(['name' => $data['o-module-folksonomy:tag']]);
+                    } else {
+                        $tag = null;
+                    }
+                    $entity->setTag($tag);
+                }
+
+                if (isset($data['o:resource'])) {
+                    if (is_object($data['o:resource'])) {
+                        $resource = $data['o:resource'] instanceof Resource
+                            ? $data['o:resource']
+                            : null;
+                    } elseif (is_numeric($data['o:resource']['o:id'])) {
+                        $resource = $this->getAdapter('resources')
+                            ->findEntity($data['o:resource']['o:id']);
+                    } else {
+                        $resource = null;
+                    }
+                    $entity->setResource($resource);
+                }
+                break;
+
+
+            // Only update status.
+            case Request::UPDATE:
+                if ($this->shouldHydrate($request, 'o:status')) {
+                    $entity->setStatus($data['o:status']);
+                }
+                break;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateRequest(Request $request, ErrorStore $errorStore)
     {
         $data = $request->getContent();
@@ -145,9 +133,6 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
         $this->validateStatus($entity->getStatus(), $errorStore);
@@ -183,9 +168,6 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildQuery(QueryBuilder $qb, array $query)
     {
         // TODO Check status according to admin/public.
@@ -280,9 +262,6 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sortQuery(QueryBuilder $qb, array $query)
     {
         if (is_string($query['sort_by'])) {
@@ -307,5 +286,16 @@ class TaggingAdapter extends AbstractEntityAdapter
                     break;
             }
         }
+    }
+
+    public function preprocessBatchUpdate(array $data, Request $request)
+    {
+        $rawData = $request->getContent();
+
+        if (isset($rawData['o:status'])) {
+            $data['o:status'] = $rawData['o:status'];
+        }
+
+        return $data;
     }
 }

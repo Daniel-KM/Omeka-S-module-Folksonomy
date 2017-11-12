@@ -1,7 +1,6 @@
 <?php
 namespace Folksonomy\View\Helper;
 
-use Folksonomy\Entity\Tagging;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Zend\View\Helper\AbstractHelper;
 

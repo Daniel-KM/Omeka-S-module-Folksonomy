@@ -3,7 +3,7 @@ namespace Folksonomy\Form;
 
 use Zend\Form\Form;
 
-class Search extends Form
+class SearchForm extends Form
 {
     public function init()
     {

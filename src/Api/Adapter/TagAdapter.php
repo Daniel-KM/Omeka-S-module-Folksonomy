@@ -20,9 +20,6 @@ class TagAdapter extends AbstractEntityAdapter
 {
     use QueryBuilderTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     protected $sortFields = [
         'internal_id' => 'id',
         // "Tag" is an alias of "name".

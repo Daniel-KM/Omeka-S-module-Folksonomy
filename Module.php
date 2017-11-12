@@ -12,8 +12,8 @@ namespace Folksonomy;
 
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
-use Folksonomy\Form\Config as ConfigForm;
-use Folksonomy\Form\Search as SearchForm;
+use Folksonomy\Form\ConfigForm;
+use Folksonomy\Form\SearchForm;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;

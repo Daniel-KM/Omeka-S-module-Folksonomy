@@ -50,13 +50,12 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
-            'Folksonomy\Form\Config' => Form\Config::class,
-            'Folksonomy\Form\Element\TagSelect' => Service\Form\Element\TagSelectFactory::class,
-            'Folksonomy\Form\Search' => Form\Search::class,
-            'Folksonomy\Form\TagCloudBlock' => Form\TagCloudBlock::class,
+            Form\ConfigForm::class => Form\ConfigForm::class,
+            Form\Element\TagSelect::class => Service\Form\Element\TagSelectFactory::class,
+            Form\SearchForm::class => Form\SearchForm::class,
         ],
         'factories' => [
-            'Folksonomy\Form\Tagging' => Service\Form\TaggingFactory::class,
+            Form\TaggingForm::class => Service\Form\TaggingFormFactory::class,
         ],
     ],
     'navigation' => [

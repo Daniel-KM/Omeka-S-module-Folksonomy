@@ -1,7 +1,6 @@
 <?php
 namespace Folksonomy\Controller\Admin;
 
-use Folksonomy\Entity\Tag;
 use Omeka\Form\ConfirmForm;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;

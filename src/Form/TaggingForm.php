@@ -7,7 +7,7 @@ use Zend\Http\PhpEnvironment\RemoteAddress;
 use Zend\Validator\StringLength;
 use Zend\View\Helper\Url;
 
-class Tagging extends Form
+class TaggingForm extends Form
 {
     /**
      * @var Setting

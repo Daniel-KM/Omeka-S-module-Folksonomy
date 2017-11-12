@@ -2,7 +2,7 @@
 namespace Folksonomy\View\Helper;
 
 use Folksonomy\Entity\Tagging;
-use Folksonomy\Form\Tagging as TaggingForm;
+use Folksonomy\Form\TaggingForm;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Zend\View\Helper\AbstractHelper;
 

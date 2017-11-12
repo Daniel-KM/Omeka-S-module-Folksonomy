@@ -7,7 +7,6 @@ use Folksonomy\Entity\Tag;
 use Omeka\Entity\Item;
 use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
-use PDO;
 use Zend\View\Helper\AbstractHelper;
 
 class TagCount extends AbstractHelper
@@ -188,8 +187,8 @@ class TagCount extends AbstractHelper
 
         $stmt = $this->connection->executeQuery($qb, $qb->getParameters());
         $fetchMode = $keyPair && $resourceType
-            ? PDO::FETCH_KEY_PAIR
-            : (PDO::FETCH_GROUP | PDO::FETCH_UNIQUE);
+            ? \PDO::FETCH_KEY_PAIR
+            : (\PDO::FETCH_GROUP | \PDO::FETCH_UNIQUE);
         $result = $stmt->fetchAll($fetchMode);
         return $result;
     }
