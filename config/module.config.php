@@ -272,4 +272,19 @@ return [
         'Request too long to process.', // @translate
         'The resource or the tag doesn’t exist.', // @translate
     ],
+    'folksonomy' => [
+        'settings' => [
+            'folksonomy_public_allow_tag' => true,
+            'folksonomy_public_require_moderation' => false,
+            'folksonomy_public_notification' => true,
+            'folksonomy_max_length_tag' => 190,
+            'folksonomy_max_length_total' => 1000,
+            'folksonomy_message' => '+',
+            'folksonomy_legal_text' => '',
+            // TODO Move to site settings.
+            'folksonomy_append_item_set_show' => true,
+            'folksonomy_append_item_show' => true,
+            'folksonomy_append_media_show' => true,
+        ],
+    ],
 ];

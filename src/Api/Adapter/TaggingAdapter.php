@@ -101,7 +101,6 @@ class TaggingAdapter extends AbstractEntityAdapter
                 }
                 break;
 
-
             // Only update status.
             case Request::UPDATE:
                 if ($this->shouldHydrate($request, 'o:status')) {

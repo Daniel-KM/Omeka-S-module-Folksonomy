@@ -13,12 +13,9 @@ namespace Folksonomy;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\ConfigForm;
-use Folksonomy\Form\SearchForm;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Api\Request;
 use Omeka\Module\AbstractModule;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
-use Omeka\Stdlib\ErrorStore;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\Controller\AbstractController;
@@ -34,25 +31,6 @@ class Module extends AbstractModule
     protected $cache = [
         'tags' => [],
         'taggings' => [],
-    ];
-
-    /**
-     * Settings and their default values.
-     *
-     * @var array
-     */
-    protected $settings = [
-        'folksonomy_public_allow_tag' => true,
-        'folksonomy_public_require_moderation' => false,
-        'folksonomy_public_notification' => true,
-        'folksonomy_max_length_tag' => 190,
-        'folksonomy_max_length_total' => 1000,
-        'folksonomy_message' => '+',
-        'folksonomy_legal_text' => '',
-        // TODO Move to site settings.
-        'folksonomy_append_item_set_show' => true,
-        'folksonomy_append_item_show' => true,
-        'folksonomy_append_media_show' => true,
     ];
 
     public function getConfig()
@@ -100,18 +78,16 @@ SQL;
         $conn = $serviceLocator->get('Omeka\Connection');
         $conn->exec($sql);
 
+        $settings = $serviceLocator->get('Omeka\Settings');
+        $this->manageSettings($settings, 'install');
+
         $html = '<p>';
         $html .= $t->translate(sprintf('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.', // @translate
             '<a rel="licence" href="#" target="_blank">', '</a>',
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
         ));
         $html .= '</p>';
-        $this->settings['folksonomy_legal_text'] = $html;
-
-        $settings = $serviceLocator->get('Omeka\Settings');
-        foreach ($this->settings as $name => $value) {
-            $settings->set($name, $value);
-        }
+        $settings->set('folksonomy_legal_text', $html);
     }
 
     public function uninstall(ServiceLocatorInterface $serviceLocator)
@@ -120,26 +96,42 @@ SQL;
 SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS tagging;
 DROP TABLE IF EXISTS tag;
+SET foreign_key_checks = 1;
 SQL;
         $conn = $serviceLocator->get('Omeka\Connection');
         $conn->exec($sql);
 
-        $settings = $serviceLocator->get('Omeka\Settings');
-        foreach ($this->settings as $name => $value) {
-            $settings->delete($name);
-        }
+        $this->manageSettings($serviceLocator->get('Omeka\Settings'), 'uninstall');
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $serviceLocator)
     {
         if (version_compare($oldVersion, '3.3.3', '<')) {
+            $config = require __DIR__ . '/config/module.config.php';
+            $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
             $settings = $serviceLocator->get('Omeka\Settings');
             $settings->set('folksonomy_append_item_set_show',
-                $this->settings['folksonomy_append_item_set_show']);
+                $defaultSettings['folksonomy_append_item_set_show']);
             $settings->set('folksonomy_append_item_show',
-                $this->settings['folksonomy_append_item_show']);
+                $defaultSettings['folksonomy_append_item_show']);
             $settings->set('folksonomy_append_media_show',
-                $this->settings['folksonomy_append_media_show']);
+                $defaultSettings['folksonomy_append_media_show']);
+        }
+    }
+
+    protected function manageSettings($settings, $process, $key = 'settings')
+    {
+        $config = require __DIR__ . '/config/module.config.php';
+        $defaultSettings = $config[strtolower(__NAMESPACE__)][$key];
+        foreach ($defaultSettings as $name => $value) {
+            switch ($process) {
+                case 'install':
+                    $settings->set($name, $value);
+                    break;
+                case 'uninstall':
+                    $settings->delete($name);
+                    break;
+            }
         }
     }
 
@@ -164,7 +156,7 @@ SQL;
         $acl = $services->get('Omeka\Acl');
         $settings = $services->get('Omeka\Settings');
 
-        $publicAllowTag = $settings->get('folksonomy_public_allow_tag', $this->settings['folksonomy_public_allow_tag']);
+        $publicAllowTag = $settings->get('folksonomy_public_allow_tag', false);
         $publicEntityRights = ['read'];
         $publicAdapterRights = ['search', 'read'];
         if ($publicAllowTag) {
@@ -680,67 +672,47 @@ SQL;
     public function getConfigForm(PhpRenderer $renderer)
     {
         $services = $this->getServiceLocator();
+        $config = $services->get('Config');
         $settings = $services->get('Omeka\Settings');
         $formElementManager = $services->get('FormElementManager');
 
         $data = [];
-        foreach ($this->settings as $name => $value) {
-            $data[$name] = $settings->get($name);
+        $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
+        foreach ($defaultSettings as $name => $value) {
+            $data['folksonomy_public_rights'][$name] = $settings->get($name);
+            $data['folksonomy_tagging_form'][$name] = $settings->get($name);
         }
-        $formData = [];
-        $formData['folksonomy_public_rights'] = [
-            'folksonomy_public_allow_tag' => $data['folksonomy_public_allow_tag'],
-            'folksonomy_public_require_moderation' => $data['folksonomy_public_require_moderation'],
-            'folksonomy_public_notification' => $data['folksonomy_public_notification'],
-        ];
-        $formData['folksonomy_tagging_form'] = [
-            'folksonomy_max_length_tag' => $data['folksonomy_max_length_tag'],
-            'folksonomy_max_length_total' => $data['folksonomy_max_length_total'],
-            'folksonomy_message' => $data['folksonomy_message'],
-            'folksonomy_legal_text' => $data['folksonomy_legal_text'],
-            'folksonomy_append_item_set_show' => $data['folksonomy_append_item_set_show'],
-            'folksonomy_append_item_show' => $data['folksonomy_append_item_show'],
-            'folksonomy_append_media_show' => $data['folksonomy_append_media_show'],
-        ];
+
+        $renderer->ckEditor();
 
         $form = $formElementManager->get(ConfigForm::class);
         $form->init();
-        $form->setData($formData);
-
-        // Allow to display fieldsets in config form.
-        $vars = [];
-        $vars['form'] = $form;
-        return $renderer->render('folksonomy/module/config.phtml', $vars);
+        $form->setData($data);
+        $html = $renderer->formCollection($form);
+        return $html;
     }
 
     public function handleConfigForm(AbstractController $controller)
     {
         $services = $this->getServiceLocator();
+        $config = $services->get('Config');
         $settings = $services->get('Omeka\Settings');
 
         $params = $controller->getRequest()->getPost();
 
-        // TODO Check ckeditor.
-        // $form = new ConfigForm;
-        // $form->init();
-        // $form->setData($params);
-        // if (!$form->isValid()) {
-        //     $controller->messenger()->addErrors($form->getMessages());
-        //     return false;
-        // }
+        $form = $this->getServiceLocator()->get('FormElementManager')
+            ->get(ConfigForm::class);
+        $form->init();
+        $form->setData($params);
+        if (!$form->isValid()) {
+            $controller->messenger()->addErrors($form->getMessages());
+            return false;
+        }
 
-        // $params = $form->getData();
-
-        // Manage fieldsets of params automatically (only used for the view).
+        $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
         foreach ($params as $name => $value) {
-            if (isset($this->settings[$name])) {
+            if (isset($defaultSettings[$name])) {
                 $settings->set($name, $value);
-            } elseif (is_array($value)) {
-                foreach ($value as $subname => $subvalue) {
-                    if (isset($this->settings[$subname])) {
-                        $settings->set($subname, $subvalue);
-                    }
-                }
             }
         }
     }
