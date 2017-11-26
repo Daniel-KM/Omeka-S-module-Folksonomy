@@ -30,9 +30,11 @@
     }
 
     @media (min-width:641px) {
+        .tags.browse table th:nth-child(1n+2),
         .tags.browse table td:nth-child(1n+2) {
             text-align: right;
         }
+        .tags.browse table th:nth-child(1n+2) *,
         .tags.browse table td:nth-child(1n+2) * {
             text-align: right;
             float: right;
@@ -41,10 +43,8 @@
         .taggings.browse table th:first-child,
         .taggings.browse table td:first-child {
             max-width: 40%;
-        }
-        .taggings.browse table th:last-child,
-        .taggings.browse table td:last-child {
-            min-width: 10%;
+            min-width: 30%;
+            width: 30%;
         }
     }
 

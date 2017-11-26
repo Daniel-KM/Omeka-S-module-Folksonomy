@@ -27,7 +27,7 @@ $(document).ready(function() {
             var msg = 'Data were added to the resource.';
             if (isOmeka) msg = Omeka.jsTranslate(msg);
             if (data.content.moderation) {
-                var msgTmp = 'They will be displayed when approved.';
+                var msgTmp = 'They will be displayed definively when approved.';
                 msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
             } else {
                 var msgTmp = 'Reload page to see new tags.';
