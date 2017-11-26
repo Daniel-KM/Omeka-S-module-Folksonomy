@@ -709,6 +709,11 @@ SQL;
             return false;
         }
 
+        $params = $params->toArray();
+        array_walk_recursive($params, function($v, $k) use (&$params) { $params[$k] = $v; });
+        unset($params['folksonomy_public_rights']);
+        unset($params['folksonomy_tagging_form']);
+
         $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
         foreach ($params as $name => $value) {
             if (isset($defaultSettings[$name])) {
