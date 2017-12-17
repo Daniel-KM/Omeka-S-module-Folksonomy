@@ -283,7 +283,8 @@ return [
             'folksonomy_max_length_total' => 1000,
             'folksonomy_message' => '+',
             'folksonomy_legal_text' => '<p>I agree with <a rel="licence" href="#" target="_blank">terms of use</a> and I accept to free my contribution under the licence <a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA</a>.</p>',
-            // TODO Move to site settings.
+        ],
+        'site_settings' => [
             'folksonomy_append_item_set_show' => true,
             'folksonomy_append_item_show' => true,
             'folksonomy_append_media_show' => true,

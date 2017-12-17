@@ -84,27 +84,6 @@ class ConfigForm extends Form
                 'id' => 'folksonomy-legal-text',
             ],
         ]);
-        $taggingFormFieldset->add([
-            'name' => 'folksonomy_append_item_set_show',
-            'type' => Checkbox::class,
-            'options' => [
-                'label' => 'Append to public item set page automatically', // @translate
-            ],
-        ]);
-        $taggingFormFieldset->add([
-            'name' => 'folksonomy_append_item_show',
-            'type' => Checkbox::class,
-            'options' => [
-                'label' => 'Append to public item page automatically', // @translate
-            ],
-        ]);
-        $taggingFormFieldset->add([
-            'name' => 'folksonomy_append_media_show',
-            'type' => Checkbox::class,
-            'options' => [
-                'label' => 'Append to public media page automatically', // @translate
-            ],
-        ]);
 
         $inputFilter = $this->getInputFilter();
 
@@ -137,18 +116,6 @@ class ConfigForm extends Form
         ]);
         $taggingFormFilter->add([
             'name' => 'folksonomy_legal_text',
-            'required' => false,
-        ]);
-        $taggingFormFilter->add([
-            'name' => 'folksonomy_append_item_set_show',
-            'required' => false,
-        ]);
-        $taggingFormFilter->add([
-            'name' => 'folksonomy_append_item_show',
-            'required' => false,
-        ]);
-        $taggingFormFilter->add([
-            'name' => 'folksonomy_append_media_show',
             'required' => false,
         ]);
     }

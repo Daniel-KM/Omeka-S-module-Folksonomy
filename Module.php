@@ -41,6 +41,8 @@ use Omeka\Module\AbstractModule;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
+use Zend\Form\Element\Checkbox;
+use Zend\Form\Fieldset;
 use Zend\Mvc\Controller\AbstractController;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -111,6 +113,7 @@ SQL;
         );
         $html .= '</p>';
         $settings->set('folksonomy_legal_text', $html);
+        $this->manageSiteSettings($serviceLocator, 'install');
     }
 
     public function uninstall(ServiceLocatorInterface $serviceLocator)
@@ -125,6 +128,7 @@ SQL;
         $conn->exec($sql);
 
         $this->manageSettings($serviceLocator->get('Omeka\Settings'), 'uninstall');
+        $this->manageSiteSettings($serviceLocator, 'uninstall');
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $serviceLocator)
@@ -139,6 +143,33 @@ SQL;
                 $defaultSettings['folksonomy_append_item_show']);
             $settings->set('folksonomy_append_media_show',
                 $defaultSettings['folksonomy_append_media_show']);
+        }
+
+        if (version_compare($oldVersion, '3.3.7', '<')) {
+            $config = require __DIR__ . '/config/module.config.php';
+            $defaultSettings = $config[strtolower(__NAMESPACE__)]['site_settings'];
+            $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+            $settings = $serviceLocator->get('Omeka\Settings');
+            $api = $serviceLocator->get('Omeka\ApiManager');
+            $sites = $api->search('sites')->getContent();
+            foreach ($sites as $site) {
+                $siteSettings->setTargetId($site->id());
+                $siteSettings->set('folksonomy_append_item_set_show',
+                    $settings->get('folksonomy_append_item_set_show',
+                        $defaultSettings['folksonomy_append_item_set_show'])
+                );
+                $siteSettings->set('folksonomy_append_item_show',
+                    $settings->get('folksonomy_append_item_show',
+                        $defaultSettings['folksonomy_append_item_show'])
+                );
+                $siteSettings->set('folksonomy_append_media_show',
+                    $settings->get('folksonomy_append_media_show',
+                        $defaultSettings['folksonomy_append_media_show'])
+                );
+            }
+            $settings->delete('folksonomy_append_item_set_show');
+            $settings->delete('folksonomy_append_item_show');
+            $settings->delete('folksonomy_append_media_show');
         }
     }
 
@@ -155,6 +186,17 @@ SQL;
                     $settings->delete($name);
                     break;
             }
+        }
+    }
+
+    protected function manageSiteSettings(ServiceLocatorInterface $serviceLocator, $process)
+    {
+        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+        $api = $serviceLocator->get('Omeka\ApiManager');
+        $sites = $api->search('sites')->getContent();
+        foreach ($sites as $site) {
+            $siteSettings->setTargetId($site->id());
+            $this->manageSettings($siteSettings, $process, 'site_settings');
         }
     }
 
@@ -690,6 +732,12 @@ SQL;
                 [$this, 'viewShowAfterPublic']
             );
         }
+
+        $sharedEventManager->attach(
+            \Omeka\Form\SiteSettingsForm::class,
+            'form.add_elements',
+            [$this, 'addSiteSettingsFormElements']
+        );
     }
 
     public function getConfigForm(PhpRenderer $renderer)
@@ -743,6 +791,66 @@ SQL;
                 $settings->set($name, $value);
             }
         }
+    }
+
+    public function addSiteSettingsFormElements(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $config = $services->get('Config');
+        $form = $event->getTarget();
+
+        $defaultSiteSettings = $config[strtolower(__NAMESPACE__)]['site_settings'];
+
+        $fieldset = new Fieldset('folksonomy');
+        $fieldset->setLabel('Folksonomy'); // @translate
+
+        $fieldset->add([
+            'name' => 'folksonomy_append_item_set_show',
+            'type' => Checkbox::class,
+            'options' => [
+                'label' => 'Append automatically to item set page"', // @translate
+                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+            ],
+            'attributes' => [
+                'value' => $siteSettings->get(
+                    'folksonomy_append_item_set_show',
+                    $defaultSiteSettings['folksonomy_append_item_set_show']
+                ),
+            ],
+        ]);
+
+        $fieldset->add([
+            'name' => 'folksonomy_append_item_show',
+            'type' => Checkbox::class,
+            'options' => [
+                'label' => 'Append automatically to item page', // @translate
+                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+            ],
+            'attributes' => [
+                'value' => $siteSettings->get(
+                    'folksonomy_append_item_show',
+                    $defaultSiteSettings['folksonomy_append_item_show']
+                ),
+            ],
+        ]);
+
+        $fieldset->add([
+            'name' => 'folksonomy_append_media_show',
+            'type' => Checkbox::class,
+            'options' => [
+                'label' => 'Append automatically to media page"', // @translate
+                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+            ],
+            'attributes' => [
+                'value' => $siteSettings->get(
+                    'folksonomy_append_media_show',
+                    $defaultSiteSettings['folksonomy_append_media_show']
+                ),
+            ],
+        ]);
+
+        $form->add($fieldset);
     }
 
     /**
@@ -1076,20 +1184,21 @@ SQL;
     public function viewShowAfterPublic(Event $event)
     {
         $serviceLocator = $this->getServiceLocator();
-        $settings = $serviceLocator->get('Omeka\Settings');
+        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
         $view = $event->getTarget();
         $resource = $view->resource;
         $resourceName = $resource->resourceName();
-
         $appendMap = [
             'item_sets' => 'folksonomy_append_item_set_show',
             'items' => 'folksonomy_append_item_show',
             'media' => 'folksonomy_append_media_show',
         ];
-        if ($settings->get($appendMap[$resource->resourceName()])) {
-            echo $view->showTags($resource);
-            $this->displayTaggingQuickForm($event);
+        if (!$siteSettings->get($appendMap[$resourceName])) {
+            return;
         }
+
+        echo $view->showTags($resource);
+        $this->displayTaggingQuickForm($event);
     }
 
     /**
