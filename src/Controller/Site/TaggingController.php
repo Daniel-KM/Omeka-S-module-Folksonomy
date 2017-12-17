@@ -2,6 +2,7 @@
 namespace Folksonomy\Controller\Site;
 
 use Folksonomy\Entity\Tagging;
+use Omeka\Entity\Resource;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -52,7 +53,7 @@ class TaggingController extends AbstractActionController
         }
 
         if ($this->settings()->get('folksonomy_public_notification')) {
-            $this->notifyEmail($resourceId, $addedTags);
+            $this->notifyEmail($resource, $addedTags);
         }
 
         return new JsonModel([
@@ -68,21 +69,23 @@ class TaggingController extends AbstractActionController
     /**
      * Notify by email for taggings on a resource.
      *
-     * @param int $resourceId
+     * @param Resource $resource
      * @param array $tags
      */
-    protected function notifyEmail($resourceId, $tags)
+    protected function notifyEmail(Resource $resource, $tags)
     {
         $site = @$_SERVER['SERVER_NAME'] ?: sprintf('Server (%s)', @$_SERVER['SERVER_ADDR']); // @translate
         $subject = sprintf('[%s] New public tags', $site); // @translate
 
+        $representation = $resource->getRepresentation();
+
         $total = count($tags);
         $stringTags = implode('", "', $tags);
         $body = $total <= 1
-            ? sprintf('%d tag added to resource #%d: "%s".', // @translate
-                $total, $resourceId, $stringTags)
-            : sprintf('%d tags added to resource #%d: "%s".', // @translate
-                $total, $resourceId, $stringTags);
+            ? sprintf('%d tag added to resource #%d (%s): "%s".', // @translate
+                $total, $resource->getId(), $representation->adminUrl(), $stringTags)
+            : sprintf('%d tags added to resource #%d (%s): "%s".', // @translate
+                $total, $resource->getId(), $representation->adminUrl(), $stringTags);
         $body .= "\r\n\r\n";
 
         $adminEmail = $this->settings()->get('administrator_email');
