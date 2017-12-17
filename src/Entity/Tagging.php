@@ -5,6 +5,7 @@ use DateTime;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Omeka\Entity\AbstractEntity;
+use Omeka\Entity\Exception\InvalidArgumentException;
 use Omeka\Entity\User;
 
 /**
@@ -104,7 +105,7 @@ class Tagging extends AbstractEntity
             self::STATUS_APPROVED,
             self::STATUS_REJECTED,
         ])) {
-            throw new \InvalidArgumentException('Invalid tagging status.');
+            throw new InvalidArgumentException('Invalid tagging status.');
         }
         $this->status = $status;
     }
