@@ -27,6 +27,8 @@ $sortHeadings = [
         'value' => 'created'
     ],
 ];
+$batchEditRight = $this->userIsAllowed(TaggingAdapter::class, 'batch-update')
+    || $this->userIsAllowed(TaggingAdapter::class, 'batch-delete');
 $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
     || $this->userIsAllowed(TaggingAdapter::class, 'delete');
 ?>
@@ -45,7 +47,7 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
 
 <?php if ($taggings): ?>
 <div id="page-actions">
-    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'update')): ?>
+    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'batch-update')): ?>
     <a href="#"
         class="button batch-actions status-batch"
         data-status-batch-url="<?php echo $escape($this->url(null, ['action' => 'batch-approve'], true)); ?>"
@@ -59,7 +61,7 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
         aria-label="<?php echo $escape($this->translate('Reject')); ?>"
         title="<?php echo $escape($this->translate('Reject')); ?>"><?php echo $escape($this->translate('Reject')); ?></a>
     <?php endif; ?>
-    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'delete')): ?>
+    <?php if ($this->userIsAllowed(TaggingAdapter::class, 'batch-delete')): ?>
     <a href="#"
         class="button delete batch-actions sidebar-content"
         data-sidebar-content-url="<?php echo $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)); ?>"
@@ -75,12 +77,13 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
     <p><?php echo $this->translate('There are no taggings.'); ?></p>
 </div>
 <?php $this->trigger('view.browse.after'); ?>
+
 <?php else: ?>
-<table class="tablesaw <?php if ($editRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
+<table class="tablesaw <?php if ($batchEditRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
     <thead>
         <tr>
             <th class="column-tag">
-                <?php if ($editRight): ?>
+                <?php if ($batchEditRight): ?>
                 <input type="checkbox" class="select-all">
                 <?php endif; ?>
                 <?php echo $this->translate('Tag'); ?>
@@ -108,15 +111,15 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
         ?>
         <tr>
             <td>
-                <?php if ($editRight): ?>
+                <?php if ($batchEditRight): ?>
                     <input type="checkbox" name="resource_ids[]" value="<?php echo $tagging->id(); ?>">
                 <?php endif; ?>
                 <?php if ($tag): ?>
                 <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
-                <span class="is-public-or-not <?php if (!$tagging->isPublic()) echo 'o-icon-private'; ?>"></span>
+                <span class="is-public-or-not<?php if (!$tagging->isPublic()) echo ' o-icon-private'; ?>" aria-label="<?php echo $this->translate('Private'); ?>"></span>
                 <?php else: ?>
                 <span class="tag-name no-tag">[<?php echo $this->translate('Removed'); ?>]</span>
-                <span class="is-public-or-not o-icon-private"></span>
+                <span class="is-public-or-not o-icon-private" aria-label="<?php echo $this->translate('Private'); ?>"></span>
                 <?php endif;?>
                 <ul class="actions">
                 <?php $editRightTagging = $tagging->userIsAllowed('update'); ?>
@@ -150,7 +153,7 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
             <td>
                 <?php if ($resource): ?>
                     <?php echo $resource->link($resource->displayTitle()); ?>
-                <span class="resource-name <?php echo $resource->getControllerName(); ?>"></span>
+                <span class="resource-name <?php echo $resource->getControllerName(); ?>" aria-label="<?php echo $this->translate($resource->getControllerName()); ?>"></span>
                 <?php else: ?>
                     [<?php echo $this->translate('Removed'); ?>]
                 <span class="resource-name no-resource"></span>

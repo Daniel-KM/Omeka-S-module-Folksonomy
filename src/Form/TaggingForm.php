@@ -2,6 +2,8 @@
 namespace Folksonomy\Form;
 
 use Omeka\View\Helper\Setting;
+use Zend\Form\Element\Button;
+use Zend\Form\Element\Csrf;
 use Zend\Form\Form;
 use Zend\Http\PhpEnvironment\RemoteAddress;
 use Zend\Validator\StringLength;
@@ -148,7 +150,7 @@ class TaggingForm extends Form
         }
 
         $this->add([
-            'type' => 'csrf',
+            'type' => Csrf::class,
             'name' => sprintf('csrf_%s', $resourceId),
             'options' => [
                 'csrf_options' => ['timeout' => 3600],
@@ -156,7 +158,7 @@ class TaggingForm extends Form
         ]);
 
         $this->add([
-            'type' => 'button',
+            'type' => Button::class,
             'name' => 'submit',
             'options' => [
                 'label' => 'Tag it!', // @translate

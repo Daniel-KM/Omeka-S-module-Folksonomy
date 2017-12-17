@@ -7,6 +7,29 @@
  *
  * @copyright Daniel Berthereau, 2013-2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
+ *
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software.  You can use, modify and/ or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated with
+ * loading, using, modifying and/or developing or reproducing the software by
+ * the user in light of its specific status of free software, that may mean that
+ * it is complicated to manipulate, and that also therefore means that it is
+ * reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling
+ * the security of their systems and/or data to be ensured and, more generally,
+ * to use and operate it in the same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
 namespace Folksonomy;
 
@@ -149,6 +172,8 @@ SQL;
 
     /**
      * Add ACL rules for this module.
+     *
+     * @todo Simplify rules (see module Comment).
      */
     protected function addAclRules()
     {
@@ -489,8 +514,7 @@ SQL;
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
-        $serviceLocator = $this->getServiceLocator();
-        $settings = $serviceLocator->get('Omeka\Settings');
+        // TODO Add a setting to limit resources (see module Comment).
 
         // Add the Folksonomy term definition.
         $sharedEventManager->attach(
@@ -526,7 +550,7 @@ SQL;
             $sharedEventManager->attach(
                 $representation,
                 'rep.resource.json',
-                [$this, 'filterResourceJsonLd']
+                [$this, 'filterJsonLd']
             );
         }
 
@@ -547,12 +571,12 @@ SQL;
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.post',
-                [$this, 'cacheResourceTaggingData']
+                [$this, 'cacheData']
             );
             $sharedEventManager->attach(
                 $adapter,
                 'api.read.post',
-                [$this, 'cacheResourceTaggingData']
+                [$this, 'cacheData']
             );
 
             // Handle hydration after hydration of resource.
@@ -571,6 +595,7 @@ SQL;
             'Omeka\Controller\Site\Item',
             'Omeka\Controller\Site\ItemSet',
             'Omeka\Controller\Site\Media',
+            // TODO Add user.
         ];
         foreach ($controllers as $controller) {
             $sharedEventManager->attach(
@@ -646,11 +671,11 @@ SQL;
         }
 
         $controllers = [
-            'folksonomy_append_item_show' => 'Omeka\Controller\Site\Item',
-            'folksonomy_append_item_set_show' => 'Omeka\Controller\Site\ItemSet',
-            'folksonomy_append_media_show' => 'Omeka\Controller\Site\Media',
+            'Omeka\Controller\Site\Item',
+            'Omeka\Controller\Site\ItemSet',
+            'Omeka\Controller\Site\Media',
         ];
-        foreach ($controllers as $append => $controller) {
+        foreach ($controllers as $controller) {
             // Filter the search filters for the advanced search pages.
             $sharedEventManager->attach(
                 $controller,
@@ -659,13 +684,11 @@ SQL;
             );
 
             // Add the tags to the resource show public pages.
-            if ($settings->get($append)) {
-                $sharedEventManager->attach(
-                    $controller,
-                    'view.show.after',
-                    [$this, 'viewShowAfterPublic']
-                );
-            }
+            $sharedEventManager->attach(
+                $controller,
+                'view.show.after',
+                [$this, 'viewShowAfterPublic']
+            );
         }
     }
 
@@ -725,24 +748,25 @@ SQL;
     /**
      * Cache taggings and tags for resource API search/read.
      *
-     * @internal The cache avoids self::filterItemJsonLd() to make multiple
-     * queries to the database during one request.
+     * The cache avoids self::filterItemJsonLd() to make multiple queries to the
+     * database during one request.
      *
      * @param Event $event
      */
-    public function cacheResourceTaggingData(Event $event)
+    public function cacheData(Event $event)
     {
-        $content = $event->getParam('response')->getContent();
+        $resource = $event->getParam('response')->getContent();
         // Check if this is an api search or api read to get the list of ids.
-        $resourceIds = is_array($content)
+        $resourceIds = is_array($resource)
             ? array_map(function ($v) {
                 return $v->getId();
-            }, $content)
-            : [$content->getId()];
+            }, $resource)
+            : [$resource->getId()];
         if (empty($resourceIds)) {
             return;
         }
 
+        // TODO Use a unique direct scalar query to get all values to cache? Cache?
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $taggings = $api
             ->search('taggings', ['resource_id' => $resourceIds])
@@ -764,7 +788,7 @@ SQL;
      * @todo Use tag and tagging reference, not representation.
      * @param Event $event
      */
-    public function filterResourceJsonLd(Event $event)
+    public function filterJsonLd(Event $event)
     {
         $resourceId = $event->getTarget()->id();
         $jsonLd = $event->getParam('jsonLd');
@@ -796,13 +820,16 @@ SQL;
             $adapter = $event->getTarget();
             $taggingAlias = $adapter->createAlias();
             $resourceAlias = $adapter->getEntityClass();
+            $resourceName = $adapter->getResourceName() === 'users'
+                ? 'owner'
+                : 'resource';
             $qb
                 ->innerJoin(
                     Tagging::class,
                     $taggingAlias,
                     'WITH',
                     $qb->expr()->andX(
-                        $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                        $qb->expr()->eq($taggingAlias . '.' . $resourceName, $resourceAlias . '.id'),
                         $qb->expr()->isNotNull($taggingAlias . '.tag')
                     )
                 );
@@ -956,6 +983,11 @@ SQL;
         }
     }
 
+    /**
+     * Add the headers for admin management.
+     *
+     * @param Event $event
+     */
     public function addHeadersAdmin(Event $event)
     {
         $view = $event->getTarget();
@@ -1001,7 +1033,7 @@ SQL;
         }
 
         echo $event->getTarget()->partial(
-            'common/admin/tagging-form.phtml'
+            'common/admin/tagging-form'
         );
     }
 
@@ -1037,17 +1069,27 @@ SQL;
     }
 
     /**
-     * Display the tags for a resource in public.
+     * Display a partial for a resource in public.
      *
      * @param Event $event
      */
     public function viewShowAfterPublic(Event $event)
     {
+        $serviceLocator = $this->getServiceLocator();
+        $settings = $serviceLocator->get('Omeka\Settings');
         $view = $event->getTarget();
-        $resource = $event->getTarget()->resource;
-        echo $view->showTags($resource);
+        $resource = $view->resource;
+        $resourceName = $resource->resourceName();
 
-        $this->displayTaggingQuickForm($event);
+        $appendMap = [
+            'item_sets' => 'folksonomy_append_item_set_show',
+            'items' => 'folksonomy_append_item_show',
+            'media' => 'folksonomy_append_media_show',
+        ];
+        if ($settings->get($appendMap[$resource->resourceName()])) {
+            echo $view->showTags($resource);
+            $this->displayTaggingQuickForm($event);
+        }
     }
 
     /**
@@ -1076,8 +1118,8 @@ SQL;
         $tags = $this->listResourceTagsByName($resource);
         $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $listAsDiv
-            ? 'common/admin/tag-resource.phtml'
-            : 'common/admin/tag-resource-list.phtml';
+            ? 'common/admin/tag-resource'
+            : 'common/admin/tag-resource-list';
         echo $event->getTarget()->partial(
             $partial,
             [
@@ -1088,6 +1130,11 @@ SQL;
         );
     }
 
+    /**
+     * Display the advanced search form via partial.
+     *
+     * @param Event $event
+     */
     public function displayAdvancedSearch(Event $event)
     {
         $query = $event->getParam('query', []);
@@ -1100,6 +1147,11 @@ SQL;
         $event->setParam('partials', $partials);
     }
 
+    /**
+     * Filter search filters.
+     *
+     * @param Event $event
+     */
     public function filterSearchFilters(Event $event)
     {
         $translate = $event->getTarget()->plugin('translate');

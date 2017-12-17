@@ -12,7 +12,7 @@ class SearchTagForm extends AbstractHelper
     protected $searchForm;
 
     /**
-     * Return the partial to display tags.
+     * Return the partial to display search tags.
      *
      * @return string
      */

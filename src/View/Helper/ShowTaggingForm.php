@@ -3,7 +3,7 @@ namespace Folksonomy\View\Helper;
 
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\TaggingForm;
-use Omeka\Api\Representation\AbstractResourceRepresentation;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Zend\View\Helper\AbstractHelper;
 
 class ShowTaggingForm extends AbstractHelper
@@ -20,7 +20,7 @@ class ShowTaggingForm extends AbstractHelper
      *
      * @return string
      */
-    public function __invoke(AbstractResourceRepresentation $resource)
+    public function __invoke(AbstractResourceEntityRepresentation $resource)
     {
         $view = $this->getView();
         if (!$view->userIsAllowed(Tagging::class, 'create')) {
@@ -36,6 +36,6 @@ class ShowTaggingForm extends AbstractHelper
         ]);
         $form->init();
         $view->vars()->offsetSet('taggingForm', $form);
-        return $view->partial('common/tagging-quick-form.phtml');
+        return $view->partial('common/tagging-quick-form');
     }
 }

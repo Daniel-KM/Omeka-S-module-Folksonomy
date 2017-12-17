@@ -63,15 +63,21 @@ $('#content').on('click', 'a.status-toggle', function(e) {
         }
     })
     .done(function(data) {
-        status = data.content.status;
-        button.data('status', status);
-        var row = button.closest('tr')
-        row.find('.status-label').text(data.content.statusLabel);
-        var isPublicOrNot = row.find('.is-public-or-not');
-        if (status === 'proposed' || status === 'rejected') {
-            isPublicOrNot.addClass('o-icon-private');
+        if (!data.content) {
+            alert(Omeka.jsTranslate('Something went wrong'));
         } else {
-            isPublicOrNot.removeClass('o-icon-private');
+            status = data.content.status;
+            button.data('status', status);
+            var row = button.closest('tr')
+            row.find('.status-label').text(data.content.statusLabel);
+            var isPublicOrNot = row.find('.is-public-or-not');
+            if (status === 'proposed' || status === 'rejected') {
+                isPublicOrNot.show();
+                isPublicOrNot.addClass('o-icon-private');
+            } else {
+                isPublicOrNot.hide();
+                isPublicOrNot.removeClass('o-icon-private');
+            }
         }
     })
     .fail(function(jqXHR, textStatus) {
@@ -90,7 +96,7 @@ $('#content').on('click', 'a.status-toggle', function(e) {
 $('#content').on('click', 'a.status-batch', function(e) {
     e.preventDefault();
 
-    var selected = $('.batch-edit td input[type="checkbox"]:checked');
+    var selected = $('.batch-edit td input[name="resource_ids[]"][type="checkbox"]:checked');
     if (selected.length == 0) {
         return;
     }
@@ -104,24 +110,31 @@ $('#content').on('click', 'a.status-batch', function(e) {
             selected.closest('tr').find('.status-toggle').each(function() {
                 $(this).removeClass('o-icon-' + $(this).data('status')).addClass('o-icon-transmit');
             });
+            $('.select-all').prop('checked', false);
         }
     })
     .done(function(data) {
-        status = data.content.status;
-        var statusLabel = Omeka.jsTranslate(data.content.statusLabel);
-        selected.closest('tr').each(function() {
-            var row = $(this);
-            row.find('input[type="checkbox"]').prop('checked', false);
-            row.find('.status-toggle').data('status', status);
-            row.find('.status-toggle').removeClass('o-icon-transmit').addClass('o-icon-' + status);
-            row.find('.status-label').text(statusLabel);
-            var isPublicOrNot = row.find('.is-public-or-not');
-            if (status === 'approved') {
-                isPublicOrNot.removeClass('o-icon-private');
-            } else {
-                isPublicOrNot.addClass('o-icon-private');
-            }
-        });
+        if (!data.content) {
+            alert(Omeka.jsTranslate('Something went wrong'));
+        } else {
+            status = data.content.status;
+            var statusLabel = Omeka.jsTranslate(data.content.statusLabel);
+            selected.closest('tr').each(function() {
+                var row = $(this);
+                row.find('input[type="checkbox"]').prop('checked', false);
+                row.find('.status-toggle').data('status', status);
+                row.find('.status-toggle').removeClass('o-icon-transmit').addClass('o-icon-' + status);
+                row.find('.status-label').text(statusLabel);
+                var isPublicOrNot = row.find('.is-public-or-not');
+                if (status === 'approved') {
+                    isPublicOrNot.hide();
+                    isPublicOrNot.removeClass('o-icon-private');
+                } else {
+                    isPublicOrNot.show();
+                    isPublicOrNot.addClass('o-icon-private');
+                }
+            });
+        }
     })
     .fail(function(jqXHR, textStatus) {
         selected.closest('tr').find('.status-toggle').each(function() {

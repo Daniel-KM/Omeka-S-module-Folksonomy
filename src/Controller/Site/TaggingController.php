@@ -13,12 +13,13 @@ class TaggingController extends AbstractActionController
         // TODO Validate via form.
         // $form = $this->getForm(TaggingForm::class);
 
-        if (!empty($this->params()->fromPost('o-module-folksonomy:check'))) {
+        $params = $this->params();
+        if (!empty($params->fromPost('o-module-folksonomy:check'))) {
             return $this->jsonErrorUnauthorized();
         }
 
-        $legalText = $this->settings()->get('folksonomy_legal_text', '');
-        if ($legalText && empty($this->params()->fromPost('legal_agreement'))) {
+        $legalText = $this->settings()->get('folksonomy_legal_text');
+        if ($legalText && empty($params->fromPost('legal_agreement'))) {
             return $this->jsonErrorLegalAgreement();
         }
 
@@ -26,7 +27,7 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorUnauthorized();
         }
 
-        $resourceId = $this->params()->fromPost('resource_id');
+        $resourceId = $params->fromPost('resource_id');
         if (!$resourceId) {
             return $this->jsonErrorNotFound();
         }
@@ -38,7 +39,7 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorNotFound();
         }
 
-        $tags = $this->params()->fromPost('o-module-folksonomy:tag-new', '');
+        $tags = $params->fromPost('o-module-folksonomy:tag-new', '');
         $tags = explode(',', $tags);
 
         $addedTags = $this->addTags($resource, $tags);

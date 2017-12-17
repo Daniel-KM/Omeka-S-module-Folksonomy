@@ -10,10 +10,10 @@ return [
     ],
     'entity_manager' => [
         'mapping_classes_paths' => [
-            __DIR__ . '/../src/Entity',
+            dirname(__DIR__) . '/src/Entity',
         ],
         'proxy_paths' => [
-            __DIR__ . '/../data/doctrine-proxies',
+            dirname(__DIR__) . '/data/doctrine-proxies',
         ],
         'filters' => [
             'tagging_visibility' => Db\Filter\TaggingVisibilityFilter::class,
@@ -21,7 +21,7 @@ return [
     ],
     'view_manager' => [
         'template_path_stack' => [
-            __DIR__ . '/../view',
+            dirname(__DIR__) . '/view',
         ],
         'strategies' => [
             'ViewJsonStrategy',
@@ -254,7 +254,7 @@ return [
         'translation_file_patterns' => [
             [
                 'type' => 'gettext',
-                'base_dir' => __DIR__ . '/../language',
+                'base_dir' => dirname(__DIR__) . '/language',
                 'pattern' => '%s.mo',
                 'text_domain' => null,
             ],
@@ -271,6 +271,8 @@ return [
         'Reload page to see new tags.', // @translate
         'Request too long to process.', // @translate
         'The resource or the tag doesn’t exist.', // @translate
+        'Something went wrong', // @translate
+
     ],
     'folksonomy' => [
         'settings' => [

@@ -20,9 +20,6 @@ class TaggingAdapter extends AbstractEntityAdapter
 {
     use QueryBuilderTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     protected $sortFields = [
         'id' => 'id',
         'status' => 'status',
@@ -32,9 +29,9 @@ class TaggingAdapter extends AbstractEntityAdapter
         'item_id' => 'resource',
         'media_id' => 'resource',
         'owner_id' => 'owner',
+        'owner_name' => 'owner',
         // For info.
         // 'tag_name' => 'tag',
-        // 'owner_name' => 'owner',
         // // 'resource_title' => 'resource',
     ];
 
@@ -93,7 +90,7 @@ class TaggingAdapter extends AbstractEntityAdapter
                             : null;
                     } elseif (is_numeric($data['o:resource']['o:id'])) {
                         $resource = $this->getAdapter('resources')
-                            ->findEntity($data['o:resource']['o:id']);
+                            ->findEntity(['id' => $data['o:resource']['o:id']]);
                     } else {
                         $resource = null;
                     }
@@ -108,6 +105,8 @@ class TaggingAdapter extends AbstractEntityAdapter
                 }
                 break;
         }
+
+        $this->updateTimestamps($request, $entity);
     }
 
     public function validateRequest(Request $request, ErrorStore $errorStore)
@@ -289,12 +288,12 @@ class TaggingAdapter extends AbstractEntityAdapter
 
     public function preprocessBatchUpdate(array $data, Request $request)
     {
+        $updatables = [
+            'o:status' => true,
+        ];
         $rawData = $request->getContent();
-
-        if (isset($rawData['o:status'])) {
-            $data['o:status'] = $rawData['o:status'];
-        }
-
+        $rawData = array_intersect_key($rawData, $updatables);
+        $data = $rawData + $data;
         return $data;
     }
 }

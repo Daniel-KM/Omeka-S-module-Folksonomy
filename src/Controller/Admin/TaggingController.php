@@ -75,6 +75,21 @@ class TaggingController extends AbstractActionController
         ]);
     }
 
+    public function deleteConfirmAction()
+    {
+        $response = $this->api()->read('taggings', $this->params('id'));
+        $tagging = $response->getContent();
+
+        $view = new ViewModel;
+        $view->setTerminal(true);
+        $view->setTemplate('common/delete-confirm-details');
+        $view->setVariable('tagging', $tagging);
+        $view->setVariable('resource', $tagging);
+        $view->setVariable('resourceLabel', 'tagging');
+        $view->setVariable('partialPath', 'folksonomy/admin/tagging/show-details');
+        return $view;
+    }
+
     public function deleteAction()
     {
         if ($this->getRequest()->isPost()) {
@@ -90,21 +105,6 @@ class TaggingController extends AbstractActionController
             }
         }
         return $this->redirect()->toRoute('admin/tagging');
-    }
-
-    public function deleteConfirmAction()
-    {
-        $response = $this->api()->read('taggings', $this->params('id'));
-        $tagging = $response->getContent();
-
-        $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('common/delete-confirm-details');
-        $view->setVariable('tagging', $tagging);
-        $view->setVariable('resource', $tagging);
-        $view->setVariable('resourceLabel', 'tagging');
-        $view->setVariable('partialPath', 'folksonomy/admin/tagging/show-details');
-        return $view;
     }
 
     public function batchDeleteConfirmAction()
@@ -162,30 +162,6 @@ class TaggingController extends AbstractActionController
         return $this->batchUpdateStatus(Tagging::STATUS_REJECTED);
     }
 
-    public function toggleStatusAction()
-    {
-        $id = $this->params('id');
-        $tagging = $this->api()->read('taggings', $id)->getContent();
-        $status = $tagging->status() == Tagging::STATUS_APPROVED
-            ? Tagging::STATUS_REJECTED
-            : Tagging::STATUS_APPROVED;
-
-        $data = [];
-        $data['o:status'] = $status;
-        $response = $this->api()
-            ->update('taggings', $id, $data, ['isPartial' => true]);
-        if (!$response) {
-            return $this->jsonErrorUpdate();
-        }
-
-        return new JsonModel([
-            'content' => [
-                'status' => $status,
-                'statusLabel' => $response->getContent()->statusLabel(),
-            ],
-        ]);
-    }
-
     protected function batchUpdateStatus($status)
     {
         if (!$this->getRequest()->isPost()) {
@@ -211,6 +187,30 @@ class TaggingController extends AbstractActionController
             'content' => [
                 'status' => $status,
                 'statusLabel' => ucfirst($status),
+            ],
+        ]);
+    }
+
+    public function toggleStatusAction()
+    {
+        $id = $this->params('id');
+        $tagging = $this->api()->read('taggings', $id)->getContent();
+        $status = $tagging->status() == Tagging::STATUS_APPROVED
+            ? Tagging::STATUS_REJECTED
+            : Tagging::STATUS_APPROVED;
+
+        $data = [];
+        $data['o:status'] = $status;
+        $response = $this->api()
+            ->update('taggings', $id, $data, ['isPartial' => true]);
+        if (!$response) {
+            return $this->jsonErrorUpdate();
+        }
+
+        return new JsonModel([
+            'content' => [
+                'status' => $status,
+                'statusLabel' => $response->getContent()->statusLabel(),
             ],
         ]);
     }

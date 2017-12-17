@@ -24,17 +24,22 @@ $(document).ready(function() {
             }
         })
         .done(function (data) {
-            var msg = 'Data were added to the resource.';
-            if (isOmeka) msg = Omeka.jsTranslate(msg);
-            if (data.content.moderation) {
-                var msgTmp = 'They will be displayed definively when approved.';
-                msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
+            if (!data.content) {
+                msg = 'Something went wrong';
+                if (isOmeka) msg = Omeka.jsTranslate(msg);
+                alert(msg);
             } else {
-                var msgTmp = 'Reload page to see new tags.';
-                msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
+                var msg = 'Data were added to the resource.';
+                if (isOmeka) msg = Omeka.jsTranslate(msg);
+                if (data.content.moderation) {
+                    var msgTmp = 'They will be displayed definively when approved.';
+                    msg += ' ' + (isOmeka ? Omeka.jsTranslate(msgTmp) : msgTmp);
+                    alert(msg);
+                    form.find('input[type=text]').val('');
+                } else {
+                    location.reload(true);
+                }
             }
-            alert(msg);
-            form.find('input[type=text]').val('');
         })
         .fail(function(jqXHR, textStatus) {
             if (textStatus == 'timeout') {
