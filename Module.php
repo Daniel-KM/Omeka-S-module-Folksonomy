@@ -105,10 +105,10 @@ SQL;
         $this->manageSettings($settings, 'install');
 
         $html = '<p>';
-        $html .= $t->translate(sprintf('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.', // @translate
+        $html .= sprintf($t->translate('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.'), // @translate
             '<a rel="licence" href="#" target="_blank">', '</a>',
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
-        ));
+        );
         $html .= '</p>';
         $settings->set('folksonomy_legal_text', $html);
     }
