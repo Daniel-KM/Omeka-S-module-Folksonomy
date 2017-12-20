@@ -33,12 +33,15 @@
  */
 namespace Folksonomy;
 
+use Doctrine\DBAL\DBALException;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\ConfigForm;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Module\AbstractModule;
+use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
+use Omeka\Stdlib\Message;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Form\Element\Checkbox;
@@ -74,13 +77,18 @@ class Module extends AbstractModule
     {
         $t = $serviceLocator->get('MvcTranslator');
 
-        $sql = <<<'SQL'
+        // To resolve an issue on Percona sql server, the queries are divided.
+
+        $sqls = [];
+        $sqls[] = <<<'SQL'
 CREATE TABLE `tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_389B7835E237E06` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+SQL;
+        $sqls[] = <<<'SQL'
 CREATE TABLE `tagging` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tag_id` int(11) DEFAULT NULL,
@@ -101,7 +109,19 @@ CREATE TABLE `tagging` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 SQL;
         $conn = $serviceLocator->get('Omeka\Connection');
-        $conn->exec($sql);
+
+        foreach ($sqls as $sql) {
+            try{
+                $conn->exec($sql);
+            } catch (DBALException $e) {
+                $this->uninstall($serviceLocator);
+                $logger = $serviceLocator->get('Omeka\Logger');
+                $logger->err($e);
+                throw new ModuleCannotInstallException(
+                    new Message($t->translate('An error occured during table install. See log for more details. Code: %s; Message: %s'), // @translate
+                        $e->getCode(), $e->getMessage()));
+            }
+        }
 
         $settings = $serviceLocator->get('Omeka\Settings');
         $this->manageSettings($settings, 'install');
