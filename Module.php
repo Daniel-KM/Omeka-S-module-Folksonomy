@@ -77,48 +77,43 @@ class Module extends AbstractModule
     {
         $t = $serviceLocator->get('MvcTranslator');
 
-        // To resolve an issue on Percona sql server, the queries are divided.
-
-        $sqls = [];
-        $sqls[] = <<<'SQL'
-CREATE TABLE `tag` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_389B7835E237E06` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        $sql = <<<'SQL'
+CREATE TABLE tag (
+    id INT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(190) NOT NULL,
+    UNIQUE INDEX UNIQ_389B7835E237E06 (name),
+    PRIMARY KEY(id)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+CREATE TABLE tagging (
+    id INT AUTO_INCREMENT NOT NULL,
+    tag_id INT DEFAULT NULL,
+    resource_id INT DEFAULT NULL,
+    owner_id INT DEFAULT NULL,
+    status VARCHAR(190) NOT NULL,
+    created DATETIME NOT NULL,
+    modified DATETIME DEFAULT NULL,
+    INDEX IDX_A4AED123BAD26311 (tag_id),
+    INDEX IDX_A4AED12389329D25 (resource_id),
+    INDEX IDX_A4AED1237E3C61F9 (owner_id),
+    INDEX IDX_A4AED1237B00651C (status),
+    UNIQUE INDEX owner_tag_resource (owner_id, tag_id, resource_id),
+    PRIMARY KEY(id)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+ALTER TABLE tagging ADD CONSTRAINT FK_A4AED123BAD26311 FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE SET NULL;
+ALTER TABLE tagging ADD CONSTRAINT FK_A4AED12389329D25 FOREIGN KEY (resource_id) REFERENCES resource (id) ON DELETE SET NULL;
+ALTER TABLE tagging ADD CONSTRAINT FK_A4AED1237E3C61F9 FOREIGN KEY (owner_id) REFERENCES user (id) ON DELETE SET NULL;
 SQL;
-        $sqls[] = <<<'SQL'
-CREATE TABLE `tagging` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tag_id` int(11) DEFAULT NULL,
-  `resource_id` int(11) DEFAULT NULL,
-  `owner_id` int(11) DEFAULT NULL,
-  `status` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `owner_tag_resource` (`owner_id`,`tag_id`,`resource_id`),
-  KEY `IDX_A4AED1237B00651C` (`status`),
-  KEY `IDX_A4AED123BAD26311` (`tag_id`),
-  KEY `IDX_A4AED12389329D25` (`resource_id`),
-  KEY `IDX_A4AED1237E3C61F9` (`owner_id`),
-  CONSTRAINT `FK_A4AED1237E3C61F9` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_A4AED12389329D25` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_A4AED123BAD26311` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-SQL;
-        $conn = $serviceLocator->get('Omeka\Connection');
-
+        $connection = $serviceLocator->get('Omeka\Connection');
+        $sqls = array_filter(array_map('trim', explode(';', $sql)));
         foreach ($sqls as $sql) {
             try{
-                $conn->exec($sql);
+                $connection->exec($sql);
             } catch (DBALException $e) {
                 $this->uninstall($serviceLocator);
                 $logger = $serviceLocator->get('Omeka\Logger');
                 $logger->err($e);
                 throw new ModuleCannotInstallException(
-                    new Message($t->translate('An error occured during table install. See log for more details. Code: %s; Message: %s'), // @translate
+                    new Message($t->translate('An error occured during sql query. See log for more details. Code: %s; Message: %s'), // @translate
                         $e->getCode(), $e->getMessage()));
             }
         }
@@ -139,13 +134,14 @@ SQL;
     public function uninstall(ServiceLocatorInterface $serviceLocator)
     {
         $sql = <<<'SQL'
-SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS tagging;
 DROP TABLE IF EXISTS tag;
-SET foreign_key_checks = 1;
 SQL;
-        $conn = $serviceLocator->get('Omeka\Connection');
-        $conn->exec($sql);
+        $connection = $serviceLocator->get('Omeka\Connection');
+        $sqls = array_filter(array_map('trim', explode(';', $sql)));
+        foreach ($sqls as $sql) {
+            $connection->exec($sql);
+        }
 
         $this->manageSettings($serviceLocator->get('Omeka\Settings'), 'uninstall');
         $this->manageSiteSettings($serviceLocator, 'uninstall');
