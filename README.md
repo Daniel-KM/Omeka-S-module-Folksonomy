@@ -107,7 +107,7 @@ the digital library of [Mines ParisTech].
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2013-2017
+* Copyright Daniel Berthereau, 2013-2018
 
 
 [Folksonomy]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy

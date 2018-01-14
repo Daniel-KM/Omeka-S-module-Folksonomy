@@ -7,6 +7,7 @@ use Folksonomy\Entity\Tag;
 use Omeka\Entity\Item;
 use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
+use Omeka\Entity\Resource;
 use Zend\View\Helper\AbstractHelper;
 
 class TagCount extends AbstractHelper
