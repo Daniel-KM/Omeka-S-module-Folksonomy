@@ -202,7 +202,7 @@ class TaggingController extends AbstractActionController
         $data = [];
         $data['o:status'] = $status;
         $response = $this->api()
-            ->update('taggings', $id, $data, ['isPartial' => true]);
+            ->update('taggings', $id, $data, [], ['isPartial' => true]);
         if (!$response) {
             return $this->jsonErrorUpdate();
         }

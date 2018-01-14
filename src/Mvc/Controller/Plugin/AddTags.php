@@ -178,7 +178,7 @@ class AddTags extends AbstractPlugin
                         continue;
                     }
                     $response = $api
-                        ->update('taggings', $tagging->id(), $dataUpdate, ['isPartial' => true]);
+                        ->update('taggings', $tagging->id(), [], $dataUpdate, ['isPartial' => true]);
                 }
             }
         }
