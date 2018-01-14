@@ -275,7 +275,7 @@ return [
 
     ],
     'folksonomy' => [
-        'settings' => [
+        'config' => [
             'folksonomy_public_allow_tag' => true,
             'folksonomy_public_require_moderation' => false,
             'folksonomy_public_notification' => true,

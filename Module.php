@@ -151,7 +151,7 @@ SQL;
     {
         if (version_compare($oldVersion, '3.3.3', '<')) {
             $config = require __DIR__ . '/config/module.config.php';
-            $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
+            $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
             $settings = $serviceLocator->get('Omeka\Settings');
             $settings->set('folksonomy_append_item_set_show',
                 $defaultSettings['folksonomy_append_item_set_show']);
@@ -189,7 +189,7 @@ SQL;
         }
     }
 
-    protected function manageSettings($settings, $process, $key = 'settings')
+    protected function manageSettings($settings, $process, $key = 'config')
     {
         $config = require __DIR__ . '/config/module.config.php';
         $defaultSettings = $config[strtolower(__NAMESPACE__)][$key];
@@ -764,7 +764,7 @@ SQL;
         $formElementManager = $services->get('FormElementManager');
 
         $data = [];
-        $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
+        $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
         foreach ($defaultSettings as $name => $value) {
             $data['folksonomy_public_rights'][$name] = $settings->get($name);
             $data['folksonomy_tagging_form'][$name] = $settings->get($name);
@@ -801,7 +801,7 @@ SQL;
         unset($params['folksonomy_public_rights']);
         unset($params['folksonomy_tagging_form']);
 
-        $defaultSettings = $config[strtolower(__NAMESPACE__)]['settings'];
+        $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
         foreach ($params as $name => $value) {
             if (isset($defaultSettings[$name])) {
                 $settings->set($name, $value);
