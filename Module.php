@@ -106,7 +106,7 @@ SQL;
         $connection = $serviceLocator->get('Omeka\Connection');
         $sqls = array_filter(array_map('trim', explode(';', $sql)));
         foreach ($sqls as $sql) {
-            try{
+            try {
                 $connection->exec($sql);
             } catch (DBALException $e) {
                 $this->uninstall($serviceLocator);
@@ -669,29 +669,7 @@ SQL;
             'Omeka\Controller\Admin\Media',
         ];
         foreach ($controllers as $controller) {
-            // Add the tab tagging form to the resource add and edit admin pages.
-            $sharedEventManager->attach(
-                $controller,
-                'view.add.section_nav',
-                [$this, 'addTaggingTab']
-            );
-            $sharedEventManager->attach(
-                $controller,
-                'view.edit.section_nav',
-                [$this, 'addTaggingTab']
-            );
-            $sharedEventManager->attach(
-                $controller,
-                'view.add.form.after',
-                [$this, 'displayTaggingForm']
-            );
-            $sharedEventManager->attach(
-                $controller,
-                'view.edit.form.after',
-                [$this, 'displayTaggingForm']
-            );
-
-            // Add the show tags to the resource show admin pages.
+            // Add a tab to the resource show admin pages.
             $sharedEventManager->attach(
                 $controller,
                 'view.show.before',
@@ -700,15 +678,15 @@ SQL;
             $sharedEventManager->attach(
                 $controller,
                 'view.show.section_nav',
-                [$this, 'addTaggingTab']
+                [$this, 'addTab']
             );
             $sharedEventManager->attach(
                 $controller,
                 'view.show.after',
-                [$this, 'viewShowAfter']
+                [$this, 'displayListAndForm']
             );
 
-            // Add the show tags to the resource browse admin pages (details).
+            // Add the details to the resource browse admin pages.
             $sharedEventManager->attach(
                 $controller,
                 'view.browse.before',
@@ -718,6 +696,28 @@ SQL;
                 $controller,
                 'view.details',
                 [$this, 'viewDetails']
+            );
+
+            // Add the tab form to the resource add and edit admin pages.
+            $sharedEventManager->attach(
+                $controller,
+                'view.add.section_nav',
+                [$this, 'addTab']
+            );
+            $sharedEventManager->attach(
+                $controller,
+                'view.edit.section_nav',
+                [$this, 'addTab']
+            );
+            $sharedEventManager->attach(
+                $controller,
+                'view.add.form.after',
+                [$this, 'displayForm']
+            );
+            $sharedEventManager->attach(
+                $controller,
+                'view.edit.form.after',
+                [$this, 'displayForm']
             );
 
             // Filter the search filters for the advanced search pages.
@@ -745,7 +745,7 @@ SQL;
             $sharedEventManager->attach(
                 $controller,
                 'view.show.after',
-                [$this, 'viewShowAfterPublic']
+                [$this, 'displayListAndFormPublic']
             );
         }
 
@@ -797,7 +797,9 @@ SQL;
         }
 
         $params = $params->toArray();
-        array_walk_recursive($params, function($v, $k) use (&$params) { $params[$k] = $v; });
+        array_walk_recursive($params, function ($v, $k) use (&$params) {
+            $params[$k] = $v;
+        });
         unset($params['folksonomy_public_rights']);
         unset($params['folksonomy_tagging_form']);
 
@@ -1115,16 +1117,16 @@ SQL;
     public function addHeadersAdmin(Event $event)
     {
         $view = $event->getTarget();
-        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
-        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', __NAMESPACE__));
+        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', __NAMESPACE__));
     }
 
     /**
-     * Add the tagging tab to section navigations.
+     * Add a tab to section navigation.
      *
      * @param Event $event
      */
-    public function addTaggingTab(Event $event)
+    public function addTab(Event $event)
     {
         $sectionNav = $event->getParam('section_nav');
         $sectionNav['tags'] = 'Tags'; // @translate
@@ -1132,11 +1134,66 @@ SQL;
     }
 
     /**
-     * Display the tagging form.
+     * Display a partial for a resource.
      *
      * @param Event $event
      */
-    public function displayTaggingForm(Event $event)
+    public function displayListAndForm(Event $event)
+    {
+        $acl = $this->getServiceLocator()->get('Omeka\Acl');
+        $allowed = $acl->userIsAllowed(Tagging::class, 'create');
+
+        echo '<div id="tags" class="section">';
+        $resource = $event->getTarget()->resource;
+        $this->displayResourceFolksonomy($event, $resource, false);
+        if ($allowed) {
+            $this->displayTaggingQuickForm($event);
+        }
+        echo '</div>';
+    }
+
+    /**
+     * Display a partial for a resource in public.
+     *
+     * @param Event $event
+     */
+    public function displayListAndFormPublic(Event $event)
+    {
+        $serviceLocator = $this->getServiceLocator();
+        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+        $view = $event->getTarget();
+        $resource = $view->resource;
+        $resourceName = $resource->resourceName();
+        $appendMap = [
+            'item_sets' => 'folksonomy_append_item_set_show',
+            'items' => 'folksonomy_append_item_show',
+            'media' => 'folksonomy_append_media_show',
+        ];
+        if (!$siteSettings->get($appendMap[$resourceName])) {
+            return;
+        }
+
+        echo $view->showTags($resource);
+        $this->displayTaggingQuickForm($event);
+    }
+
+    /**
+     * Display the details for a resource.
+     *
+     * @param Event $event
+     */
+    public function viewDetails(Event $event)
+    {
+        $representation = $event->getParam('entity');
+        $this->displayResourceFolksonomy($event, $representation, true);
+    }
+
+    /**
+     * Display a form.
+     *
+     * @param Event $event
+     */
+    public function displayForm(Event $event)
     {
         $vars = $event->getTarget()->vars();
         // Manage add/edit form.
@@ -1171,61 +1228,6 @@ SQL;
         $view = $event->getTarget();
         $resource = $event->getTarget()->resource;
         echo $view->showTaggingForm($resource);
-    }
-
-    /**
-     * Display the tags for a resource.
-     *
-     * @param Event $event
-     */
-    public function viewShowAfter(Event $event)
-    {
-        $acl = $this->getServiceLocator()->get('Omeka\Acl');
-        $allowed = $acl->userIsAllowed(Tagging::class, 'create');
-
-        echo '<div id="tags" class="section">';
-        $resource = $event->getTarget()->resource;
-        $this->displayResourceFolksonomy($event, $resource, false);
-        if ($allowed) {
-            $this->displayTaggingQuickForm($event);
-        }
-        echo '</div>';
-    }
-
-    /**
-     * Display a partial for a resource in public.
-     *
-     * @param Event $event
-     */
-    public function viewShowAfterPublic(Event $event)
-    {
-        $serviceLocator = $this->getServiceLocator();
-        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-        $view = $event->getTarget();
-        $resource = $view->resource;
-        $resourceName = $resource->resourceName();
-        $appendMap = [
-            'item_sets' => 'folksonomy_append_item_set_show',
-            'items' => 'folksonomy_append_item_show',
-            'media' => 'folksonomy_append_media_show',
-        ];
-        if (!$siteSettings->get($appendMap[$resourceName])) {
-            return;
-        }
-
-        echo $view->showTags($resource);
-        $this->displayTaggingQuickForm($event);
-    }
-
-    /**
-     * Display the tags for a resource (details).
-     *
-     * @param Event $event
-     */
-    public function viewDetails(Event $event)
-    {
-        $representation = $event->getParam('entity');
-        $this->displayResourceFolksonomy($event, $representation, true);
     }
 
     /**

@@ -1,6 +1,4 @@
 <?php
-use Folksonomy\Entity\Tagging;
-
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
 ?>
@@ -13,7 +11,7 @@ $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folks
     <?php
     $escape = $this->plugin('escapeHtml');
     $resourceName = $resource->getControllerName();
-    $updateRight = $this->userIsAllowed(Tagging::class, 'update');
+    $updateRight = $this->userIsAllowed(\Folksonomy\Entity\Tagging::class, 'update');
     ?>
     <ul>
     <?php foreach ($tags as $tag): ?>

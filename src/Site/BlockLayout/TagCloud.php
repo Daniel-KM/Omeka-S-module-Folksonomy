@@ -5,7 +5,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
-use Zend\Form\Element\Select;
+use Zend\Form\Element;
 use Zend\Form\Form;
 use Zend\View\Renderer\PhpRenderer;
 
@@ -24,7 +24,7 @@ class TagCloud extends AbstractBlockLayout
         $form = new Form();
         $form->add([
             'name' => 'o:block[__blockIndex__][o:data][resource_name]',
-            'type' => 'Select',
+            'type' => Element\Select::class,
             'options' => [
                 'label' => 'Select resource', // @translate
                 'info' => 'Browse links are available only for item sets and items.',
@@ -39,14 +39,14 @@ class TagCloud extends AbstractBlockLayout
         ]);
         $form->add([
             'name' => 'o:block[__blockIndex__][o:data][max_classes]',
-            'type' => 'Number',
+            'type' => Element\Number::class,
             'options' => [
                 'label' => 'Max classes', // @translate
             ],
         ]);
         $form->add([
             'name' => 'o:block[__blockIndex__][o:data][tag_numbers]',
-            'type' => 'Checkbox',
+            'type' => Element\Checkbox::class,
             'options' => [
                 'label' => 'Display tag numbers', // @translate
             ],

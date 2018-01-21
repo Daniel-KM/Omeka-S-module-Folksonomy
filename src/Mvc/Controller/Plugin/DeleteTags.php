@@ -2,7 +2,6 @@
 namespace Folksonomy\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
-use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;

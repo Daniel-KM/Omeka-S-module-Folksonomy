@@ -3,8 +3,6 @@ namespace Folksonomy\Api\Representation;
 
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Api\Representation\UserRepresentation;
 use Omeka\Api\ResourceInterface;
 
 /**

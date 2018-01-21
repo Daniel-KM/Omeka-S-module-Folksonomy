@@ -6,6 +6,7 @@ use Zend\Form\Element\Button;
 use Zend\Form\Element\Csrf;
 use Zend\Form\Form;
 use Zend\Http\PhpEnvironment\RemoteAddress;
+use Zend\ServiceManager\ServiceLocatorInterface as FormElementManager;
 use Zend\Validator\StringLength;
 use Zend\View\Helper\Url;
 
@@ -204,7 +205,7 @@ class TaggingForm extends Form
     /**
      * @param FormElementManager $formElementManager
      */
-    public function setFormElementManager($formElementManager)
+    public function setFormElementManager(FormElementManager $formElementManager)
     {
         $this->formElementManager = $formElementManager;
     }

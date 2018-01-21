@@ -2,12 +2,10 @@
 namespace Folksonomy\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\Query\FilterCollection;
-use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Adapter\Manager as ApiAdapterManager;
 use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;
-use Omeka\Entity\User;
 use Omeka\Permissions\Acl;
 use Omeka\Settings\Settings;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;

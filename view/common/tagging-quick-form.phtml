@@ -17,7 +17,7 @@ $formElement = $this->plugin('formElement');
     <?php if ($taggingForm->has('recaptcha')): ?>
     <?php $element = $taggingForm->get('recaptcha'); ?>
     <div class="field">
-        <div class="inputs" required="required">
+        <div class="inputs required">
             <?php echo $this->formElement($element); ?>
         </div>
     </div>
@@ -25,7 +25,7 @@ $formElement = $this->plugin('formElement');
     <?php if ($taggingForm->has('o-module-folksonomy:check')): /* honeyspot */ ?>
     <?php $element = $taggingForm->get('o-module-folksonomy:check'); ?>
     <div class="field">
-        <div class="inputs" required="required">
+        <div class="inputs required">
             <?php echo $this->formElement($element); ?>
         </div>
     </div>
@@ -33,7 +33,7 @@ $formElement = $this->plugin('formElement');
     <?php if ($taggingForm->has('legal_agreement')): ?>
     <?php $element = $taggingForm->get('legal_agreement'); ?>
     <div class="field">
-        <div class="inputs" required="required">
+        <div class="inputs required">
             <?php echo $this->setting('folksonomy_legal_text'); ?>
             <?php echo $this->formCheckbox($element); ?>
         </div>
