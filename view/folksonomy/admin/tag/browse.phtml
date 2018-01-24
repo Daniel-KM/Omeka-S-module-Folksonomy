@@ -89,7 +89,7 @@ $deleteRight = $this->userIsAllowed(TagAdapter::class, 'delete');
         <tr>
             <td>
                 <?php if ($deleteRight): ?>
-                    <input type="checkbox" name="resource_ids[]" value="<?php echo $tag->id(); ?>">
+                    <input type="checkbox" name="resource_ids[]" value="<?php echo $this->escapeHtml($tag->id()); ?>">
                 <?php endif; ?>
                 <span class="tag-name"<?php
                     if ($updateRight) echo ' contenteditable="true" data-update-url="' . $tag->url('update') . '"';
