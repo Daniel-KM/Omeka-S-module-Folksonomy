@@ -9,7 +9,7 @@ $('#tag-selector .selector-child').click(function(event) {
     $('#resource-tags').removeClass('empty');
     var tagName = $(this).data('child-search');
 
-    if ($('#resource-tags').find('input[value="' + tagName.replace(/"/g, '\"') + '"]').length) {
+    if ($('#resource-tags').find('input[value="' + tagName.replace(/"/g, '\"').replace(/'/g, "\'") + '"]').length) {
         return;
     }
 
