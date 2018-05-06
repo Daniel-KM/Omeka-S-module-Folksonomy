@@ -112,7 +112,7 @@ Copyright
 
 [Folksonomy]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy
 [Omeka S]: https://omeka.org/s
-[Tagging plugin]: https://github.com/Daniel-KM/Tagging
+[Tagging plugin]: https://github.com/Daniel-KM/Omeka-plugin-Tagging
 [Omeka Classic]: https://omeka.org
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
