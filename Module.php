@@ -857,7 +857,7 @@ SQL;
             'name' => 'folksonomy_append_media_show',
             'type' => Checkbox::class,
             'options' => [
-                'label' => 'Append automatically to media page"', // @translate
+                'label' => 'Append automatically to media page', // @translate
                 'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
             ],
             'attributes' => [
