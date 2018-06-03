@@ -14,6 +14,7 @@ class TagController extends AbstractActionController
 
         $query = $this->params()->fromQuery();
         $query['site_id'] = $site->id();
+        // TODO Check if this limit should be removed (check adapter, too).
         $query['limit'] = 0;
         // Never display "rejected" tags on public, in all cases.
         // The "proposed" status may be filtered via the visibility filter.

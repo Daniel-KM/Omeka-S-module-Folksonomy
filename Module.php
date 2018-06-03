@@ -761,7 +761,7 @@ SQL;
         $services = $this->getServiceLocator();
         $config = $services->get('Config');
         $settings = $services->get('Omeka\Settings');
-        $formElementManager = $services->get('FormElementManager');
+        $form = $services->get('FormElementManager')->get(ConfigForm::class);
 
         $data = [];
         $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
@@ -772,7 +772,6 @@ SQL;
 
         $renderer->ckEditor();
 
-        $form = $formElementManager->get(ConfigForm::class);
         $form->init();
         $form->setData($data);
         $html = $renderer->formCollection($form);
@@ -787,8 +786,7 @@ SQL;
 
         $params = $controller->getRequest()->getPost();
 
-        $form = $this->getServiceLocator()->get('FormElementManager')
-            ->get(ConfigForm::class);
+        $form = $services->get('FormElementManager')->get(ConfigForm::class);
         $form->init();
         $form->setData($params);
         if (!$form->isValid()) {
@@ -827,8 +825,8 @@ SQL;
             'name' => 'folksonomy_append_item_set_show',
             'type' => Checkbox::class,
             'options' => [
-                'label' => 'Append automatically to item set page"', // @translate
-                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+                'label' => 'Append automatically to item set page', // @translate
+                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
             ],
             'attributes' => [
                 'value' => $siteSettings->get(
@@ -843,7 +841,7 @@ SQL;
             'type' => Checkbox::class,
             'options' => [
                 'label' => 'Append automatically to item page', // @translate
-                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
             ],
             'attributes' => [
                 'value' => $siteSettings->get(
@@ -858,7 +856,7 @@ SQL;
             'type' => Checkbox::class,
             'options' => [
                 'label' => 'Append automatically to media page', // @translate
-                'info' => 'If unchecked, the viewer can be added via the helper in the theme or the block in any page.', // @translate
+                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
             ],
             'attributes' => [
                 'value' => $siteSettings->get(

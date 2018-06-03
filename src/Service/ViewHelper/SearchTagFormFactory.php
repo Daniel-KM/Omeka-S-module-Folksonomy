@@ -12,8 +12,8 @@ class SearchTagFormFactory implements FactoryInterface
     {
         $formElementManager = $services->get('FormElementManager');
         $searchForm = $formElementManager->get(SearchForm::class);
-        $form = new SearchTagForm();
-        $form->setSearchForm($searchForm);
-        return $form;
+        $helper = new SearchTagForm();
+        $helper->setSearchForm($searchForm);
+        return $helper;
     }
 }

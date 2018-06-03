@@ -267,7 +267,7 @@ return [
         'Rejected', // @translate
         'You should accept the legal agreement.', // @translate
         'Data were added to the resource.', // @translate
-        'They will be displayed definively when approved.', // @translate
+        'They will be displayed definitely when approved.', // @translate
         'Reload page to see new tags.', // @translate
         'Request too long to process.', // @translate
         'The resource or the tag doesn’t exist.', // @translate
