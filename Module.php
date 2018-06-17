@@ -44,7 +44,7 @@ use Omeka\Permissions\Assertion\OwnsEntityAssertion;
 use Omeka\Stdlib\Message;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Form\Element\Checkbox;
+use Zend\Form\Element;
 use Zend\Form\Fieldset;
 use Zend\Mvc\Controller\AbstractController;
 use Zend\Mvc\MvcEvent;
@@ -752,7 +752,7 @@ SQL;
         $sharedEventManager->attach(
             \Omeka\Form\SiteSettingsForm::class,
             'form.add_elements',
-            [$this, 'addSiteSettingsFormElements']
+            [$this, 'addFormElementsSiteSettings']
         );
     }
 
@@ -803,13 +803,13 @@ SQL;
 
         $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
         foreach ($params as $name => $value) {
-            if (isset($defaultSettings[$name])) {
+            if (array_key_exists($name, $defaultSettings)) {
                 $settings->set($name, $value);
             }
         }
     }
 
-    public function addSiteSettingsFormElements(Event $event)
+    public function addFormElementsSiteSettings(Event $event)
     {
         $services = $this->getServiceLocator();
         $siteSettings = $services->get('Omeka\Settings\Site');
@@ -823,7 +823,7 @@ SQL;
 
         $fieldset->add([
             'name' => 'folksonomy_append_item_set_show',
-            'type' => Checkbox::class,
+            'type' => Element\Checkbox::class,
             'options' => [
                 'label' => 'Append automatically to item set page', // @translate
                 'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
@@ -838,7 +838,7 @@ SQL;
 
         $fieldset->add([
             'name' => 'folksonomy_append_item_show',
-            'type' => Checkbox::class,
+            'type' => Element\Checkbox::class,
             'options' => [
                 'label' => 'Append automatically to item page', // @translate
                 'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
@@ -853,7 +853,7 @@ SQL;
 
         $fieldset->add([
             'name' => 'folksonomy_append_media_show',
-            'type' => Checkbox::class,
+            'type' => Element\Checkbox::class,
             'options' => [
                 'label' => 'Append automatically to media page', // @translate
                 'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
