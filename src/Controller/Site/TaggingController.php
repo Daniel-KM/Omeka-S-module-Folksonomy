@@ -40,8 +40,8 @@ class TaggingController extends AbstractActionController
             return $this->jsonErrorNotFound();
         }
 
-        $tags = $params->fromPost('o-module-folksonomy:tag-new', '');
-        $tags = explode(',', $tags);
+        $tags = $params->fromPost('o-module-folksonomy:tag-new', []);
+        $tags = is_array($tags) ? $tags : explode(',', $tags);
 
         $addedTags = $this->addTags($resource, $tags);
         if (is_null($addedTags)) {

@@ -1043,11 +1043,12 @@ SQL;
 
         $submittedTags = $request->getValue('o-module-folksonomy:tag') ?: [];
         // Normalized new tags if any.
+        $newTags = $request->getValue('o-module-folksonomy:tag-new', []);
         $newTags = array_filter(
             array_unique(
                 array_map(
                     [$this, 'sanitizeString'],
-                    explode(',', $request->getValue('o-module-folksonomy:tag-new', ''))
+                    is_array($newTags) ? $newTags : explode(',', $newTags)
                 )
             ),
             function ($v) {
