@@ -1022,6 +1022,7 @@ SQL;
     public function handleTagging(Event $event)
     {
         $resourceAdapter = $event->getTarget();
+        /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
 
         if (!$resourceAdapter->shouldHydrate($request, 'o-module-folksonomy:tag')) {

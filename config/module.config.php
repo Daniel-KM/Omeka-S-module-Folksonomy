@@ -274,6 +274,53 @@ return [
         'Something went wrong', // @translate
 
     ],
+    'csvimport' => [
+        'mappings' => [
+            'item_sets' => [
+                'mappings' => [
+                    Mapping\FolksonomyMapping::class,
+                ],
+            ],
+            'items' => [
+                'mappings' => [
+                    Mapping\FolksonomyMapping::class,
+                ],
+            ],
+            'media' => [
+                'mappings' => [
+                    Mapping\FolksonomyMapping::class,
+                ],
+            ],
+            'resources' => [
+                'mappings' => [
+                    Mapping\FolksonomyMapping::class,
+                ],
+            ],
+        ],
+        'automapping' => [
+            'tag' => [
+                'name' => 'tag',
+                'value' => 1,
+                'label' => 'Tagging [Tag]', // @translate
+                'class' => 'tagging',
+            ],
+            'tagging' => [
+                'name' => 'tagging',
+                'value' => 1,
+                'label' => 'Tagging []', // @translate
+                'class' => 'tagging',
+            ],
+        ],
+        'user_settings' => [
+            'csvimport_automap_user_list' => [
+                'tag' => 'tag',
+                'tags' => 'tag',
+                'tagger' => 'tagging {owner}',
+                'tag status' => 'tagging {status}',
+                'tag date' => 'tagging {created}',
+            ],
+        ],
+    ],
     'folksonomy' => [
         'config' => [
             'folksonomy_public_allow_tag' => true,
