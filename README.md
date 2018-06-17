@@ -7,6 +7,7 @@ order to create a folksonomy or a tag cloud.
 
 Tags can be added with or without captcha and approbation. Once approved, public
 tags become normal tags. Tag creation and approbation are managed via roles.
+They can be imported by the module [CSV Import] like in Omeka Classic.
 
 This [Omeka S] module is a full and improved rewrite of the [Tagging plugin] for
 [Omeka Classic].
@@ -113,6 +114,7 @@ Copyright
 [Folksonomy]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy
 [Omeka S]: https://omeka.org/s
 [Tagging plugin]: https://github.com/Daniel-KM/Omeka-plugin-Tagging
+[CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [Omeka Classic]: https://omeka.org
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
