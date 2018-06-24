@@ -11,7 +11,7 @@ class FolksonomyMapping extends AbstractMapping
 
     public function getSidebar(PhpRenderer $view)
     {
-        return $view->partial('common/folksonomy-mapping-sidebar');
+        return $view->partial('common/admin/folksonomy-mapping-sidebar');
     }
 
     public function processRow(array $row)
