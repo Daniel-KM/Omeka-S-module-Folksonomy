@@ -21,6 +21,12 @@ class TagCloud extends AbstractBlockLayout
     ) {
         $data = $block ? $block->data() : [];
 
+        $defaultValues =  [
+            'resource_name' => 'items',
+            'max_classes' => 9,
+            'tag_numbers' => false,
+        ];
+
         $form = new Form();
         $form->add([
             'name' => 'o:block[__blockIndex__][o:data][resource_name]',
@@ -36,12 +42,20 @@ class TagCloud extends AbstractBlockLayout
                     'media' => 'Media',  // @translate
                 ],
             ],
+            'attributes' => [
+                'id' => 'folksonomy_page_resource_name',
+            ],
         ]);
         $form->add([
             'name' => 'o:block[__blockIndex__][o:data][max_classes]',
             'type' => Element\Number::class,
             'options' => [
                 'label' => 'Max classes', // @translate
+            ],
+            'attributes' => [
+                'id' => 'folksonomy_page_max_classes',
+                'min' => 1,
+                'max' => 99,
             ],
         ]);
         $form->add([
@@ -50,15 +64,17 @@ class TagCloud extends AbstractBlockLayout
             'options' => [
                 'label' => 'Display tag numbers', // @translate
             ],
+            'attributes' => [
+                'id' => 'folksonomy_page_tag_numbers',
+            ],
         ]);
 
-        if ($data) {
-            $form->setData([
-                'o:block[__blockIndex__][o:data][resource_name]' => $data['resource_name'],
-                'o:block[__blockIndex__][o:data][max_classes]' => $data['max_classes'],
-                'o:block[__blockIndex__][o:data][tag_numbers]' => $data['tag_numbers'],
-            ]);
-        }
+        $data = array_merge($defaultValues, $data);
+        $form->setData([
+            'o:block[__blockIndex__][o:data][resource_name]' => $data['resource_name'],
+            'o:block[__blockIndex__][o:data][max_classes]' => $data['max_classes'],
+            'o:block[__blockIndex__][o:data][tag_numbers]' => $data['tag_numbers'],
+        ]);
 
         return $view->formCollection($form);
     }

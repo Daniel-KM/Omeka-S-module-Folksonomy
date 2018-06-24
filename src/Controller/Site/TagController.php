@@ -10,6 +10,13 @@ class TagController extends AbstractActionController
     {
         $site = $this->currentSite();
 
+        $settings = $this->settings();
+        $options = [
+            'resourceName' => $settings->get('folksonomy_page_resource_name', 'items'),
+            'maxClasses' => $settings->get('folksonomy_page_max_classes', 9),
+            'tagNumbers' => $settings->get('folksonomy_page_tag_numbers', false),
+        ];
+
         $this->setBrowseDefaults('name', 'asc');
 
         $query = $this->params()->fromQuery();
@@ -25,6 +32,7 @@ class TagController extends AbstractActionController
         $view = new ViewModel;
         $view->setVariable('site', $site);
         $view->setVariable('tags', $tags);
+        $view->setVariable('options', $options);
         return $view;
     }
 

@@ -10,6 +10,56 @@ class ConfigForm extends Form
 {
     public function init()
     {
+        // TODO Use the elements of the block layout.
+        $this->add([
+            'name' => 'folksonomy_tag_page',
+            'type' => Fieldset::class,
+            'options' => [
+                'label' => 'Tag cloud page', // @translate
+            ],
+        ]);
+        $tagPageFieldset = $this->get('folksonomy_tag_page');
+        $tagPageFieldset->add([
+            'name' => 'folksonomy_page_resource_name',
+            'type' => Element\Select::class,
+            'options' => [
+                'label' => 'Select resource', // @translate
+                'info' => 'Browse links are available only for item sets and items.',
+                'value_options' => [
+                    '' => 'All resources (separately)', // @translate
+                    'resources' => 'All resources (together)',  // @translate
+                    'item_sets' => 'Item sets',  // @translate
+                    'items' => 'Items',  // @translate
+                    'media' => 'Media',  // @translate
+                ],
+            ],
+            'attributes' => [
+                'id' => 'folksonomy_page_resource_name',
+            ],
+        ]);
+        $tagPageFieldset->add([
+            'name' => 'folksonomy_page_max_classes',
+            'type' => Element\Number::class,
+            'options' => [
+                'label' => 'Max classes', // @translate
+            ],
+            'attributes' => [
+                'id' => 'folksonomy_page_max_classes',
+                'min' => 1,
+                'max' => 99,
+            ],
+        ]);
+        $tagPageFieldset->add([
+            'name' => 'folksonomy_page_tag_numbers',
+            'type' => Element\Checkbox::class,
+            'options' => [
+                'label' => 'Display tag numbers', // @translate
+            ],
+            'attributes' => [
+                'id' => 'folksonomy_page_tag_numbers',
+            ],
+        ]);
+
         $this->add([
             'type' => Fieldset::class,
             'name' => 'folksonomy_public_rights',
@@ -106,6 +156,20 @@ class ConfigForm extends Form
         ]);
 
         $inputFilter = $this->getInputFilter();
+
+        $tagPageFilter = $inputFilter->get('folksonomy_tag_page');
+        $tagPageFilter->add([
+            'name' => 'folksonomy_page_resource_name',
+            'required' => false,
+        ]);
+        $tagPageFilter->add([
+            'name' => 'folksonomy_page_max_classes',
+            'required' => false,
+        ]);
+        $tagPageFilter->add([
+            'name' => 'folksonomy_page_tag_numbers',
+            'required' => false,
+        ]);
 
         $publicRightsFilter = $inputFilter->get('folksonomy_public_rights');
         $publicRightsFilter->add([

@@ -10,12 +10,7 @@ if (!empty($tags) || is_null($tags)) {
     $statuses = isset($statuses) ? $statuses : ['allowed', 'approved'];
     $orderBy = empty($orderBy) ? '' : $orderBy;
     $usedOnly = !empty($usedOnly);
-    // Browse resources or media are not supported.
-    $link = (empty($link) || in_array($resourceName, ['resources', 'media'])) ? null : $link;
-    $maxClasses = isset($maxClasses) ? $maxClasses : 9;
-    $tagNumbers = empty($tagNumbers) ? false : $tagNumbers;
-    $slug = $this->params()->fromRoute('site-slug');
-
+    // Get the stats.
     $tags = $this->tagCount($tags, $resourceName, $statuses, $orderBy, $usedOnly);
 }
 
@@ -24,6 +19,13 @@ if (empty($tags)): ?>
     <p><?php echo $this->translate('No tags are available.'); ?></p>
 </div>
 <?php else: ?>
+<?php
+    // Browse resources or media are not supported in public.
+    $link = (empty($link) || in_array($resourceName, ['resources', 'media'])) ? null : $link;
+    $maxClasses = isset($maxClasses) ? max((int) $maxClasses, 1) : 9;
+    $tagNumbers = empty($tagNumbers) ? false : $tagNumbers;
+    $slug = $this->params()->fromRoute('site-slug');
+?>
 <div class="hTagcloud">
     <ul class="popularity">
     <?php

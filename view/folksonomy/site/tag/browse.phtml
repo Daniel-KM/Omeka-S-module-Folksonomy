@@ -1,4 +1,3 @@
-<?php $escape = $this->plugin('escapeHtml'); ?>
 <?php $this->htmlElement('body')->appendAttribute('class', 'folksonomy tags browse'); ?>
 <?php echo $this->pageTitle($this->translate('Folksonomy'), 2); ?>
 <?php if (empty($tags)): ?>
@@ -9,14 +8,14 @@
 <?php $this->trigger('view.browse.before'); ?>
 <?php echo $this->partial('common/tag-cloud', [
     'tags' => $tags,
-    'resourceName' => '',
+    'resourceName' => $options['resourceName'],
     // Never display "rejected" tags in public view, in all cases.
     // The "proposed" status may be filtered via the visibility filter.
     'statuses' => ['allowed', 'approved', 'proposed'],
     'orderBy' => 'tag.name',
     'link' => true,
-    'maxClasses' => 9,
-    'tagNumbers' => 'after',
+    'maxClasses' => $options['maxClasses'],
+    'tagNumbers' => $options['tagNumbers'],
 ]); ?>
 <?php $this->trigger('view.browse.after'); ?>
 <?php endif; ?>

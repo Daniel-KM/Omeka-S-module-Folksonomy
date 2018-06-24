@@ -324,6 +324,9 @@ return [
     ],
     'folksonomy' => [
         'config' => [
+            'folksonomy_page_resource_name' => 'items',
+            'folksonomy_page_max_classes' => 9,
+            'folksonomy_page_tag_numbers' => false,
             'folksonomy_public_allow_tag' => true,
             'folksonomy_public_require_moderation' => false,
             'folksonomy_public_notification' => true,

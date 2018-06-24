@@ -26,6 +26,10 @@
     margin-right: 8px;
 }
 
+.unused {
+    font-size: 90%;
+    font: italic;
+}
 .popular {
     font-size: 100%;
 }

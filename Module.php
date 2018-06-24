@@ -763,9 +763,11 @@ SQL;
         $settings = $services->get('Omeka\Settings');
         $form = $services->get('FormElementManager')->get(ConfigForm::class);
 
+        // TODO Find a better way to manage fieldset in config form.
         $data = [];
         $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
         foreach ($defaultSettings as $name => $value) {
+            $data['folksonomy_tag_page'][$name] = $settings->get($name);
             $data['folksonomy_public_rights'][$name] = $settings->get($name);
             $data['folksonomy_tagging_form'][$name] = $settings->get($name);
         }
@@ -774,7 +776,11 @@ SQL;
 
         $form->init();
         $form->setData($data);
-        $html = $renderer->formCollection($form);
+        $html = '<p>';
+        $html .= $renderer->translate('It is recommended to create tag clouds with the blocks of the site pages.'); // @translate
+        $html .= ' ' . $renderer->translate('So first options are used only to create global pages, that are not provided by Omeka yet.'); // @translate
+        $html .= '</p>';
+        $html .= $renderer->formCollection($form);
         return $html;
     }
 
@@ -798,6 +804,7 @@ SQL;
         array_walk_recursive($params, function ($v, $k) use (&$params) {
             $params[$k] = $v;
         });
+        unset($params['folksonomy_tag_page']);
         unset($params['folksonomy_public_rights']);
         unset($params['folksonomy_tagging_form']);
 
