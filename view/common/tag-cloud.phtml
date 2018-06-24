@@ -30,7 +30,7 @@ if (empty($tags)): ?>
     <ul class="popularity">
     <?php
     // Get the largest value in the tags array.
-    $largest = max(array_map(function ($v) { return $v['count']; }, $tags));
+    $largest = max(array_map(function ($v) { return $v['count']; }, $tags)) ?: 1;
     if ($maxClasses > $largest ) {
         $maxClasses = $largest;
     }
@@ -57,11 +57,13 @@ if (empty($tags)): ?>
     }
 
     foreach( $tags as $name => $tag):
-        $size = $largest > 1
-            ? (int) (($tag['count'] * $maxClasses) / ($largest - 1))
-            : $tag['count'] == 1 ? 0 : -1;
+        $size = empty($tag['count'])
+            ? -1
+            // The check of the tag count and the "-1" avoid issues with round.
+            : (($largest == 1 || $maxClasses == 1 || $tag['count'] == 1)
+                ? 0
+                : (int) (($tag['count'] - 1) * $maxClasses / $largest));
         $class = $size < 0 ? 'unused' : ($size ? str_repeat('v', $size) . '-' : '') . 'popular';
-
         $mainUrl = $link && $resourceName && !empty($urls[$resourceName])
             ? $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($name), $urls[$resourceName]))
             : '';
