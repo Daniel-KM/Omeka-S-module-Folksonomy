@@ -39,7 +39,7 @@ class TaggingForm extends Form
         $urlHelper = $this->getUrlHelper();
         $resourceId = $this->getOption('resource_id');
         $siteSlug = $this->getOption('site-slug');
-        $isPublic = (boolean) strlen($siteSlug);
+        $isPublic = (bool) strlen($siteSlug);
         $action = $isPublic
             ? $urlHelper('site/tagging', ['action' => 'add', 'site-slug' => $siteSlug])
             : $urlHelper('admin/tagging', ['action' => 'add']);

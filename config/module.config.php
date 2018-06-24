@@ -29,6 +29,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'countTags' => View\Helper\CountTags::class,
             'showTags' => View\Helper\ShowTags::class,
             'tagSelector' => View\Helper\TagSelector::class,
         ],
