@@ -7,22 +7,36 @@ use Zend\View\Helper\AbstractHelper;
 class ShowTags extends AbstractHelper
 {
     /**
+     * @var string
+     */
+    protected $partial = 'common/site/tag-resource';
+
+    /**
      * Return the partial to display tags.
      *
+     * @param AbstractResourceEntityRepresentation $resource
+     * @param string $partial
+     * @param array $options Options to pass to the partial. Supported by
+     * default: delimiter.
      * @return string
      */
-    public function __invoke(AbstractResourceEntityRepresentation $resource)
+    public function __invoke(AbstractResourceEntityRepresentation $resource, $partial = null, array $options = [])
     {
         $view = $this->getView();
-        $tags = $this->listResourceTags($resource);
-        $taggings = $this->listResourceTaggings($resource);
+
+        $options['resource'] = $resource;
+        $options['tags'] = $this->listResourceTags($resource);
+        if ($view->params()->fromRoute('__ADMIN__')) {
+            $options['taggings'] = $this->listResourceTaggings($resource);
+        }
+
+        if (!$partial) {
+            $partial = $this->partial;
+        }
+
         return $view->partial(
-            'common/site/tag-resource',
-            [
-                'resource' => $resource,
-                'tags' => $tags,
-                'taggings' => $taggings,
-            ]
+            $partial,
+            $options
         );
     }
 

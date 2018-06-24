@@ -5,8 +5,9 @@ if ($tags):
 ?>
 <div class="property tags">
     <h4><?php echo $this->translate('Tags'); ?></h4>
+    <?php $hyperlink = $this->plugin('hyperlink'); ?>
     <?php foreach ($tags as $tag): ?>
-    <div class="value tag"><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></div>
+    <div class="value tag"><?php echo $hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></div>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>

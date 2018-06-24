@@ -1,0 +1,20 @@
+<?php
+if (count($tags)) {
+    $escape = $this->plugin('escapeHtml');
+
+    $tagStrings = array();
+    if (isset($link) && $link === false) {
+        foreach ($tags as $tag) {
+            $tagStrings[] = $escape($tag->name());
+        }
+    } else {
+        $hyperlink = $this->plugin('hyperlink');
+        $resourceName = $resource->getControllerName();
+        foreach ($tags as $tag) {
+            $tagStrings[] = $hyperlink($tag->name(), $tag->urlResources($resourceName));
+        }
+    }
+
+    if (!isset($delimiter)) { $delimiter = ', '; }
+    echo join($escape($delimiter), $tagStrings);
+}
