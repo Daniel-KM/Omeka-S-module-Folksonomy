@@ -73,10 +73,10 @@ class TaggingController extends AbstractActionController
     /**
      * Notify by email for taggings on a resource.
      *
-     * @param AbstractResourceEntityRepresentation $representation
+     * @param AbstractResourceEntityRepresentation $resource
      * @param array $tags
      */
-    protected function notifyEmail(AbstractResourceEntityRepresentation $representation, $tags)
+    protected function notifyEmail(AbstractResourceEntityRepresentation $resource, $tags)
     {
         $site = @$_SERVER['SERVER_NAME'] ?: sprintf('Server (%s)', @$_SERVER['SERVER_ADDR']); // @translate
         $subject = sprintf('[%s] New public tags', $site); // @translate
@@ -85,9 +85,9 @@ class TaggingController extends AbstractActionController
         $stringTags = implode('", "', $tags);
         $body = $total <= 1
             ? sprintf('%d tag added to resource #%d (%s): "%s".', // @translate
-                $total, $representation->id(), $representation->adminUrl(), $stringTags)
+                $total, $resource->id(), $resource->adminUrl(), $stringTags)
             : sprintf('%d tags added to resource #%d (%s): "%s".', // @translate
-                $total, $representation->id(), $representation->adminUrl(), $stringTags);
+                $total, $resource->id(), $resource->adminUrl(), $stringTags);
         $body .= "\r\n\r\n";
 
         $adminEmail = $this->settings()->get('administrator_email');
