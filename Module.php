@@ -251,13 +251,13 @@ SQL;
         $acl->allow(
             null,
             [
-                Controller\Admin\TaggingController::class,
-                Controller\Site\TaggingController::class,
+                \Folksonomy\Controller\Admin\TaggingController::class,
+                \Folksonomy\Controller\Site\TaggingController::class,
             ]
         );
         $acl->allow(
             null,
-            Api\Adapter\TaggingAdapter::class,
+            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
             $publicAdapterRights
         );
         $acl->allow(
@@ -268,7 +268,7 @@ SQL;
 
         $acl->allow(
             'researcher',
-            Controller\Admin\TaggingController::class,
+            [\Folksonomy\Controller\Admin\TaggingController::class],
             [
                 'add',
                 'index',
@@ -281,21 +281,21 @@ SQL;
         );
         $acl->allow(
             'researcher',
-            Api\Adapter\TaggingAdapter::class,
+            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'researcher',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'researcher',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'read',
             ],
@@ -304,7 +304,7 @@ SQL;
 
         $acl->allow(
             'author',
-            Controller\Admin\TaggingController::class,
+            [\Folksonomy\Controller\Admin\TaggingController::class],
             [
                 'add',
                 'index',
@@ -317,21 +317,21 @@ SQL;
         );
         $acl->allow(
             'author',
-            Api\Adapter\TaggingAdapter::class,
+            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'author',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'author',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'read',
             ],
@@ -340,7 +340,7 @@ SQL;
 
         $acl->allow(
             'reviewer',
-            Controller\Admin\TaggingController::class,
+            [\Folksonomy\Controller\Admin\TaggingController::class],
             [
                 'add',
                 'edit',
@@ -355,7 +355,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            Api\Adapter\TaggingAdapter::class,
+            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
             [
                 'create',
                 'update',
@@ -364,7 +364,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'create',
                 'update',
@@ -375,7 +375,7 @@ SQL;
 
         $acl->allow(
             'editor',
-            Controller\Admin\TaggingController::class,
+            [\Folksonomy\Controller\Admin\TaggingController::class],
             [
                 'add',
                 'edit',
@@ -390,7 +390,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            Api\Adapter\TaggingAdapter::class,
+            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
             [
                 'create',
                 'update',
@@ -399,7 +399,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            Tagging::class,
+            [\Folksonomy\Entity\Tagging::class],
             [
                 'create',
                 'update',
@@ -412,24 +412,24 @@ SQL;
         $acl->allow(
             null,
             [
-                Controller\Admin\TagController::class,
-                Controller\Site\TagController::class,
+                \Folksonomy\Controller\Admin\TagController::class,
+                \Folksonomy\Controller\Site\TagController::class,
             ]
         );
         $acl->allow(
             null,
-            Api\Adapter\TagAdapter::class,
+            [\Folksonomy\Api\Adapter\TagAdapter::class],
             $publicAdapterRights
         );
         $acl->allow(
             null,
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             $publicEntityRights
         );
 
         $acl->allow(
             'researcher',
-            Controller\Admin\TagController::class,
+            [\Folksonomy\Controller\Admin\TagController::class],
             [
                 'add',
                 'index',
@@ -442,21 +442,21 @@ SQL;
         );
         $acl->allow(
             'researcher',
-            Api\Adapter\TagAdapter::class,
+            [\Folksonomy\Api\Adapter\TagAdapter::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'researcher',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'researcher',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'read',
             ],
@@ -465,7 +465,7 @@ SQL;
 
         $acl->allow(
             'author',
-            Controller\Admin\TagController::class,
+            [\Folksonomy\Controller\Admin\TagController::class],
             [
                 'add',
                 'index',
@@ -478,21 +478,21 @@ SQL;
         );
         $acl->allow(
             'author',
-            Api\Adapter\TagAdapter::class,
+            [\Folksonomy\Api\Adapter\TagAdapter::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'author',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'create',
             ]
         );
         $acl->allow(
             'author',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'read',
             ],
@@ -501,7 +501,7 @@ SQL;
 
         $acl->allow(
             'reviewer',
-            Controller\Admin\TagController::class,
+            [\Folksonomy\Controller\Admin\TagController::class],
             [
                 'add',
                 'edit',
@@ -516,7 +516,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            Api\Adapter\TagAdapter::class,
+            [\Folksonomy\Api\Adapter\TagAdapter::class],
             [
                 'create',
                 'update',
@@ -525,7 +525,7 @@ SQL;
         );
         $acl->allow(
             'reviewer',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'create',
                 'update',
@@ -536,7 +536,7 @@ SQL;
 
         $acl->allow(
             'editor',
-            Controller\Admin\TagController::class,
+            [\Folksonomy\Controller\Admin\TagController::class],
             [
                 'add',
                 'edit',
@@ -551,7 +551,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            Api\Adapter\TagAdapter::class,
+            [\Folksonomy\Api\Adapter\TagAdapter::class],
             [
                 'create',
                 'update',
@@ -560,7 +560,7 @@ SQL;
         );
         $acl->allow(
             'editor',
-            Tag::class,
+            [\Folksonomy\Entity\Tag::class],
             [
                 'create',
                 'update',
