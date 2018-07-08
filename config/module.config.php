@@ -41,8 +41,8 @@ return [
         ],
     ],
     'block_layouts' => [
-        'invokables' => [
-            'tagCloud' => Site\BlockLayout\TagCloud::class,
+        'factories' => [
+            'tagCloud' => Service\BlockLayout\TagCloudFactory::class,
         ],
     ],
     'navigation_links' => [
@@ -54,6 +54,7 @@ return [
         'invokables' => [
             Form\ConfigForm::class => Form\ConfigForm::class,
             Form\SearchForm::class => Form\SearchForm::class,
+            Form\TagCloudBlockForm::class => Form\TagCloudBlockForm::class,
         ],
         'factories' => [
             Form\Element\TagSelect::class => Service\Form\Element\TagSelectFactory::class,
@@ -339,6 +340,13 @@ return [
             'folksonomy_append_item_set_show' => true,
             'folksonomy_append_item_show' => true,
             'folksonomy_append_media_show' => true,
+        ],
+        'block_settings' => [
+            'tagCloud' => [
+                'resource_name' => 'items',
+                'max_classes' => 9,
+                'tag_numbers' => false,
+            ],
         ],
     ],
 ];
