@@ -1,10 +1,11 @@
 <?php
 if ($tags):
+    $translate = $this->plugin('translate');
     // In public view, only items (default) and item sets are available.
     $resourceName = $resource->getControllerName() == 'item-set' ? 'item-set' : null;
 ?>
 <div class="property tags">
-    <h4><?php echo $this->translate('Tags'); ?></h4>
+    <h4><?php echo $translate('Tags'); ?></h4>
     <?php $hyperlink = $this->plugin('hyperlink'); ?>
     <?php foreach ($tags as $tag): ?>
     <div class="value tag"><?php echo $hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></div>

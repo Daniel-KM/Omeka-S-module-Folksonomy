@@ -13,7 +13,7 @@ class TagCloudBlockForm extends Form
             'type' => Element\Select::class,
             'options' => [
                 'label' => 'Select resource', // @translate
-                'info' => 'Browse links are available only for item sets and items.', // @transalte
+                'info' => 'Browse links are available only for item sets and items.', // @translate
                 'value_options' => [
                     '' => 'All resources (separately)', // @translate
                     'resources' => 'All resources (together)',  // @translate

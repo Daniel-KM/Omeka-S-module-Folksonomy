@@ -1,11 +1,12 @@
 <?php
+$translate = $this->plugin('translate');
+$formElement = $this->plugin('formElement');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy.js', 'Folksonomy'));
 $taggingForm->prepare();
-$formElement = $this->plugin('formElement');
 ?>
 <div class="property">
-    <h4><?php echo $this->translate('New Tags'); ?></h4>
+    <h4><?php echo $translate('New Tags'); ?></h4>
     <?php // echo $this->form($taggingForm); ?>
     <?php echo $this->form()->openTag($taggingForm); ?>
     <?php $element = $taggingForm->get('o-module-folksonomy:tag-new'); ?>
