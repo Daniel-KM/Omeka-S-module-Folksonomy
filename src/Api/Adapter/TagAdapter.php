@@ -258,11 +258,10 @@ class TagAdapter extends AbstractEntityAdapter
     {
         // Quote is allowed.
         $string = strip_tags($string);
-        // The first character is a space and the last one is a no-break space.
-        $string = trim($string, ' /\\?<>:*%|"`&;' . "\t\n\r");
+        $string = preg_replace('~^[\p{Z}/\\?<>:*%|"`&;]+|[\p{Z}/\\?<>:*%|"`&;]+$~u', '', $string);
         $string = preg_replace('/[\(\{]/', '[', $string);
         $string = preg_replace('/[\)\}]/', ']', $string);
-        $string = preg_replace('/[[:cntrl:]\/\\\?<>\*\%\|\"`\&\;#+\^\$\s]/', ' ', $string);
+        $string = preg_replace('~[[:cntrl:]/\\\?<>\*\%\|\"`\&\;#+\^\$\s]~', ' ', $string);
         return trim(preg_replace('/\s+/', ' ', $string));
     }
 
