@@ -1,8 +1,9 @@
 <?php
 // Inspired from the function tag_cloud() of Omeka Classic.
 
-$this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
+$translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
+$this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
 
 if (!empty($tags) || is_null($tags)) {
     // Set default values.
@@ -16,7 +17,7 @@ if (!empty($tags) || is_null($tags)) {
 
 if (empty($tags)): ?>
 <div class="no-resources">
-    <p><?php echo $this->translate('No tags are available.'); ?></p>
+    <p><?php echo $translate('No tags are available.'); ?></p>
 </div>
 <?php else: ?>
 <?php

@@ -1,8 +1,9 @@
 <?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
-$escape = $this->plugin('escapeHtml');
-$removeStr = $escape($this->translate('Remove tag'));
+$removeStr = $escape($translate('Remove tag'));
 $tagTemplate = '
 <tr>
     <td class="tag-name"></td>
@@ -17,11 +18,11 @@ $tagTemplate = '
 </tr>';
 ?>
 <fieldset id="tags" class="section folksonomy" aria-labelledby="tags-label">
-    <legend id="tags-legend"><?php echo $this->translate('Tags'); ?></legend>
+    <legend id="tags-legend"><?php echo $translate('Tags'); ?></legend>
     <table id="resource-tags" data-tablesaw-mode="stack" class="tablesaw tablesaw-stack <?php echo ($resource && $tags) ? '' : 'empty'; ?>">
         <thead>
         <tr>
-            <th><?php echo $this->translate('Tag'); ?></th>
+            <th><?php echo $translate('Tag'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -43,8 +44,8 @@ $tagTemplate = '
                         class="status-toggle o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"
                         data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
                         data-status="<?php echo $tagging->status(); ?>"
-                        aria-label="<?php echo $escape($this->translate('Toggle status')); ?>"
-                        title="<?php echo $escape($this->translate('Toggle status')); ?>"></a></span>
+                        aria-label="<?php echo $escape($translate('Toggle status')); ?>"
+                        title="<?php echo $escape($translate('Toggle status')); ?>"></a></span>
                     <?php else: ?>
                     <span class="no-action o-icon-<?php echo $tagging->status(); ?>"></span>
                     <?php endif; ?>
@@ -62,17 +63,17 @@ $tagTemplate = '
     </table>
     <div class="no-resources">
         <p>
-            <?php echo $this->translate('There are no tags for this resource.'); ?>
+            <?php echo $translate('There are no tags for this resource.'); ?>
             <br />
-            <?php echo $this->translate('Add existing ones using the interface to the right or add new ones in the field below.'); ?>
+            <?php echo $translate('Add existing ones using the interface to the right or add new ones in the field below.'); ?>
         </p>
     </div>
     <div class="field">
         <div class="inputs">
-            <input name="o-module-folksonomy:tag-new" value="" placeholder="<?php echo $this->translate('Add one or multiple comma-separated new tags'); ?>" class="touched" type="text">
+            <input name="o-module-folksonomy:tag-new" value="" placeholder="<?php echo $translate('Add one or multiple comma-separated new tags'); ?>" class="touched" type="text">
         </div>
     </div>
-    <button id="tag-selector-button" class="mobile-only"><?php echo $this->translate('Add a tag'); ?></button>
+    <button id="tag-selector-button" class="mobile-only"><?php echo $translate('Add a tag'); ?></button>
     <span id="tag-template" data-template="<?php echo $escape($tagTemplate); ?>"></span>
     <?php echo $this->tagSelector(); ?>
 </fieldset>
