@@ -98,7 +98,11 @@ class TaggingController extends AbstractActionController
             ->addTo($adminEmail)
             ->setSubject($subject)
             ->setBody($body);
-        $mailer->send($message);
+        try {
+            $mailer->send($message);
+        } catch (\Zend\Mail\Transport\Exception\RuntimeException $e) {
+            $this->logger()->err('Unable to send an email after tagging.'); // @translate
+        }
     }
 
     protected function jsonErrorLegalAgreement()
