@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-14 10:17+0200\n"
+"POT-Creation-Date: 2019-11-04 00:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,343 +17,573 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: TaggingPlugin.php:101 TaggingPlugin.php:102 TaggingPlugin.php:103
-#: TaggingPlugin.php:103
+#: Module.php:81
 #, php-format
 msgid ""
-"I agree with %s terms of use %s and I accept to free my contribution under "
-"the licence %s CC BY-SA %s."
+"I agree with %sterms of use%s and I accept to free my contribution under the "
+"licence %sCC BY-SA%s."
 msgstr ""
 
-#: TaggingPlugin.php:220 TaggingPlugin.php:223 TaggingPlugin.php:245
-#: TaggingPlugin.php:245
-msgid "No proposed taggings"
+#: Module.php:502
+msgid ""
+"It is recommended to create tag clouds with the blocks of the site pages."
 msgstr ""
 
-#: TaggingPlugin.php:224 TaggingPlugin.php:227 TaggingPlugin.php:249
-#: TaggingPlugin.php:249
+#: Module.php:503
+msgid ""
+"So first options are used only to create global pages, that are not provided "
+"by Omeka yet."
+msgstr ""
+
+#: Module.php:967
+msgid "Has tags"
+msgstr ""
+
+#: Module.php:968
+msgid "true"
+msgstr ""
+
+#: Module.php:972 view/common/admin/folksonomy-mapping-sidebar.phtml:11
+#: view/common/admin/tagging-form.phtml:25
+#: view/folksonomy/admin/tag/browse.phtml:11
+#: view/folksonomy/admin/tag/browse.phtml:77
+#: view/folksonomy/admin/tag/show-details.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:15
+#: view/folksonomy/admin/tagging/browse.phtml:90
+#: view/folksonomy/admin/tagging/show-details.phtml:14
+msgid "Tag"
+msgstr ""
+
+#: src/Generic/AbstractModule.php:518
 #, php-format
-msgid "Taggings: %d proposed (%d not moderated)"
+msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: TaggingPlugin.php:236 TaggingPlugin.php:234 TaggingPlugin.php:256
-#: TaggingPlugin.php:256
-msgid "Taggings:"
+#: src/Generic/AbstractModule.php:538
+#, php-format
+msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: TaggingPlugin.php:264 TaggingPlugin.php:275 TaggingPlugin.php:297
-#: views/admin/index/browse.php:72 views/admin/index/browse.php:111
-#: views/admin/common/quick-filters.php:8 TaggingPlugin.php:297
-#: views/admin/index/browse.php:72 views/admin/index/browse.php:111
-#: views/admin/common/quick-filters.php:8
-msgid "Proposed"
+#: src/Generic/AbstractModule.php:606
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
 msgstr ""
 
-#: TaggingPlugin.php:265 TaggingPlugin.php:276 TaggingPlugin.php:299
-#: views/admin/index/browse.php:74 views/admin/index/browse.php:113
-#: views/admin/common/quick-filters.php:10 TaggingPlugin.php:299
-#: views/admin/index/browse.php:74 views/admin/index/browse.php:113
-#: views/admin/common/quick-filters.php:10
-msgid "Approved"
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:6
+#: view/folksonomy/site/tag/browse.phtml:11
+msgid "Folksonomy"
 msgstr ""
 
-#: TaggingPlugin.php:266 TaggingPlugin.php:277 TaggingPlugin.php:300
-#: views/admin/index/browse.php:75 views/admin/index/browse.php:114
-#: views/admin/common/quick-filters.php:11 TaggingPlugin.php:300
-#: views/admin/index/browse.php:75 views/admin/index/browse.php:114
-#: views/admin/common/quick-filters.php:11
-msgid "Rejected"
-msgstr ""
-
-#: TaggingPlugin.php:317 TaggingPlugin.php:288 TaggingPlugin.php:339
-#: TaggingPlugin.php:311 TaggingPlugin.php:362 TaggingPlugin.php:311
-#: TaggingPlugin.php:362
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:37
 msgid "Taggings"
 msgstr ""
 
-#: controllers/IndexController.php:38 controllers/IndexController.php:41
-#: controllers/IndexController.php:41
-msgid "This record does not accept tags."
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:10
+msgid "Select below"
 msgstr ""
 
-#: controllers/IndexController.php:45 controllers/IndexController.php:48
-#: controllers/IndexController.php:48
-msgid "Record does not exist."
+#: view/common/admin/tag-resource-list.phtml:9
+#: view/common/admin/tagging-form.phtml:66
+msgid "There are no tags for this resource."
 msgstr ""
 
-#: controllers/IndexController.php:101 controllers/IndexController.php:113
-#: controllers/IndexController.php:113
-#, php-format
-msgid "A proposed tag cannot be longer than %d characters."
+#: view/common/admin/tag-resource-list.phtml:26
+#: view/common/admin/tag-resource-list.phtml:27
+#: view/common/admin/tag-resource.phtml:18
+#: view/common/admin/tag-resource.phtml:19
+#: view/common/admin/tagging-form.phtml:47
+#: view/common/admin/tagging-form.phtml:48
+#: view/folksonomy/admin/tagging/browse.phtml:133
+#: view/folksonomy/admin/tagging/browse.phtml:134
+msgid "Toggle status"
 msgstr ""
 
-#: controllers/IndexController.php:127 controllers/IndexController.php:139
-#: controllers/IndexController.php:139
-#, php-format
-msgid "Proposed tags \"%s\" have been approved."
+#: view/common/admin/tag-resource.phtml:9
+#: view/common/admin/tagging-form.phtml:21
+#: view/common/site/tag-resource.phtml:19
+#: view/folksonomy/admin/tag/browse.phtml:39
+msgid "Tags"
 msgstr ""
 
-#: controllers/IndexController.php:130 controllers/IndexController.php:142
-#: controllers/IndexController.php:142
-#, php-format
+#: view/common/admin/tagging-form.phtml:6
+msgid "Remove tag"
+msgstr ""
+
+#: view/common/admin/tagging-form.phtml:68
 msgid ""
-"Your proposition \"%s\"  is already proposed or is not correctly formatted."
+"Add existing ones using the interface to the right or add new ones in the "
+"field below."
 msgstr ""
 
-#: controllers/IndexController.php:134 controllers/IndexController.php:146
-#: controllers/IndexController.php:146
+#: view/common/admin/tagging-form.phtml:73
+msgid "Add one or multiple comma-separated new tags"
+msgstr ""
+
+#: view/common/admin/tagging-form.phtml:76
+msgid "Add a tag"
+msgstr ""
+
+#: view/common/tag-cloud.phtml:32
+msgid "No tags are available."
+msgstr ""
+
+#: view/common/tag-selector.phtml:20
+msgid "Close Me"
+msgstr ""
+
+#: view/common/tag-selector.phtml:21
+msgid "Click on a tag to add it to the edit panel."
+msgstr ""
+
+#: view/common/tag-selector.phtml:22
+msgid "Filter tags"
+msgstr ""
+
+#: view/common/tag-selector.phtml:24
+msgid "All tags"
+msgstr ""
+
+#: view/common/tagging-quick-form.phtml:19
+msgid "New Tags"
+msgstr ""
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:5
+msgid "Delete tags"
+msgstr ""
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:6
+msgid "Are you sure you would like to delete the selected tags?"
+msgstr ""
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:7
+msgid "WARNING: This will delete the associated taggings."
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:15
+#: view/folksonomy/admin/tag/browse.phtml:79
+msgid "Total count"
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:19
+msgid "Total item sets"
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:23
+msgid "Total items"
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:27
+msgid "Total media"
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:31
+msgid "Recent"
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:66
+#: view/folksonomy/site/tag/browse.phtml:14
+msgid "There are no tags."
+msgstr ""
+
+#: view/folksonomy/admin/tag/browse.phtml:104
+#: view/folksonomy/admin/tag/browse.phtml:105
+msgid "Edit name"
+msgstr ""
+
+#: view/folksonomy/admin/tag/show-details.phtml:15
+msgid "Internal id"
+msgstr ""
+
+#: view/folksonomy/admin/tag/show-details.phtml:21
+msgid "Stats"
+msgstr ""
+
+#: view/folksonomy/admin/tag/show-details.phtml:23
+msgid "Total"
+msgstr ""
+
+#: view/folksonomy/admin/tag/show-details.phtml:35
+msgid "Medias"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:5
+msgid "Delete taggings"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:6
+msgid "Are you sure you would like to delete the selected taggings?"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:7
 #, php-format
-msgid "Your proposition \"%s\" is awaiting approbation."
+msgid "Note: This won’t delete tags: check the %stags page%s to manage them."
 msgstr ""
 
-#: controllers/IndexController.php:141 controllers/IndexController.php:153
-#: controllers/IndexController.php:153
+#: view/folksonomy/admin/tagging/browse.phtml:23
+#: view/folksonomy/admin/tagging/browse.phtml:94
+#: view/folksonomy/admin/tagging/show-details.phtml:43
+msgid "Tagger"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/browse.phtml:27
+#: view/folksonomy/admin/tagging/browse.phtml:95
+msgid "Date tagged"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/browse.phtml:56
+#: view/folksonomy/admin/tagging/browse.phtml:57
+msgid "Approve"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/browse.phtml:62
+#: view/folksonomy/admin/tagging/browse.phtml:63
+msgid "Reject"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/browse.phtml:78
+msgid "There are no taggings."
+msgstr ""
+
+#: view/folksonomy/admin/tagging/browse.phtml:122
+#: view/folksonomy/admin/tagging/browse.phtml:159
+#: view/folksonomy/admin/tagging/show-details.phtml:37
+msgid "Removed"
+msgstr ""
+
+#: view/folksonomy/admin/tagging/show-details.phtml:12
 #, php-format
-msgid "Your tag \"%s\" have been added."
+msgid "Tagging #%d"
 msgstr ""
 
-#: controllers/IndexController.php:144 controllers/IndexController.php:156
-#: controllers/IndexController.php:156
-#, php-format
-msgid "Your tags \"%s\" have been added."
+#: view/folksonomy/admin/tagging/show-details.phtml:20
+msgid "[Removed]"
 msgstr ""
 
-#: forms/TaggingForm.php:13 forms/TaggingForm.php:32 forms/TaggingForm.php:32
-msgid "Add Tags"
+#: src/Form/TaggingForm.php:65
+msgid "Add tags"
 msgstr ""
 
-#: forms/TaggingForm.php:14 forms/TaggingForm.php:33 forms/TaggingForm.php:33
-#, php-format
-msgid "Separe multiple tags with a \"%s\"."
-msgstr ""
-
-#: forms/TaggingForm.php:26 forms/TaggingForm.php:45 forms/TaggingForm.php:45
+#: src/Form/TaggingForm.php:77
 msgid "Proposed tag cannot be empty."
 msgstr ""
 
-#: forms/TaggingForm.php:28 forms/TaggingForm.php:47 forms/TaggingForm.php:47
+#: src/Form/TaggingForm.php:79
 #, php-format
 msgid "Proposed tags cannot be longer than %d characters."
 msgstr ""
 
-#: forms/TaggingForm.php:39 forms/TaggingForm.php:58 forms/TaggingForm.php:58
-msgid "Please verify you're a human"
+#: src/Form/TaggingForm.php:111
+msgid "Terms of service"
 msgstr ""
 
-#: forms/TaggingForm.php:63 forms/TaggingForm.php:82 forms/TaggingForm.php:82
+#: src/Form/TaggingForm.php:125
 msgid "You must agree to the terms and conditions."
 msgstr ""
 
-#: forms/TaggingForm.php:92 forms/TaggingForm.php:115
-#: forms/TaggingForm.php:115
-msgid "Tag it"
+#: src/Form/TaggingForm.php:137
+msgid "String to check"
 msgstr ""
 
-#: models/Tagging.php:72 models/Tagging.php:79 models/Tagging.php:79
-msgid "Can't leave an empty tag!"
+#: src/Form/TaggingForm.php:140
+msgid "Set the string to check"
 msgstr ""
 
-#: models/Tagging.php:75 models/Tagging.php:82 models/Tagging.php:82
-msgid "This status is not authorized."
+#: src/Form/TaggingForm.php:165
+msgid "Tag it!"
 msgstr ""
 
-#: models/Tagging.php:78 models/Tagging.php:85 models/Tagging.php:85
-msgid "Record type cannot be empty."
+#: src/Form/TagCloudFieldset.php:16
+msgid "Block title"
 msgstr ""
 
-#: models/Tagging.php:81 models/Tagging.php:88 models/Tagging.php:88
-msgid "Record id cannot be empty."
+#: src/Form/TagCloudFieldset.php:17
+msgid "Heading for the block, if any."
 msgstr ""
 
-#: models/Tagging.php:121 models/Tagging.php:128 models/Tagging.php:128
-msgid "Anonymous"
+#: src/Form/TagCloudFieldset.php:28
+msgid "Browse links are available only for item sets and items."
 msgstr ""
 
-#: TaggingPlugin.php:251 TaggingPlugin.php:273 TaggingPlugin.php:273
-msgid "No taggings."
+#: src/Form/TagCloudFieldset.php:30 src/Form/ConfigForm.php:29
+msgid "All resources (separately)"
 msgstr ""
 
-#: TaggingPlugin.php:298 views/admin/index/browse.php:73
-#: views/admin/index/browse.php:112 views/admin/common/quick-filters.php:9
-#: TaggingPlugin.php:298 views/admin/index/browse.php:73
-#: views/admin/index/browse.php:112 views/admin/common/quick-filters.php:9
-msgid "Allowed"
+#: src/Form/TagCloudFieldset.php:31 src/Form/ConfigForm.php:30
+msgid "All resources (together)"
 msgstr ""
 
-#: views/admin/index/browse.php:2 views/admin/index/browse.php:2
-#, php-format
-msgid "Taggings (%d total)"
+#: src/Form/TagCloudFieldset.php:45 src/Form/ConfigForm.php:44
+msgid "Max classes"
 msgstr ""
 
-#: views/admin/index/browse.php:13 views/admin/index/browse.php:13
-msgid "security settings"
+#: src/Form/TagCloudFieldset.php:57 src/Form/ConfigForm.php:56
+msgid "Display tag numbers"
 msgstr ""
 
-#: views/admin/index/browse.php:13 views/admin/index/browse.php:13
-#, php-format
-msgid ""
-"You have not entered your %s API keys under %s. We recommend adding these "
-"keys, or the tagging form will be vulnerable to spam."
+#: src/Form/SearchForm.php:24
+msgid "Search by tag"
 msgstr ""
 
-#: views/admin/index/browse.php:15 views/admin/index/browse.php:15
-#, php-format
-msgid "Use <a href=\"%s\">items page</a> to manage taggings by item."
+#: src/Form/Element/TagSelect.php:58
+msgid "Select tags"
 msgstr ""
 
-#: views/admin/index/browse.php:23 views/admin/index/browse.php:93
-#: views/admin/index/browse.php:23 views/admin/index/browse.php:93
-msgid "Approve"
+#: src/Form/ConfigForm.php:18
+msgid "Tag cloud page"
 msgstr ""
 
-#: views/admin/index/browse.php:26 views/admin/index/browse.php:96
-#: views/admin/index/browse.php:26 views/admin/index/browse.php:96
-msgid "Reject"
+#: src/Form/ConfigForm.php:67
+msgid "Public rights"
 msgstr ""
 
-#: views/admin/index/browse.php:29 views/admin/index/browse.php:99
-#: views/admin/index/browse.php:29 views/admin/index/browse.php:99
-msgid "Delete"
-msgstr ""
-
-#: views/admin/index/browse.php:39 views/admin/index/browse.php:39
-msgid "Select"
-msgstr ""
-
-#: views/admin/index/browse.php:43 views/admin/index/browse.php:43
-msgid "Title"
-msgstr ""
-
-#: views/admin/index/browse.php:44 views/admin/index/browse.php:44
-msgid "Tag"
-msgstr ""
-
-#: views/admin/index/browse.php:45 views/admin/index/browse.php:45
-msgid "Status"
-msgstr ""
-
-#: views/admin/index/browse.php:46 views/admin/index/browse.php:46
-msgid "User"
-msgstr ""
-
-#: views/admin/index/browse.php:47 views/admin/index/browse.php:47
-msgid "Date Added"
-msgstr ""
-
-#: views/admin/index/browse.php:76 views/admin/index/browse.php:76
-msgid "Undefined"
-msgstr ""
-
-#: views/admin/index/browse.php:115 views/admin/index/browse.php:115
-msgid "Are your sure to remove these taggings?"
-msgstr ""
-
-#: views/admin/index/browse.php:123 views/admin/index/browse.php:123
-msgid "There is no tagging yet."
-msgstr ""
-
-#: views/admin/index/browse.php:125 views/admin/index/browse.php:125
-#, php-format
-msgid "The query searched %d items and returned no results."
-msgstr ""
-
-#: views/admin/index/browse.php:126 views/admin/index/browse.php:126
-msgid "See all taggings."
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:11
-#: views/admin/plugins/tagging-config-form.php:11
-msgid "Tagging Form"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:14
-#: views/admin/plugins/tagging-config-form.php:14
-msgid "Class to add to the form"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:23
-#: views/admin/plugins/tagging-config-form.php:23
-msgid "Proposed Tagging"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:26
-#: views/admin/plugins/tagging-config-form.php:26
-msgid "Max length of the proposition of tagging"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:36
-#: views/admin/plugins/tagging-config-form.php:36
-msgid "Max length of a proposed tag"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:45
-#: views/admin/plugins/tagging-config-form.php:45
-msgid "Public Rights"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:48
-#: views/admin/plugins/tagging-config-form.php:48
-msgid "Legal agreement"
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:62
-#: views/admin/plugins/tagging-config-form.php:62
-msgid "This text will be shown beside the legal checkbox."
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:63
-#: views/admin/plugins/tagging-config-form.php:63
-msgid "Let empty if you don't want to use a legal agreement."
-msgstr ""
-
-#: views/admin/plugins/tagging-config-form.php:76
-#: views/admin/plugins/tagging-config-form.php:76
+#: src/Form/ConfigForm.php:75
 msgid "Allow public to tag"
 msgstr ""
 
-#: views/admin/plugins/tagging-config-form.php:88
-#: views/admin/plugins/tagging-config-form.php:88
+#: src/Form/ConfigForm.php:85
 msgid "Require approbation for public tags"
 msgstr ""
 
-#: views/admin/plugins/tagging-config-form.php:93
-#: views/admin/plugins/tagging-config-form.php:93
-msgid "Roles"
+#: src/Form/ConfigForm.php:95
+msgid "Notify by email for public tagging"
 msgstr ""
 
-#: views/admin/plugins/tagging-config-form.php:96
-#: views/admin/plugins/tagging-config-form.php:96
-msgid "Roles that can tag"
+#: src/Form/ConfigForm.php:106
+msgid "Tagging form"
 msgstr ""
 
-#: views/admin/plugins/tagging-config-form.php:120
-#: views/admin/plugins/tagging-config-form.php:120
-msgid "Roles that require moderation"
+#: src/Form/ConfigForm.php:117
+msgid "Max length of a proposed tag"
 msgstr ""
 
-#: views/admin/plugins/tagging-config-form.php:144
-#: views/admin/plugins/tagging-config-form.php:144
-msgid "Roles that can moderate"
+#: src/Form/ConfigForm.php:118
+msgid "The maximum for the database is 190 characters."
 msgstr ""
 
-#: views/admin/common/quick-filters.php:2
-#: views/admin/common/quick-filters.php:4
-#: views/admin/common/quick-filters.php:2
-#: views/admin/common/quick-filters.php:4
-msgid "Quick Filter"
+#: src/Form/ConfigForm.php:128
+msgid "Max length for all proposed tags"
 msgstr ""
 
-#: views/admin/common/quick-filters.php:5
-#: views/admin/common/quick-filters.php:5
-msgid "View All"
+#: src/Form/ConfigForm.php:129
+msgid "Multiple tags can be proposed in one time, separated by comma."
 msgstr ""
 
-#: views/admin/common/quick-filters.php:6
-#: views/admin/common/quick-filters.php:6
-msgid "Not moderated"
+#: src/Form/ConfigForm.php:139
+msgid "Message to invite to tag"
 msgstr ""
 
-#: views/admin/common/quick-filters.php:7
-#: views/admin/common/quick-filters.php:7
-msgid "Moderated"
+#: src/Form/ConfigForm.php:140
+msgid ""
+"The text to click to display the tag form (a simple \"+\" by default, "
+"customizable in the theme)."
+msgstr ""
+
+#: src/Form/ConfigForm.php:150
+msgid "Legal agreement"
+msgstr ""
+
+#: src/Form/ConfigForm.php:151
+msgid ""
+"This text will be shown beside the legal checkbox. Let empty if you don’t "
+"want to use a legal agreement."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:81
+msgid "SERVER_ADDR"
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:82
+#, php-format
+msgid "[%s] New public tags"
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:87
+#, php-format
+msgid "%d tag added to resource #%d (%s): \"%s\"."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:89
+#, php-format
+msgid "%d tags added to resource #%d (%s): \"%s\"."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:104
+msgid "Unable to send an email after tagging."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:112 config/module.config.php:270
+msgid "You should accept the legal agreement."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:119
+#: src/Controller/Admin/TagController.php:172
+msgid "No tags submitted."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:126
+#: src/Controller/Admin/TaggingController.php:229
+msgid "Submitted tags are already set."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:133
+#: src/Controller/Admin/TagController.php:186
+#: src/Controller/Admin/TaggingController.php:236
+msgid "Unauthorized access."
+msgstr ""
+
+#: src/Controller/Site/TaggingController.php:140
+msgid "Resource not found."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:52
+msgid "Tag successfully deleted."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:104
+msgid "You must select at least one tag to batch delete."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:113
+msgid "Tags successfully deleted."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:123
+msgid "Delete of all tags is not supported currently."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:179
+msgid ""
+"This tag is invalid: it is a duplicate or it contains forbidden characters."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:193
+msgid "Tag not found."
+msgstr ""
+
+#: src/Controller/Admin/TagController.php:200
+#: src/Controller/Admin/TaggingController.php:250
+msgid "An internal error occurred."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:101
+msgid "Tagging successfully deleted."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:133
+msgid "You must select at least one tagging to batch delete."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:142
+msgid "Taggings successfully deleted."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:152
+msgid "Delete of all taggings is not supported currently."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:222
+msgid "No taggings submitted."
+msgstr ""
+
+#: src/Controller/Admin/TaggingController.php:243
+msgid "Tagging not found."
+msgstr ""
+
+#: src/View/Helper/TagSelect.php:28
+msgid "Select tag…"
+msgstr ""
+
+#: src/Api/Representation/TaggingRepresentation.php:15
+#: config/module.config.php:266
+msgid "Proposed"
+msgstr ""
+
+#: src/Api/Representation/TaggingRepresentation.php:16
+#: config/module.config.php:267
+msgid "Allowed"
+msgstr ""
+
+#: src/Api/Representation/TaggingRepresentation.php:17
+#: config/module.config.php:268
+msgid "Approved"
+msgstr ""
+
+#: src/Api/Representation/TaggingRepresentation.php:18
+#: config/module.config.php:269
+msgid "Rejected"
+msgstr ""
+
+#: src/Api/Representation/TaggingRepresentation.php:84
+msgid "Undefined"
+msgstr ""
+
+#: src/Api/Adapter/TaggingAdapter.php:124
+msgid "The name of the tag must be set."
+msgstr ""
+
+#: src/Api/Adapter/TaggingAdapter.php:129
+msgid "The tagged resource must be set."
+msgstr ""
+
+#: src/Api/Adapter/TaggingAdapter.php:153
+#, php-format
+msgid "The user #%d has already added the tag \"%s\" on the resource #%d."
+msgstr ""
+
+#: src/Api/Adapter/TaggingAdapter.php:165
+#, php-format
+msgid "The status \"%s\" is unknown."
+msgstr ""
+
+#: src/Api/Adapter/TagAdapter.php:77
+#, php-format
+msgid "The tag \"%s\" is already taken."
+msgstr ""
+
+#: src/Api/Adapter/TagAdapter.php:100
+#, php-format
+msgid "The tag \"%s\" contains forbidden characters."
+msgstr ""
+
+#: src/Api/Adapter/TagAdapter.php:106
+msgid "A tag must have a name."
+msgstr ""
+
+#: src/Site/BlockLayout/TagCloud.php:19
+msgid "Tag cloud"
+msgstr ""
+
+#: src/Site/Navigation/Link/BrowseTags.php:12
+msgid "Browse tags"
+msgstr ""
+
+#: config/module.config.php:271
+msgid "Data were added to the resource."
+msgstr ""
+
+#: config/module.config.php:272
+msgid "They will be displayed definitely when approved."
+msgstr ""
+
+#: config/module.config.php:273
+msgid "Reload page to see new tags."
+msgstr ""
+
+#: config/module.config.php:274
+msgid "Request too long to process."
+msgstr ""
+
+#: config/module.config.php:275
+msgid "The resource or the tag doesn’t exist."
+msgstr ""
+
+#: config/module.config.php:306
+msgid "Tagging [Tag]"
+msgstr ""
+
+#: config/module.config.php:312
+msgid "Tagging []"
 msgstr ""
