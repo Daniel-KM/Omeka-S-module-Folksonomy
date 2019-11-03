@@ -173,7 +173,7 @@ class TagCount extends AbstractHelper
 
         $orderBy = trim($orderBy);
         if (strpos($orderBy, ' ')) {
-            $order = explode(' ', $orderBy);
+            $orderBy = explode(' ', $orderBy);
             $orderBy = $orderBy[0];
             $orderDir = $orderBy[1];
         } else {
