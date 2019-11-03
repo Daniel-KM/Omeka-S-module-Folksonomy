@@ -111,6 +111,8 @@ class TagAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        $isOldOmeka = \Omeka\Module::VERSION < 2;
+        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         if (isset($query['internal_id'])) {
@@ -148,7 +150,7 @@ class TagAdapter extends AbstractEntityAdapter
                     $taggingAlias,
                     'WITH',
                     $expr->andX(
-                        $expr->eq($taggingAlias . '.tag', $this->getEntityClass() . '.id'),
+                        $expr->eq($taggingAlias . '.tag', $alias . '.id'),
                         $expr->in(
                             $taggingAlias . '.' . $column,
                             $this->createNamedParameter($qb, $entities)
@@ -212,7 +214,6 @@ class TagAdapter extends AbstractEntityAdapter
                     break;
                 case 'recent':
                     $taggingAlias = $this->createAlias();
-                    $orderAlias = $this->createAlias();
                     $orderBy = $taggingAlias . '.created';
                     $qb
                         ->leftJoin(

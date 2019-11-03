@@ -622,14 +622,16 @@ class Module extends AbstractModule
     {
         // TODO Add option for tagging status in admin search view.
 
+        $adapter = $event->getTarget();
+        $isOldOmeka = \Omeka\Module::VERSION < 2;
+        $resourceAlias = $isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
+
         $qb = $event->getParam('queryBuilder');
         $expr = $qb->expr();
         $query = $event->getParam('request')->getContent();
 
         if (!empty($query['has_tags'])) {
-            $adapter = $event->getTarget();
             $taggingAlias = $adapter->createAlias();
-            $resourceAlias = $adapter->getEntityClass();
             $resourceName = $adapter->getResourceName() === 'users'
                 ? 'owner'
                 : 'resource';
@@ -650,11 +652,11 @@ class Module extends AbstractModule
             if (empty($tags)) {
                 return;
             }
-            $adapter = $event->getTarget();
-            $resourceAlias = $adapter->getEntityClass();
             // All resources with any tag ("OR").
             // TODO The resquest is working, but it needs a format for querying.
             /*
+            $tagAlias = $adapter->createAlias();
+            $taggingAlias = $adapter->createAlias();
             $qb
                 ->innerJoin(
                     Tagging::class,
