@@ -223,9 +223,9 @@ SQL;
     {
         $services = $this->getServiceLocator();
         $acl = $services->get('Omeka\Acl');
-        $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
-        $entityManagerFilters->enable('tagging_visibility');
-        $entityManagerFilters->getFilter('tagging_visibility')->setAcl($acl);
+        $services->get('Omeka\EntityManager')->getFilters()
+            ->enable('tagging_visibility')
+            ->setAcl($acl);
     }
 
     /**
