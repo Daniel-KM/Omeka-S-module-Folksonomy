@@ -54,7 +54,6 @@ return [
         'invokables' => [
             Form\ConfigForm::class => Form\ConfigForm::class,
             Form\SearchForm::class => Form\SearchForm::class,
-            Form\SiteSettingsFieldset::class => Form\SiteSettingsFieldset::class,
             Form\TagCloudFieldset::class => Form\TagCloudFieldset::class,
         ],
         'factories' => [
@@ -336,11 +335,6 @@ return [
             'folksonomy_max_length_total' => 1000,
             'folksonomy_message' => '+',
             'folksonomy_legal_text' => '<p>I agree with <a rel="licence" href="#" target="_blank">terms of use</a> and I accept to free my contribution under the licence <a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA</a>.</p>',
-        ],
-        'site_settings' => [
-            'folksonomy_append_item_set_show' => true,
-            'folksonomy_append_item_show' => true,
-            'folksonomy_append_media_show' => true,
         ],
         'block_settings' => [
             'tagCloud' => [

@@ -16,6 +16,8 @@ This [Omeka S] module is a full and improved rewrite of the [Tagging plugin] for
 Installation
 ------------
 
+First, install the two optional modules [Generic] and [Blocks Disposition].
+
 Uncompress files and rename module folder "Folksonomy".
 
 Then install it like any other Omeka module and follow the config instructions.
@@ -30,8 +32,9 @@ the admin view.
 Display Tagging Form
 --------------------
 
-The plugin will add tagging form automatically on each resource edit admin and
-public view, if the current user has right to use it. The forms are customizable
+The tags and the tagging form are displayed automatically on item set, item or
+media pages. To manage the display more precisely, use the module [Blocks Disposition],
+or use the helpers to display them in your theme. The templates are customizable
 in the theme. Rights and visibility are automatically managed.
 
 * Important

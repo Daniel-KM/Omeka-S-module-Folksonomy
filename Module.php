@@ -476,12 +476,6 @@ class Module extends AbstractModule
                 [$this, 'displayListAndFormPublic']
             );
         }
-
-        $sharedEventManager->attach(
-            \Omeka\Form\SiteSettingsForm::class,
-            'form.add_elements',
-            [$this, 'handleSiteSettings']
-        );
     }
 
     public function getConfigForm(PhpRenderer $renderer)
@@ -854,20 +848,8 @@ class Module extends AbstractModule
      */
     public function displayListAndFormPublic(Event $event)
     {
-        $services = $this->getServiceLocator();
-        $siteSettings = $services->get('Omeka\Settings\Site');
         $view = $event->getTarget();
         $resource = $view->resource;
-        $resourceName = $resource->resourceName();
-        $appendMap = [
-            'item_sets' => 'folksonomy_append_item_set_show',
-            'items' => 'folksonomy_append_item_show',
-            'media' => 'folksonomy_append_media_show',
-        ];
-        if (!$siteSettings->get($appendMap[$resourceName])) {
-            return;
-        }
-
         echo $view->showTags($resource);
         $this->displayTaggingQuickForm($event);
     }

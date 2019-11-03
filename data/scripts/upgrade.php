@@ -58,3 +58,11 @@ if (version_compare($oldVersion, '3.3.7', '<')) {
     $settings->delete('folksonomy_append_item_show');
     $settings->delete('folksonomy_append_media_show');
 }
+
+if (version_compare($oldVersion, '3.3.9', '<')) {
+    $sql = <<<'SQL'
+DELETE FROM site_setting
+WHERE id IN ("folksonomy_append_item_set_show", "folksonomy_append_item_show", "folksonomy_append_media_show");
+SQL;
+    $connection->exec($sql);
+}
