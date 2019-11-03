@@ -171,6 +171,8 @@ class TaggingAdapter extends AbstractEntityAdapter
         // TODO Check status according to admin/public.
         // TODO Check resource and owner visibility for public view.
 
+        $expr = $qb->expr();
+
         if (array_key_exists('id', $query)) {
             $this->buildQueryIdsItself($qb, $query['id'], 'id');
         }
@@ -189,9 +191,9 @@ class TaggingAdapter extends AbstractEntityAdapter
                    Tag::class,
                     $tagAlias,
                     'WITH',
-                    $qb->expr()->andX(
-                        $qb->expr()->eq($tagAlias . '.id', $this->getEntityClass(). '.tag'),
-                        $qb->expr()->in(
+                    $expr->andX(
+                        $expr->eq($tagAlias . '.id', $this->getEntityClass(). '.tag'),
+                        $expr->in(
                             $tagAlias . '.name',
                             $this->createNamedParameter($qb, $tags)
                         )
@@ -217,10 +219,10 @@ class TaggingAdapter extends AbstractEntityAdapter
             // An empty string means true in order to manage get/post query.
             if (in_array($query['has_resource'], [false, 'false', 0, '0'], true)) {
                 $qb
-                    ->andWhere($qb->expr()->isNull($this->getEntityClass() . '.resource'));
+                    ->andWhere($expr->isNull($this->getEntityClass() . '.resource'));
             } else {
                 $qb
-                    ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.resource'));
+                    ->andWhere($expr->isNotNull($this->getEntityClass() . '.resource'));
             }
         }
 
@@ -234,13 +236,13 @@ class TaggingAdapter extends AbstractEntityAdapter
             ];
             if ($query['resource_type'] === 'resources') {
                 $qb
-                     ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.resource'));
+                     ->andWhere($expr->isNotNull($this->getEntityClass() . '.resource'));
             // TODO Distinct users, else there may be x times the same tagger.
             // The issue doesn't occur for resource, since there is a check
             // before.
             // } elseif ($query['resource_type'] === 'users') {
             //     $qb
-            //         ->andWhere($qb->expr()->isNotNull($this->getEntityClass() . '.owner'));
+            //         ->andWhere($expr->isNotNull($this->getEntityClass() . '.owner'));
             } elseif (isset($mapResourceTypes[$query['resource_type']])) {
                 $entityAlias = $this->createAlias();
                 $qb
@@ -248,7 +250,7 @@ class TaggingAdapter extends AbstractEntityAdapter
                         $mapResourceTypes[$query['resource_type']],
                         $entityAlias,
                         'WITH',
-                        $qb->expr()->eq(
+                        $expr->eq(
                             $this->getEntityClass() . '.resource',
                             $entityAlias . '.id'
                         )

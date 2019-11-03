@@ -111,6 +111,8 @@ class TagAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        $expr = $qb->expr();
+
         if (isset($query['internal_id'])) {
             $this->buildQueryIdsItself($qb, $query['internal_id'], 'id');
         }
@@ -145,9 +147,9 @@ class TagAdapter extends AbstractEntityAdapter
                     Tagging::class,
                     $taggingAlias,
                     'WITH',
-                    $qb->expr()->andX(
-                        $qb->expr()->eq($taggingAlias . '.tag', $this->getEntityClass() . '.id'),
-                        $qb->expr()->in(
+                    $expr->andX(
+                        $expr->eq($taggingAlias . '.tag', $this->getEntityClass() . '.id'),
+                        $expr->in(
                             $taggingAlias . '.' . $column,
                             $this->createNamedParameter($qb, $entities)
                         )
@@ -159,6 +161,8 @@ class TagAdapter extends AbstractEntityAdapter
     public function sortQuery(QueryBuilder $qb, array $query)
     {
         if (is_string($query['sort_by'])) {
+            $expr = $qb->expr();
+
             // TODO Use Doctrine native queries (here: ORM query builder).
             switch ($query['sort_by']) {
                 case 'count':
@@ -170,7 +174,7 @@ class TagAdapter extends AbstractEntityAdapter
                             Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
+                            $expr->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->addSelect($orderBy . ' AS HIDDEN ' . $orderAlias)
                         ->addOrderBy($orderAlias, $query['sort_order'])
@@ -194,13 +198,13 @@ class TagAdapter extends AbstractEntityAdapter
                             Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
+                            $expr->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->leftJoin(
                             $resourceType,
                             $resourceAlias,
                             'WITH',
-                            $qb->expr()->eq($resourceAlias . '.id', $taggingAlias . '.resource')
+                            $expr->eq($resourceAlias . '.id', $taggingAlias . '.resource')
                         )
                         ->addSelect($orderBy . ' AS HIDDEN ' . $orderAlias)
                         ->addOrderBy($orderAlias, $query['sort_order'])
@@ -215,7 +219,7 @@ class TagAdapter extends AbstractEntityAdapter
                             Tagging::class,
                             $taggingAlias,
                             'WITH',
-                            $qb->expr()->eq($taggingAlias . '.tag', Tag::class)
+                            $expr->eq($taggingAlias . '.tag', Tag::class)
                         )
                         ->addOrderBy($orderBy, $query['sort_order'])
                     ;

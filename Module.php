@@ -628,10 +628,11 @@ class Module extends AbstractModule
     {
         // TODO Add option for tagging status in admin search view.
 
+        $qb = $event->getParam('queryBuilder');
+        $expr = $qb->expr();
         $query = $event->getParam('request')->getContent();
 
         if (!empty($query['has_tags'])) {
-            $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
             $taggingAlias = $adapter->createAlias();
             $resourceAlias = $adapter->getEntityClass();
@@ -643,9 +644,9 @@ class Module extends AbstractModule
                     Tagging::class,
                     $taggingAlias,
                     'WITH',
-                    $qb->expr()->andX(
-                        $qb->expr()->eq($taggingAlias . '.' . $resourceName, $resourceAlias . '.id'),
-                        $qb->expr()->isNotNull($taggingAlias . '.tag')
+                    $expr->andX(
+                        $expr->eq($taggingAlias . '.' . $resourceName, $resourceAlias . '.id'),
+                        $expr->isNotNull($taggingAlias . '.tag')
                     )
                 );
         }
@@ -655,7 +656,6 @@ class Module extends AbstractModule
             if (empty($tags)) {
                 return;
             }
-            $qb = $event->getParam('queryBuilder');
             $adapter = $event->getTarget();
             $resourceAlias = $adapter->getEntityClass();
             // All resources with any tag ("OR").
@@ -666,15 +666,15 @@ class Module extends AbstractModule
                     Tagging::class,
                     $taggingAlias,
                     'WITH',
-                    $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id')
+                    $expr->eq($taggingAlias . '.resource', $resourceAlias . '.id')
                 )
                 ->innerJoin(
                     Tag::class,
                     $tagAlias,
                     'WITH',
-                    $qb->expr()->eq($tagAlias . '.id', $taggingAlias . '.tag')
+                    $expr->eq($tagAlias . '.id', $taggingAlias . '.tag')
                 )
-                ->andWhere($qb->expr()->in($tagAlias . '.name', $tags));
+                ->andWhere($expr->in($tagAlias . '.name', $tags));
             */
             // All resources with all tags ("AND").
             foreach ($tags as $tag) {
@@ -685,18 +685,19 @@ class Module extends AbstractModule
                     ->innerJoin(
                         Tag::class,
                         $tagAlias,
-                        'WITH', '1 = 1'
+                        'WITH',
+                        '1 = 1'
                     )
                     ->innerJoin(
                         Tagging::class,
                         $taggingAlias,
                         'WITH',
-                        $qb->expr()->andX(
-                            $qb->expr()->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
-                            $qb->expr()->eq($taggingAlias . '.tag', $tagAlias . '.id')
+                        $expr->andX(
+                            $expr->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                            $expr->eq($taggingAlias . '.tag', $tagAlias . '.id')
                         )
                     )
-                    ->andWhere($qb->expr()->eq(
+                    ->andWhere($expr->eq(
                         $tagAlias . '.name',
                         $adapter->createNamedParameter($qb, $tag)
                     ));

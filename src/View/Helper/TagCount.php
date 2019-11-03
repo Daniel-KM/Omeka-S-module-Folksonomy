@@ -54,6 +54,7 @@ class TagCount extends AbstractHelper
         $keyPair = false
     ) {
         $qb = $this->connection->createQueryBuilder();
+        $expr = $qb->expr();
 
         $select = [];
         $select['name'] = 'tag.name';
@@ -70,8 +71,8 @@ class TagCount extends AbstractHelper
         ];
         $resourceType = isset($types[$resourceName]) ? $types[$resourceName] : '';
 
-        $eqTagTagging = $qb->expr()->eq('tag.id', 'tagging.tag_id');
-        $eqResourceTagging = $qb->expr()->eq('resource.id', 'tagging.resource_id');
+        $eqTagTagging = $expr->eq('tag.id', 'tagging.tag_id');
+        $eqResourceTagging = $expr->eq('resource.id', 'tagging.resource_id');
 
         // Select all types of resource separately and together.
         if (empty($resourceType)) {
@@ -99,9 +100,9 @@ class TagCount extends AbstractHelper
                         'tag',
                         'tagging',
                         'tagging',
-                        $qb->expr()->andX(
+                        $expr->andX(
                             $eqTagTagging,
-                            $qb->expr()->isNotNull('tagging.resource_id')
+                            $expr->isNotNull('tagging.resource_id')
                     ));
             } else {
                 $qb
@@ -111,7 +112,7 @@ class TagCount extends AbstractHelper
 
         // Select one type of resource.
         else {
-            $eqResourceType = $qb->expr()->eq('resource.resource_type', ':resource_type');
+            $eqResourceType = $expr->eq('resource.resource_type', ':resource_type');
             $qb
                 ->setParameter('resource_type', $resourceType);
             if ($usedOnly) {
@@ -122,7 +123,7 @@ class TagCount extends AbstractHelper
                         'tagging',
                         'resource',
                         'resource',
-                        $qb->expr()->andX(
+                        $expr->andX(
                             $eqResourceTagging,
                             $eqResourceType
                     ));
@@ -134,7 +135,7 @@ class TagCount extends AbstractHelper
                         'tagging',
                         'resource',
                         'resource',
-                        $qb->expr()->andX(
+                        $expr->andX(
                             $eqResourceTagging,
                             $eqResourceType
                     ));
@@ -151,7 +152,7 @@ class TagCount extends AbstractHelper
             // TODO How to do a "WHERE IN" with doctrine and strings?
             $quotedTags = array_map([$this->connection, 'quote'], $tags);
             $qb
-                ->andWhere($qb->expr()->in('tag.name', $quotedTags));
+                ->andWhere($expr->in('tag.name', $quotedTags));
         }
 
         if ($statuses) {
@@ -159,13 +160,13 @@ class TagCount extends AbstractHelper
             $statuses = array_map([$this->connection, 'quote'], (array) $statuses);
             if ($usedOnly) {
                 $qb
-                   ->andWhere($qb->expr()->in('tagging.status', $statuses));
+                   ->andWhere($expr->in('tagging.status', $statuses));
             } else {
                 $qb
                     ->andWhere(
-                        $qb->expr()->orX(
-                            $qb->expr()->in('tagging.status', $statuses),
-                            $qb->expr()->isNull('tagging.status')
+                        $expr->orX(
+                            $expr->in('tagging.status', $statuses),
+                            $expr->isNull('tagging.status')
                     ));
             }
         }
