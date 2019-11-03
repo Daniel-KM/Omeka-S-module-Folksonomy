@@ -10,6 +10,17 @@ class TagCloudFieldset extends Fieldset
     {
         $this
             ->add([
+                'name' => 'o:block[__blockIndex__][o:data][heading]',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Block title', // @translate
+                    'info' => 'Heading for the block, if any.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'tag-cloud-heading',
+                ],
+            ])
+            ->add([
                 'name' => 'o:block[__blockIndex__][o:data][resource_name]',
                 'type' => Element\Select::class,
                 'options' => [

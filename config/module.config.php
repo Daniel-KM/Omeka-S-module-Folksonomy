@@ -344,6 +344,7 @@ return [
         ],
         'block_settings' => [
             'tagCloud' => [
+                'heading' => '',
                 'resource_name' => 'items',
                 'max_classes' => 9,
                 'tag_numbers' => false,

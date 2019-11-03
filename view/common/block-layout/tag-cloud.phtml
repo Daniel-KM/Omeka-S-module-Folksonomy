@@ -2,9 +2,14 @@
 /**
  * @var \Zend\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var string $heading
  */
 
 ?>
+
+<?php if ($heading = $block->dataValue('heading')): ?>
+<h2><?= $heading ?></h2>
+<?php endif; ?>
 
 <?= $this->partial('common/tag-cloud', [
     'tags' => null,
