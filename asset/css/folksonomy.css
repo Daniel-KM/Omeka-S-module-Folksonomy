@@ -12,6 +12,15 @@
     }
 }
 
+.tagging-form {
+    box-sizing: border-box;
+}
+
+.tagging-form input[type=text] {
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .hTagcloud {
     margin-top: 2em;
 }

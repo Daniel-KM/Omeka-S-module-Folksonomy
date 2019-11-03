@@ -50,7 +50,7 @@ $('#resource-tags').on('click', '.o-icon-delete', function(event) {
 /* Update taggings. */
 
 // Toggle the status of a tagging.
-$('#content').on('click', 'a.status-toggle', function(e) {
+$('#content').on('click', '.folksonomy a.status-toggle', function(e) {
     e.preventDefault();
 
     var button = $(this);
@@ -93,7 +93,7 @@ $('#content').on('click', 'a.status-toggle', function(e) {
 });
 
 // Approve or reject a list of taggings.
-$('#content').on('click', 'a.status-batch', function(e) {
+$('#content').on('click', '.folksonomy a.status-batch', function(e) {
     e.preventDefault();
 
     var selected = $('.batch-edit td input[name="resource_ids[]"][type="checkbox"]:checked');
