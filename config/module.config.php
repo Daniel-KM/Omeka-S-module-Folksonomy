@@ -41,8 +41,8 @@ return [
         ],
     ],
     'block_layouts' => [
-        'factories' => [
-            'tagCloud' => Service\BlockLayout\TagCloudFactory::class,
+        'invokables' => [
+            'tagCloud' => Site\BlockLayout\TagCloud::class,
         ],
     ],
     'navigation_links' => [
@@ -55,7 +55,7 @@ return [
             Form\ConfigForm::class => Form\ConfigForm::class,
             Form\SearchForm::class => Form\SearchForm::class,
             Form\SiteSettingsFieldset::class => Form\SiteSettingsFieldset::class,
-            Form\TagCloudBlockForm::class => Form\TagCloudBlockForm::class,
+            Form\TagCloudFieldset::class => Form\TagCloudFieldset::class,
         ],
         'factories' => [
             Form\Element\TagSelect::class => Service\Form\Element\TagSelectFactory::class,

@@ -1,66 +1,53 @@
 <?php
 namespace Folksonomy\Site\BlockLayout;
 
-use Folksonomy\Form\TagCloudBlockForm;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
-use Zend\Form\FormElementManager\FormElementManagerV3Polyfill as FormElementManager;
 use Zend\View\Renderer\PhpRenderer;
 
 class TagCloud extends AbstractBlockLayout
 {
     /**
-     * @var FormElementManager
+     * The default partial view script.
      */
-    protected $formElementManager;
-
-    /**
-     * @var array
-     */
-    protected $defaultSettings = [];
-
-    /**
-     * @param FormElementManager $formElementManager
-     * @param array $defaultSettings
-     */
-    public function __construct(FormElementManager $formElementManager, array $defaultSettings)
-    {
-        $this->formElementManager = $formElementManager;
-        $this->defaultSettings = $defaultSettings;
-    }
+    const PARTIAL_NAME = 'common/block-layout/tag-cloud';
 
     public function getLabel()
     {
         return 'Tag cloud'; // @translate
     }
 
-    public function form(PhpRenderer $view, SiteRepresentation $site,
-        SitePageRepresentation $page = null, SitePageBlockRepresentation $block = null
+    public function form(
+        PhpRenderer $view,
+        SiteRepresentation $site,
+        SitePageRepresentation $page = null,
+        SitePageBlockRepresentation $block = null
     ) {
-        /** @var \Folksonomy\Form\TagCloudBlockForm $form */
-        $form = $this->formElementManager->get(TagCloudBlockForm::class);
+        // Factory is not used to make rendering simpler.
+        $services = $site->getServiceLocator();
+        $formElementManager = $services->get('FormElementManager');
+        $defaultSettings = $services->get('Config')['folksonomy']['block_settings']['tagCloud'];
+        $blockFieldset = \Folksonomy\Form\TagCloudFieldset::class;
 
-        $data = $block
-            ? $block->data() + $this->defaultSettings
-            : $this->defaultSettings;
-        $form->setData([
-            'o:block[__blockIndex__][o:data][resource_name]' => $data['resource_name'],
-            'o:block[__blockIndex__][o:data][max_classes]' => $data['max_classes'],
-            'o:block[__blockIndex__][o:data][tag_numbers]' => $data['tag_numbers'],
-        ]);
+        $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
 
-        $form->prepare();
+        $dataForm = [];
+        foreach ($data as $key => $value) {
+            $dataForm['o:block[__blockIndex__][o:data][' . $key . ']'] = $value;
+        }
 
-        return $view->formCollection($form);
+        $fieldset = $formElementManager->get($blockFieldset);
+        $fieldset->populateValues($dataForm);
+
+        return $view->formCollection($fieldset);
     }
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        return $view->partial(
-            'common/block-layout/tag-cloud',
-            ['block' => $block]
-        );
+        return $view->partial(self::PARTIAL_NAME, [
+            'block' => $block,
+        ]);
     }
 }

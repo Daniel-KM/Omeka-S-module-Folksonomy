@@ -1,4 +1,12 @@
-<?php echo $this->partial('common/tag-cloud', [
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ */
+
+?>
+
+<?= $this->partial('common/tag-cloud', [
     'tags' => null,
     'resourceName' => $block->dataValue('resource_name', ''),
     // Never display "rejected" tags, in all cases.
@@ -8,4 +16,4 @@
     'link' => true,
     'maxClasses' => $block->dataValue('max_classes', 9),
     'tagNumbers' => $block->dataValue('tag_numbers', false),
-]); ?>
+]) ?>
