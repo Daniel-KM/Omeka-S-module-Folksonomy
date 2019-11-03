@@ -5,7 +5,7 @@
  * Add tags and tagging form to any resource to create uncontrolled vocabularies
  * and tag clouds.
  *
- * @copyright Daniel Berthereau, 2013-2018
+ * @copyright Daniel Berthereau, 2013-2019
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -33,26 +33,28 @@
  */
 namespace Folksonomy;
 
-use Doctrine\DBAL\DBALException;
+if (!class_exists(\Generic\AbstractModule::class)) {
+    require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
+        ? dirname(__DIR__) . '/Generic/AbstractModule.php'
+        : __DIR__ . '/src/Generic/AbstractModule.php';
+}
+
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\ConfigForm;
+use Generic\AbstractModule;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Module\AbstractModule;
-use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
-use Omeka\Stdlib\Message;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
 use Zend\Mvc\Controller\AbstractController;
 use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Renderer\PhpRenderer;
 
 class Module extends AbstractModule
 {
+    const NAMESPACE = __NAMESPACE__;
+
     /**
      * @var array Cache of tags and taggings by resource.
      */
@@ -61,11 +63,6 @@ class Module extends AbstractModule
         'taggings' => [],
     ];
 
-    public function getConfig()
-    {
-        return include __DIR__ . '/config/module.config.php';
-    }
-
     public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
@@ -73,53 +70,12 @@ class Module extends AbstractModule
         $this->addAclRules();
     }
 
-    public function install(ServiceLocatorInterface $serviceLocator)
+    protected function postInstall()
     {
-        $t = $serviceLocator->get('MvcTranslator');
+        $services = $this->getServiceLocator();
+        $t = $services->get('MvcTranslator');
 
-        $sql = <<<'SQL'
-CREATE TABLE tag (
-    id INT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(190) NOT NULL,
-    UNIQUE INDEX UNIQ_389B7835E237E06 (name),
-    PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
-CREATE TABLE tagging (
-    id INT AUTO_INCREMENT NOT NULL,
-    tag_id INT DEFAULT NULL,
-    resource_id INT DEFAULT NULL,
-    owner_id INT DEFAULT NULL,
-    status VARCHAR(190) NOT NULL,
-    created DATETIME NOT NULL,
-    modified DATETIME DEFAULT NULL,
-    INDEX IDX_A4AED123BAD26311 (tag_id),
-    INDEX IDX_A4AED12389329D25 (resource_id),
-    INDEX IDX_A4AED1237E3C61F9 (owner_id),
-    INDEX IDX_A4AED1237B00651C (status),
-    UNIQUE INDEX owner_tag_resource (owner_id, tag_id, resource_id),
-    PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
-ALTER TABLE tagging ADD CONSTRAINT FK_A4AED123BAD26311 FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE SET NULL;
-ALTER TABLE tagging ADD CONSTRAINT FK_A4AED12389329D25 FOREIGN KEY (resource_id) REFERENCES resource (id) ON DELETE SET NULL;
-ALTER TABLE tagging ADD CONSTRAINT FK_A4AED1237E3C61F9 FOREIGN KEY (owner_id) REFERENCES user (id) ON DELETE SET NULL;
-SQL;
-        $connection = $serviceLocator->get('Omeka\Connection');
-        $sqls = array_filter(array_map('trim', explode(';', $sql)));
-        foreach ($sqls as $sql) {
-            try {
-                $connection->exec($sql);
-            } catch (DBALException $e) {
-                $this->uninstall($serviceLocator);
-                $logger = $serviceLocator->get('Omeka\Logger');
-                $logger->err($e);
-                throw new ModuleCannotInstallException(
-                    new Message($t->translate('An error occured during sql query. See log for more details. Code: %s; Message: %s'), // @translate
-                        $e->getCode(), $e->getMessage()));
-            }
-        }
-
-        $settings = $serviceLocator->get('Omeka\Settings');
-        $this->manageSettings($settings, 'install');
+        $settings = $services->get('Omeka\Settings');
 
         $html = '<p>';
         $html .= sprintf($t->translate('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.'), // @translate
@@ -128,92 +84,6 @@ SQL;
         );
         $html .= '</p>';
         $settings->set('folksonomy_legal_text', $html);
-        $this->manageSiteSettings($serviceLocator, 'install');
-    }
-
-    public function uninstall(ServiceLocatorInterface $serviceLocator)
-    {
-        $sql = <<<'SQL'
-DROP TABLE IF EXISTS tagging;
-DROP TABLE IF EXISTS tag;
-SQL;
-        $connection = $serviceLocator->get('Omeka\Connection');
-        $sqls = array_filter(array_map('trim', explode(';', $sql)));
-        foreach ($sqls as $sql) {
-            $connection->exec($sql);
-        }
-
-        $this->manageSettings($serviceLocator->get('Omeka\Settings'), 'uninstall');
-        $this->manageSiteSettings($serviceLocator, 'uninstall');
-    }
-
-    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $serviceLocator)
-    {
-        if (version_compare($oldVersion, '3.3.3', '<')) {
-            $config = require __DIR__ . '/config/module.config.php';
-            $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
-            $settings = $serviceLocator->get('Omeka\Settings');
-            $settings->set('folksonomy_append_item_set_show',
-                $defaultSettings['folksonomy_append_item_set_show']);
-            $settings->set('folksonomy_append_item_show',
-                $defaultSettings['folksonomy_append_item_show']);
-            $settings->set('folksonomy_append_media_show',
-                $defaultSettings['folksonomy_append_media_show']);
-        }
-
-        if (version_compare($oldVersion, '3.3.7', '<')) {
-            $config = require __DIR__ . '/config/module.config.php';
-            $defaultSettings = $config[strtolower(__NAMESPACE__)]['site_settings'];
-            $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-            $settings = $serviceLocator->get('Omeka\Settings');
-            $api = $serviceLocator->get('Omeka\ApiManager');
-            $sites = $api->search('sites')->getContent();
-            foreach ($sites as $site) {
-                $siteSettings->setTargetId($site->id());
-                $siteSettings->set('folksonomy_append_item_set_show',
-                    $settings->get('folksonomy_append_item_set_show',
-                        $defaultSettings['folksonomy_append_item_set_show'])
-                );
-                $siteSettings->set('folksonomy_append_item_show',
-                    $settings->get('folksonomy_append_item_show',
-                        $defaultSettings['folksonomy_append_item_show'])
-                );
-                $siteSettings->set('folksonomy_append_media_show',
-                    $settings->get('folksonomy_append_media_show',
-                        $defaultSettings['folksonomy_append_media_show'])
-                );
-            }
-            $settings->delete('folksonomy_append_item_set_show');
-            $settings->delete('folksonomy_append_item_show');
-            $settings->delete('folksonomy_append_media_show');
-        }
-    }
-
-    protected function manageSettings($settings, $process, $key = 'config')
-    {
-        $config = require __DIR__ . '/config/module.config.php';
-        $defaultSettings = $config[strtolower(__NAMESPACE__)][$key];
-        foreach ($defaultSettings as $name => $value) {
-            switch ($process) {
-                case 'install':
-                    $settings->set($name, $value);
-                    break;
-                case 'uninstall':
-                    $settings->delete($name);
-                    break;
-            }
-        }
-    }
-
-    protected function manageSiteSettings(ServiceLocatorInterface $serviceLocator, $process)
-    {
-        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
-        $api = $serviceLocator->get('Omeka\ApiManager');
-        $sites = $api->search('sites')->getContent();
-        foreach ($sites as $site) {
-            $siteSettings->setTargetId($site->id());
-            $this->manageSettings($siteSettings, $process, 'site_settings');
-        }
     }
 
     /**
@@ -248,326 +118,195 @@ SQL;
         }
 
         // Similar than items or item sets from Omeka\Service\AclFactory.
-        $acl->allow(
-            null,
-            [
-                \Folksonomy\Controller\Admin\TaggingController::class,
-                \Folksonomy\Controller\Site\TaggingController::class,
-            ]
-        );
-        $acl->allow(
-            null,
-            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
-            $publicAdapterRights
-        );
-        $acl->allow(
-            null,
-            Tagging::class,
-            $publicEntityRights
-        );
+        $acl
+            ->allow(
+                null,
+                [
+                    \Folksonomy\Controller\Admin\TaggingController::class,
+                    \Folksonomy\Controller\Site\TaggingController::class,
+                ]
+            )
+            ->allow(
+                null,
+                [\Folksonomy\Api\Adapter\TaggingAdapter::class],
+                $publicAdapterRights
+            )
+            ->allow(
+                null,
+                Tagging::class,
+                $publicEntityRights
+            )
 
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Controller\Admin\TaggingController::class],
-            [
-                'add',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'read',
-            ],
-            new OwnsEntityAssertion
-        );
+            ->allow(
+                'researcher',
+                [\Folksonomy\Controller\Admin\TaggingController::class],
+                ['add', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Api\Adapter\TaggingAdapter::class],
+                ['create']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Entity\Tagging::class],
+                ['create']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Entity\Tagging::class],
+                ['read'],
+                new OwnsEntityAssertion
+            )
 
-        $acl->allow(
-            'author',
-            [\Folksonomy\Controller\Admin\TaggingController::class],
-            [
-                'add',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'read',
-            ],
-            new OwnsEntityAssertion
-        );
+            ->allow(
+                'author',
+                [\Folksonomy\Controller\Admin\TaggingController::class],
+                ['add', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Api\Adapter\TaggingAdapter::class],
+                ['create']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Entity\Tagging::class],
+                ['create']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Entity\Tagging::class],
+                ['read'],
+                new OwnsEntityAssertion
+            )
 
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Controller\Admin\TaggingController::class],
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'create',
-                'update',
-                'delete',
-                'view-all',
-            ]
-        );
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Controller\Admin\TaggingController::class],
+                ['add', 'edit', 'delete', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Api\Adapter\TaggingAdapter::class],
+                ['create', 'update', 'delete']
+            )
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Entity\Tagging::class],
+                ['create', 'update', 'delete', 'view-all']
+            )
 
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Controller\Admin\TaggingController::class],
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Api\Adapter\TaggingAdapter::class],
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Entity\Tagging::class],
-            [
-                'create',
-                'update',
-                'delete',
-                'view-all',
-            ]
-        );
+            ->allow(
+                'editor',
+                [\Folksonomy\Controller\Admin\TaggingController::class],
+                ['add', 'edit', 'delete', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'editor',
+                [\Folksonomy\Api\Adapter\TaggingAdapter::class],
+                ['create', 'update', 'delete']
+            )
+            ->allow(
+                'editor',
+                [\Folksonomy\Entity\Tagging::class],
+                ['create', 'update', 'delete', 'view-all']
+            )
 
-        // Similar than items or item sets from Omeka\Service\AclFactory.
-        $acl->allow(
-            null,
-            [
-                \Folksonomy\Controller\Admin\TagController::class,
-                \Folksonomy\Controller\Site\TagController::class,
-            ]
-        );
-        $acl->allow(
-            null,
-            [\Folksonomy\Api\Adapter\TagAdapter::class],
-            $publicAdapterRights
-        );
-        $acl->allow(
-            null,
-            [\Folksonomy\Entity\Tag::class],
-            $publicEntityRights
-        );
+            // Similar than items or item sets from Omeka\Service\AclFactory.
+            ->allow(
+                null,
+                [
+                    \Folksonomy\Controller\Admin\TagController::class,
+                    \Folksonomy\Controller\Site\TagController::class,
+                ]
+            )
+            ->allow(
+                null,
+                [\Folksonomy\Api\Adapter\TagAdapter::class],
+                $publicAdapterRights
+            )
+            ->allow(
+                null,
+                [\Folksonomy\Entity\Tag::class],
+                $publicEntityRights
+            )
 
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Controller\Admin\TagController::class],
-            [
-                'add',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Api\Adapter\TagAdapter::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'researcher',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'read',
-            ],
-            new OwnsEntityAssertion
-        );
+            ->allow(
+                'researcher',
+                [\Folksonomy\Controller\Admin\TagController::class],
+                ['add', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Api\Adapter\TagAdapter::class],
+                ['create']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Entity\Tag::class],
+                ['create']
+            )
+            ->allow(
+                'researcher',
+                [\Folksonomy\Entity\Tag::class],
+                ['read'],
+                new OwnsEntityAssertion
+            )
 
-        $acl->allow(
-            'author',
-            [\Folksonomy\Controller\Admin\TagController::class],
-            [
-                'add',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Api\Adapter\TagAdapter::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'create',
-            ]
-        );
-        $acl->allow(
-            'author',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'read',
-            ],
-            new OwnsEntityAssertion
-        );
+            ->allow(
+                'author',
+                [\Folksonomy\Controller\Admin\TagController::class],
+                ['add', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Api\Adapter\TagAdapter::class],
+                ['create']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Entity\Tag::class],
+                ['create']
+            )
+            ->allow(
+                'author',
+                [\Folksonomy\Entity\Tag::class],
+                ['read'],
+                new OwnsEntityAssertion
+            )
 
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Controller\Admin\TagController::class],
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Api\Adapter\TagAdapter::class],
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'reviewer',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'create',
-                'update',
-                'delete',
-                'view-all',
-            ]
-        );
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Controller\Admin\TagController::class],
+                ['add', 'edit', 'delete', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Api\Adapter\TagAdapter::class],
+                ['create', 'update', 'delete']
+            )
+            ->allow(
+                'reviewer',
+                [\Folksonomy\Entity\Tag::class],
+                ['create', 'update', 'delete', 'view-all']
+            )
 
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Controller\Admin\TagController::class],
-            [
-                'add',
-                'edit',
-                'delete',
-                'index',
-                'search',
-                'browse',
-                'show',
-                'show-details',
-                'sidebar-select',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Api\Adapter\TagAdapter::class],
-            [
-                'create',
-                'update',
-                'delete',
-            ]
-        );
-        $acl->allow(
-            'editor',
-            [\Folksonomy\Entity\Tag::class],
-            [
-                'create',
-                'update',
-                'delete',
-                'view-all',
-            ]
-        );
+            ->allow(
+                'editor',
+                [\Folksonomy\Controller\Admin\TagController::class],
+                ['add', 'edit', 'delete', 'index', 'search', 'browse', 'show', 'show-details', 'sidebar-select']
+            )
+            ->allow(
+                'editor',
+                [\Folksonomy\Api\Adapter\TagAdapter::class],
+                ['create', 'update', 'delete']
+            )
+            ->allow(
+                'editor',
+                [\Folksonomy\Entity\Tag::class],
+                ['create', 'update', 'delete', 'view-all']
+            );
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
@@ -578,24 +317,14 @@ SQL;
         $sharedEventManager->attach(
             '*',
             'api.context',
-            function (Event $event) {
-                $context = $event->getParam('context');
-                $context['o-module-folksonomy'] = 'http://omeka.org/s/vocabs/module/folksonomy#';
-                $event->setParam('context', $context);
-            }
+            [$this, 'handleApiContext']
         );
 
         // Add the visibility filters.
         $sharedEventManager->attach(
             '*',
             'sql_filter.resource_visibility',
-            function (Event $event) {
-                // Users can view taggings only if they have permission to view
-                // the attached resource.
-                $relatedEntities = $event->getParam('relatedEntities');
-                $relatedEntities[Tagging::class] = 'resource_id';
-                $event->setParam('relatedEntities', $relatedEntities);
-            }
+            [$this, 'handleSqlResourceVisibility']
         );
 
         $representations = [
@@ -604,7 +333,6 @@ SQL;
             \Omeka\Api\Representation\MediaRepresentation::class,
         ];
         foreach ($representations as $representation) {
-            // Add the tagging part to the resource representation.
             $sharedEventManager->attach(
                 $representation,
                 'rep.resource.json',
@@ -752,7 +480,7 @@ SQL;
         $sharedEventManager->attach(
             \Omeka\Form\SiteSettingsForm::class,
             'form.add_elements',
-            [$this, 'addFormElementsSiteSettings']
+            [$this, 'handleSiteSettings']
         );
     }
 
@@ -765,11 +493,11 @@ SQL;
 
         // TODO Find a better way to manage fieldset in config form.
         $data = [];
-        $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
+        $defaultSettings = $config['folksonomy']['config'];
         foreach ($defaultSettings as $name => $value) {
-            $data['folksonomy_tag_page'][$name] = $settings->get($name);
-            $data['folksonomy_public_rights'][$name] = $settings->get($name);
-            $data['folksonomy_tagging_form'][$name] = $settings->get($name);
+            $data['folksonomy_tag_page'][$name] = $settings->get($name, $value);
+            $data['folksonomy_public_rights'][$name] = $settings->get($name, $value);
+            $data['folksonomy_tagging_form'][$name] = $settings->get($name, $value);
         }
 
         $renderer->ckEditor();
@@ -808,7 +536,7 @@ SQL;
         unset($params['folksonomy_public_rights']);
         unset($params['folksonomy_tagging_form']);
 
-        $defaultSettings = $config[strtolower(__NAMESPACE__)]['config'];
+        $defaultSettings = $config['folksonomy']['config'];
         foreach ($params as $name => $value) {
             if (array_key_exists($name, $defaultSettings)) {
                 $settings->set($name, $value);
@@ -816,64 +544,20 @@ SQL;
         }
     }
 
-    public function addFormElementsSiteSettings(Event $event)
+    public function handleApiContext(Event $event)
     {
-        $services = $this->getServiceLocator();
-        $siteSettings = $services->get('Omeka\Settings\Site');
-        $config = $services->get('Config');
-        $form = $event->getTarget();
+        $context = $event->getParam('context');
+        $context['o-module-folksonomy'] = 'http://omeka.org/s/vocabs/module/folksonomy#';
+        $event->setParam('context', $context);
+    }
 
-        $defaultSiteSettings = $config[strtolower(__NAMESPACE__)]['site_settings'];
-
-        $fieldset = new Fieldset('folksonomy');
-        $fieldset->setLabel('Folksonomy'); // @translate
-
-        $fieldset->add([
-            'name' => 'folksonomy_append_item_set_show',
-            'type' => Element\Checkbox::class,
-            'options' => [
-                'label' => 'Append automatically to item set page', // @translate
-                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
-            ],
-            'attributes' => [
-                'value' => $siteSettings->get(
-                    'folksonomy_append_item_set_show',
-                    $defaultSiteSettings['folksonomy_append_item_set_show']
-                ),
-            ],
-        ]);
-
-        $fieldset->add([
-            'name' => 'folksonomy_append_item_show',
-            'type' => Element\Checkbox::class,
-            'options' => [
-                'label' => 'Append automatically to item page', // @translate
-                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
-            ],
-            'attributes' => [
-                'value' => $siteSettings->get(
-                    'folksonomy_append_item_show',
-                    $defaultSiteSettings['folksonomy_append_item_show']
-                ),
-            ],
-        ]);
-
-        $fieldset->add([
-            'name' => 'folksonomy_append_media_show',
-            'type' => Element\Checkbox::class,
-            'options' => [
-                'label' => 'Append automatically to media page', // @translate
-                'info' => 'If unchecked, the tags can be added via the helper in the theme or the block in any page.', // @translate
-            ],
-            'attributes' => [
-                'value' => $siteSettings->get(
-                    'folksonomy_append_media_show',
-                    $defaultSiteSettings['folksonomy_append_media_show']
-                ),
-            ],
-        ]);
-
-        $form->add($fieldset);
+    public function handleSqlResourceVisibility(Event $event)
+    {
+        // Users can view taggings only if they have permission to view
+        // the attached resource.
+        $relatedEntities = $event->getParam('relatedEntities');
+        $relatedEntities[Tagging::class] = 'resource_id';
+        $event->setParam('relatedEntities', $relatedEntities);
     }
 
     /**

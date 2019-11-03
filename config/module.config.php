@@ -54,6 +54,7 @@ return [
         'invokables' => [
             Form\ConfigForm::class => Form\ConfigForm::class,
             Form\SearchForm::class => Form\SearchForm::class,
+            Form\SiteSettingsFieldset::class => Form\SiteSettingsFieldset::class,
             Form\TagCloudBlockForm::class => Form\TagCloudBlockForm::class,
         ],
         'factories' => [
