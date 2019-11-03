@@ -1,8 +1,17 @@
 <?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+ * @var \Folksonomy\Api\Representation\TagRepresentation[] $tags
+ */
+
+?>
+
+<?php
 if (count($tags)) {
     $escape = $this->plugin('escapeHtml');
 
-    $tagStrings = array();
+    $tagStrings = [];
     if (isset($link) && $link === false) {
         foreach ($tags as $tag) {
             $tagStrings[] = $escape($tag->name());
@@ -15,6 +24,8 @@ if (count($tags)) {
         }
     }
 
-    if (!isset($delimiter)) { $delimiter = ', '; }
+    if (!isset($delimiter)) {
+        $delimiter = ', ';
+    }
     echo join($escape($delimiter), $tagStrings);
 }

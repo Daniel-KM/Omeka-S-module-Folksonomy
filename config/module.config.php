@@ -104,7 +104,7 @@ return [
             'site' => [
                 'child_routes' => [
                     'tag' => [
-                        'type' => 'Literal',
+                        'type' => \Zend\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/tag',
                             'defaults' => [
@@ -115,7 +115,7 @@ return [
                         ],
                     ],
                     'tag-id' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             // There is no action in public views, else force
                             // the ending "/" or make the action unskippable.
@@ -129,7 +129,7 @@ return [
                         ],
                     ],
                     'tag-resource' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/:resource/tag/:id',
                             'constraints' => [
@@ -145,7 +145,7 @@ return [
                     ],
                     // A simple common alias to browse all tags.
                     'tags' => [
-                        'type' => 'Literal',
+                        'type' => \Zend\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/tags',
                             'defaults' => [
@@ -156,7 +156,7 @@ return [
                         ],
                     ],
                     'tagging' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/tagging[/:action]',
                             'constraints' => [
@@ -175,7 +175,7 @@ return [
             'admin' => [
                 'child_routes' => [
                     'tag' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/tag[/:action]',
                             'constraints' => [
@@ -189,7 +189,7 @@ return [
                         ],
                     ],
                     'tag-id' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             // The action is not skippable in order to use name.
                             // Require ending "/" when there is no action.
@@ -205,7 +205,7 @@ return [
                         ],
                     ],
                     'tag-resource' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/:resource/tag/:id',
                             'constraints' => [
@@ -220,7 +220,7 @@ return [
                         ],
                     ],
                     'tagging' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/tagging[/:action]',
                             'constraints' => [
@@ -234,7 +234,7 @@ return [
                         ],
                     ],
                     'tagging-id' => [
-                        'type' => 'Segment',
+                        'type' => \Zend\Router\Http\Segment::class,
                         'options' => [
                             'route' => '/tagging/:id[/:action]',
                             'constraints' => [

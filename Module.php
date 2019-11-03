@@ -1124,8 +1124,11 @@ SQL;
     public function addHeadersAdmin(Event $event)
     {
         $view = $event->getTarget();
-        $view->headLink()->appendStylesheet($view->assetUrl('css/folksonomy-admin.css', __NAMESPACE__));
-        $view->headScript()->appendFile($view->assetUrl('js/folksonomy-admin.js', __NAMESPACE__));
+        $assetUrl = $view->plugin('assetUrl');
+        $view->headLink()
+            ->appendStylesheet($assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
+        $view->headScript()
+            ->appendFile($assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
     }
 
     /**
@@ -1166,8 +1169,8 @@ SQL;
      */
     public function displayListAndFormPublic(Event $event)
     {
-        $serviceLocator = $this->getServiceLocator();
-        $siteSettings = $serviceLocator->get('Omeka\Settings\Site');
+        $services = $this->getServiceLocator();
+        $siteSettings = $services->get('Omeka\Settings\Site');
         $view = $event->getTarget();
         $resource = $view->resource;
         $resourceName = $resource->resourceName();
