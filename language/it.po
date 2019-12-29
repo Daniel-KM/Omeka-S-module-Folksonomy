@@ -1,0 +1,614 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-04 00:00+0100\n"
+"PO-Revision-Date: 2019-12-28 12:34+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it_IT\n"
+
+#: Module.php:81
+#, php-format
+msgid ""
+"I agree with %sterms of use%s and I accept to free my contribution under the "
+"licence %sCC BY-SA%s."
+msgstr ""
+"Accetto %sterms of use%s e accetto di rendere disponibile il mio contributo "
+"sotto la licenza %sCC BY-SA%s."
+
+#: Module.php:502
+msgid ""
+"It is recommended to create tag clouds with the blocks of the site pages."
+msgstr ""
+"Si consiglia di creare clouds di etichette (tags) con i blocchi delle pagine "
+"del sito."
+
+#: Module.php:503
+msgid ""
+"So first options are used only to create global pages, that are not provided "
+"by Omeka yet."
+msgstr ""
+"Quindi le prime opzioni vengono utilizzate solo per creare pagine globali, "
+"che non sono ancora fornite da Omeka."
+
+#: Module.php:967
+msgid "Has tags"
+msgstr "Ha delle etichette"
+
+#: Module.php:968
+msgid "true"
+msgstr "vero"
+
+#: Module.php:972 view/common/admin/folksonomy-mapping-sidebar.phtml:11
+#: view/common/admin/tagging-form.phtml:25
+#: view/folksonomy/admin/tag/browse.phtml:11
+#: view/folksonomy/admin/tag/browse.phtml:77
+#: view/folksonomy/admin/tag/show-details.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:15
+#: view/folksonomy/admin/tagging/browse.phtml:90
+#: view/folksonomy/admin/tagging/show-details.phtml:14
+msgid "Tag"
+msgstr "Etichetta"
+
+#: src/Generic/AbstractModule.php:518
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr "Questo modulo richiede il modulo \"%s\"."
+
+#: src/Generic/AbstractModule.php:538
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr "Questo modulo richiede i moduli \"%s\"."
+
+#: src/Generic/AbstractModule.php:606
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+"Il modulo \"%s\" è stato disattivato automaticamente perché le dipendenze "
+"non sono disponibili."
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:6
+#: view/folksonomy/site/tag/browse.phtml:11
+msgid "Folksonomy"
+msgstr "Folksonomia"
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:37
+msgid "Taggings"
+msgstr "Etichettature"
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:10
+msgid "Select below"
+msgstr "Seleziona qui sotto"
+
+#: view/common/admin/tag-resource-list.phtml:9
+#: view/common/admin/tagging-form.phtml:66
+msgid "There are no tags for this resource."
+msgstr "Non ci sono etichette per questo contenuto."
+
+#: view/common/admin/tag-resource-list.phtml:26
+#: view/common/admin/tag-resource-list.phtml:27
+#: view/common/admin/tag-resource.phtml:18
+#: view/common/admin/tag-resource.phtml:19
+#: view/common/admin/tagging-form.phtml:47
+#: view/common/admin/tagging-form.phtml:48
+#: view/folksonomy/admin/tagging/browse.phtml:133
+#: view/folksonomy/admin/tagging/browse.phtml:134
+msgid "Toggle status"
+msgstr "Attivare o disattivare lo stato"
+
+#: view/common/admin/tag-resource.phtml:9
+#: view/common/admin/tagging-form.phtml:21
+#: view/common/site/tag-resource.phtml:19
+#: view/folksonomy/admin/tag/browse.phtml:39
+msgid "Tags"
+msgstr "Etichette"
+
+#: view/common/admin/tagging-form.phtml:6
+msgid "Remove tag"
+msgstr "Rimuovere l’etichetta"
+
+#: view/common/admin/tagging-form.phtml:68
+msgid ""
+"Add existing ones using the interface to the right or add new ones in the "
+"field below."
+msgstr ""
+"Aggiungere quelle esistenti utilizzando l'interfaccia a destra o aggiungerne "
+"di nuove nel campo sottostante."
+
+#: view/common/admin/tagging-form.phtml:73
+msgid "Add one or multiple comma-separated new tags"
+msgstr "Aggiungere una o più nuove etichette separate da virgole"
+
+#: view/common/admin/tagging-form.phtml:76
+msgid "Add a tag"
+msgstr "Aggiungi un’etichetta"
+
+#: view/common/tag-cloud.phtml:32
+msgid "No tags are available."
+msgstr "Non ci sono etichette disponibili."
+
+#: view/common/tag-selector.phtml:20
+msgid "Close Me"
+msgstr "Chiudere"
+
+#: view/common/tag-selector.phtml:21
+msgid "Click on a tag to add it to the edit panel."
+msgstr "Fare clic su un’etichetta per aggiungerla al pannello di modifica."
+
+#: view/common/tag-selector.phtml:22
+msgid "Filter tags"
+msgstr "Filtra le etichette"
+
+#: view/common/tag-selector.phtml:24
+msgid "All tags"
+msgstr "Tutte le etichette"
+
+#: view/common/tagging-quick-form.phtml:19
+msgid "New Tags"
+msgstr "Nuove etichette"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:5
+msgid "Delete tags"
+msgstr "Cancellare le etichette"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:6
+msgid "Are you sure you would like to delete the selected tags?"
+msgstr "Sei sicuro di voler cancellare le etichette selezionate?"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:7
+msgid "WARNING: This will delete the associated taggings."
+msgstr "ATTENZIONE: Questo cancellerà le etichettature associate."
+
+#: view/folksonomy/admin/tag/browse.phtml:15
+#: view/folksonomy/admin/tag/browse.phtml:79
+msgid "Total count"
+msgstr "Conteggio totale"
+
+#: view/folksonomy/admin/tag/browse.phtml:19
+msgid "Total item sets"
+msgstr "Totale set di contenuti"
+
+#: view/folksonomy/admin/tag/browse.phtml:23
+msgid "Total items"
+msgstr "Totale contenuti"
+
+#: view/folksonomy/admin/tag/browse.phtml:27
+msgid "Total media"
+msgstr "Totale media"
+
+#: view/folksonomy/admin/tag/browse.phtml:31
+msgid "Recent"
+msgstr "Recente"
+
+#: view/folksonomy/admin/tag/browse.phtml:66
+#: view/folksonomy/site/tag/browse.phtml:14
+msgid "There are no tags."
+msgstr "Non ci sono etichette."
+
+#: view/folksonomy/admin/tag/browse.phtml:104
+#: view/folksonomy/admin/tag/browse.phtml:105
+msgid "Edit name"
+msgstr "Modifica nome"
+
+#: view/folksonomy/admin/tag/show-details.phtml:15
+msgid "Internal id"
+msgstr "ID interno"
+
+#: view/folksonomy/admin/tag/show-details.phtml:21
+msgid "Stats"
+msgstr "Statistiche"
+
+#: view/folksonomy/admin/tag/show-details.phtml:23
+msgid "Total"
+msgstr "Totale"
+
+#: view/folksonomy/admin/tag/show-details.phtml:35
+msgid "Medias"
+msgstr "Media"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:5
+msgid "Delete taggings"
+msgstr "Cancellare le etichettature"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:6
+msgid "Are you sure you would like to delete the selected taggings?"
+msgstr "Sei sicuro di voler cancellare le etichettature selezionate?"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:7
+#, php-format
+msgid "Note: This won’t delete tags: check the %stags page%s to manage them."
+msgstr ""
+"Nota: Questo non cancella le etichette: controlla la pagina %stags%s per "
+"gestirle."
+
+#: view/folksonomy/admin/tagging/browse.phtml:23
+#: view/folksonomy/admin/tagging/browse.phtml:94
+#: view/folksonomy/admin/tagging/show-details.phtml:43
+msgid "Tagger"
+msgstr "Creatore dell’etichetta"
+
+#: view/folksonomy/admin/tagging/browse.phtml:27
+#: view/folksonomy/admin/tagging/browse.phtml:95
+msgid "Date tagged"
+msgstr "Data creazione etichetta"
+
+#: view/folksonomy/admin/tagging/browse.phtml:56
+#: view/folksonomy/admin/tagging/browse.phtml:57
+msgid "Approve"
+msgstr "Approva"
+
+#: view/folksonomy/admin/tagging/browse.phtml:62
+#: view/folksonomy/admin/tagging/browse.phtml:63
+msgid "Reject"
+msgstr "Rifiuta"
+
+#: view/folksonomy/admin/tagging/browse.phtml:78
+msgid "There are no taggings."
+msgstr "Non ci sono etichettature."
+
+#: view/folksonomy/admin/tagging/browse.phtml:122
+#: view/folksonomy/admin/tagging/browse.phtml:159
+#: view/folksonomy/admin/tagging/show-details.phtml:37
+msgid "Removed"
+msgstr "Eliminato"
+
+#: view/folksonomy/admin/tagging/show-details.phtml:12
+#, php-format
+msgid "Tagging #%d"
+msgstr "Etichettatura #%d"
+
+#: view/folksonomy/admin/tagging/show-details.phtml:20
+msgid "[Removed]"
+msgstr "[Eliminato]"
+
+#: src/Form/TaggingForm.php:65
+msgid "Add tags"
+msgstr "Aggiungi delle etichette"
+
+#: src/Form/TaggingForm.php:77
+msgid "Proposed tag cannot be empty."
+msgstr "L’etichetta proposta non può essere vuota."
+
+#: src/Form/TaggingForm.php:79
+#, php-format
+msgid "Proposed tags cannot be longer than %d characters."
+msgstr "Le etichette proposte non possono essere più lunghe di %d caratteri."
+
+#: src/Form/TaggingForm.php:111
+msgid "Terms of service"
+msgstr "Termini di servizio"
+
+#: src/Form/TaggingForm.php:125
+msgid "You must agree to the terms and conditions."
+msgstr "È necessario accettare i termini e le condizioni."
+
+#: src/Form/TaggingForm.php:137
+msgid "String to check"
+msgstr "Stringa da controllare"
+
+#: src/Form/TaggingForm.php:140
+msgid "Set the string to check"
+msgstr "Impostare la stringa da controllare"
+
+#: src/Form/TaggingForm.php:165
+msgid "Tag it!"
+msgstr "Etichettalo!"
+
+#: src/Form/TagCloudFieldset.php:16
+msgid "Block title"
+msgstr "Titolo del blocco"
+
+#: src/Form/TagCloudFieldset.php:17
+msgid "Heading for the block, if any."
+msgstr "Titolo del blocco, se esiste."
+
+#: src/Form/TagCloudFieldset.php:28
+msgid "Browse links are available only for item sets and items."
+msgstr ""
+"I link di ricerca sono disponibili solo per i set di contenuti ed i "
+"contenuti."
+
+#: src/Form/TagCloudFieldset.php:30 src/Form/ConfigForm.php:29
+msgid "All resources (separately)"
+msgstr "Tutti i contenuti (separatamente)"
+
+#: src/Form/TagCloudFieldset.php:31 src/Form/ConfigForm.php:30
+msgid "All resources (together)"
+msgstr "Tutti i contenuti (insieme)"
+
+#: src/Form/TagCloudFieldset.php:45 src/Form/ConfigForm.php:44
+msgid "Max classes"
+msgstr "Numero massimo di classi"
+
+#: src/Form/TagCloudFieldset.php:57 src/Form/ConfigForm.php:56
+msgid "Display tag numbers"
+msgstr "Visualizza i numeri delle etichette"
+
+#: src/Form/SearchForm.php:24
+msgid "Search by tag"
+msgstr "Ricerca per etichetta"
+
+#: src/Form/Element/TagSelect.php:58
+msgid "Select tags"
+msgstr "Seleziona le etichette"
+
+#: src/Form/ConfigForm.php:18
+msgid "Tag cloud page"
+msgstr "Pagina cloud etichette"
+
+#: src/Form/ConfigForm.php:67
+msgid "Public rights"
+msgstr "Autorizzazioni pubbliche"
+
+#: src/Form/ConfigForm.php:75
+msgid "Allow public to tag"
+msgstr "Consenti al pubblico di etichettare"
+
+#: src/Form/ConfigForm.php:85
+msgid "Require approbation for public tags"
+msgstr "Richiedere l'approvazione per le etichette pubbliche"
+
+#: src/Form/ConfigForm.php:95
+msgid "Notify by email for public tagging"
+msgstr "Notifica via e-mail per l’etichettatura pubblica"
+
+#: src/Form/ConfigForm.php:106
+msgid "Tagging form"
+msgstr "Formulario per etichettatura"
+
+#: src/Form/ConfigForm.php:117
+msgid "Max length of a proposed tag"
+msgstr "Lunghezza massima di una etichetta proposta"
+
+#: src/Form/ConfigForm.php:118
+msgid "The maximum for the database is 190 characters."
+msgstr "Il massimo per il database è di 190 caratteri."
+
+#: src/Form/ConfigForm.php:128
+msgid "Max length for all proposed tags"
+msgstr "Lunghezza massima di tutte le etichette proposte"
+
+#: src/Form/ConfigForm.php:129
+msgid "Multiple tags can be proposed in one time, separated by comma."
+msgstr ""
+"Delle etichette multiple possono essere proposte in una sola volta, separate "
+"da virgola."
+
+#: src/Form/ConfigForm.php:139
+msgid "Message to invite to tag"
+msgstr "Messaggio per invitare a etichettare"
+
+#: src/Form/ConfigForm.php:140
+msgid ""
+"The text to click to display the tag form (a simple \"+\" by default, "
+"customizable in the theme)."
+msgstr ""
+"Il testo da cliccare per visualizzare il il formulario di etichettatura (un "
+"semplice \"+\" di default, personalizzabile nel tema)."
+
+#: src/Form/ConfigForm.php:150
+msgid "Legal agreement"
+msgstr "Clausole legali"
+
+#: src/Form/ConfigForm.php:151
+msgid ""
+"This text will be shown beside the legal checkbox. Let empty if you don’t "
+"want to use a legal agreement."
+msgstr ""
+"Questo testo sarà mostrato accanto alla casella delle clausole legali. "
+"Lasciare vuoto se non si desidera utilizzare delle clausole legali."
+
+#: src/Controller/Site/TaggingController.php:81
+msgid "SERVER_ADDR"
+msgstr "SERVER_ADDR"
+
+#: src/Controller/Site/TaggingController.php:82
+#, php-format
+msgid "[%s] New public tags"
+msgstr "[%s] Nuove etichette pubbliche"
+
+#: src/Controller/Site/TaggingController.php:87
+#, php-format
+msgid "%d tag added to resource #%d (%s): \"%s\"."
+msgstr "%d etichetta aggiunta al contenuto #%d (%s): \"%s\"."
+
+#: src/Controller/Site/TaggingController.php:89
+#, php-format
+msgid "%d tags added to resource #%d (%s): \"%s\"."
+msgstr "%d etichette aggiunte al contenuto #%d (%s): \"%s\"."
+
+#: src/Controller/Site/TaggingController.php:104
+msgid "Unable to send an email after tagging."
+msgstr "Impossibile inviare un'e-mail dopo l’etichettatura."
+
+#: src/Controller/Site/TaggingController.php:112 config/module.config.php:270
+msgid "You should accept the legal agreement."
+msgstr "Dovresti accettare le clausole legali."
+
+#: src/Controller/Site/TaggingController.php:119
+#: src/Controller/Admin/TagController.php:172
+msgid "No tags submitted."
+msgstr "Nessuna etichetta inviata."
+
+#: src/Controller/Site/TaggingController.php:126
+#: src/Controller/Admin/TaggingController.php:229
+msgid "Submitted tags are already set."
+msgstr "Le etichette inviate sono già impostate."
+
+#: src/Controller/Site/TaggingController.php:133
+#: src/Controller/Admin/TagController.php:186
+#: src/Controller/Admin/TaggingController.php:236
+msgid "Unauthorized access."
+msgstr "Accesso non autorizzato."
+
+#: src/Controller/Site/TaggingController.php:140
+msgid "Resource not found."
+msgstr "Contenuto non trovato."
+
+#: src/Controller/Admin/TagController.php:52
+msgid "Tag successfully deleted."
+msgstr "Etichetta eliminata con successo."
+
+#: src/Controller/Admin/TagController.php:104
+msgid "You must select at least one tag to batch delete."
+msgstr ""
+"È necessario selezionare almeno un’etichetta per eliminare con il batch."
+
+#: src/Controller/Admin/TagController.php:113
+msgid "Tags successfully deleted."
+msgstr "Etichette eliminate con successo."
+
+#: src/Controller/Admin/TagController.php:123
+msgid "Delete of all tags is not supported currently."
+msgstr "La cancellazione di tutte le etichette non è attualmente supportata."
+
+#: src/Controller/Admin/TagController.php:179
+msgid ""
+"This tag is invalid: it is a duplicate or it contains forbidden characters."
+msgstr ""
+"Questa etichetta non è valida: è un duplicato o contiene caratteri vietati."
+
+#: src/Controller/Admin/TagController.php:193
+msgid "Tag not found."
+msgstr "Etichetta non trovata."
+
+#: src/Controller/Admin/TagController.php:200
+#: src/Controller/Admin/TaggingController.php:250
+msgid "An internal error occurred."
+msgstr "Si è verificato un errore interno."
+
+#: src/Controller/Admin/TaggingController.php:101
+msgid "Tagging successfully deleted."
+msgstr "Etichettatura eliminata con successo."
+
+#: src/Controller/Admin/TaggingController.php:133
+msgid "You must select at least one tagging to batch delete."
+msgstr ""
+"È necessario selezionare almeno un’etichettatura per eliminarla in batch."
+
+#: src/Controller/Admin/TaggingController.php:142
+msgid "Taggings successfully deleted."
+msgstr "L’etichettatura è stata eliminata con successo."
+
+#: src/Controller/Admin/TaggingController.php:152
+msgid "Delete of all taggings is not supported currently."
+msgstr ""
+"La cancellazione di tutte le etichettature non è attualmente supportata."
+
+#: src/Controller/Admin/TaggingController.php:222
+msgid "No taggings submitted."
+msgstr "Nessuna etichettatura proposta."
+
+#: src/Controller/Admin/TaggingController.php:243
+msgid "Tagging not found."
+msgstr "Etichettatura non trovata."
+
+#: src/View/Helper/TagSelect.php:28
+msgid "Select tag…"
+msgstr "Seleziona un’etichetta"
+
+#: src/Api/Representation/TaggingRepresentation.php:15
+#: config/module.config.php:266
+msgid "Proposed"
+msgstr "Proposta"
+
+#: src/Api/Representation/TaggingRepresentation.php:16
+#: config/module.config.php:267
+msgid "Allowed"
+msgstr "Consentita"
+
+#: src/Api/Representation/TaggingRepresentation.php:17
+#: config/module.config.php:268
+msgid "Approved"
+msgstr "Approvata"
+
+#: src/Api/Representation/TaggingRepresentation.php:18
+#: config/module.config.php:269
+msgid "Rejected"
+msgstr "Rifiutata"
+
+#: src/Api/Representation/TaggingRepresentation.php:84
+msgid "Undefined"
+msgstr "Non Definita"
+
+#: src/Api/Adapter/TaggingAdapter.php:124
+msgid "The name of the tag must be set."
+msgstr "Il nome dell'etichetta deve essere impostato."
+
+#: src/Api/Adapter/TaggingAdapter.php:129
+msgid "The tagged resource must be set."
+msgstr "Il contenuto etichettato deve essere impostato."
+
+#: src/Api/Adapter/TaggingAdapter.php:153
+#, php-format
+msgid "The user #%d has already added the tag \"%s\" on the resource #%d."
+msgstr "L'utente #%d ha già aggiunto il’etichetta \"%s\" sul contenuto #%d."
+
+#: src/Api/Adapter/TaggingAdapter.php:165
+#, php-format
+msgid "The status \"%s\" is unknown."
+msgstr "Lo stato \"%s\" è sconosciuto."
+
+#: src/Api/Adapter/TagAdapter.php:77
+#, php-format
+msgid "The tag \"%s\" is already taken."
+msgstr "L’etichetta \"%s\" è già presa."
+
+#: src/Api/Adapter/TagAdapter.php:100
+#, php-format
+msgid "The tag \"%s\" contains forbidden characters."
+msgstr "L’etichetta \"%s\" contiene caratteri vietati."
+
+#: src/Api/Adapter/TagAdapter.php:106
+msgid "A tag must have a name."
+msgstr "Un'etichetta deve avere un nome."
+
+#: src/Site/BlockLayout/TagCloud.php:19
+msgid "Tag cloud"
+msgstr "Cloud di etichette"
+
+#: src/Site/Navigation/Link/BrowseTags.php:12
+msgid "Browse tags"
+msgstr "Sfoglia le etichette"
+
+#: config/module.config.php:271
+msgid "Data were added to the resource."
+msgstr "I dati sono stati aggiunti al contenuto."
+
+#: config/module.config.php:272
+msgid "They will be displayed definitely when approved."
+msgstr "Saranno visualizzate definitivamente quando saranno approvate."
+
+#: config/module.config.php:273
+msgid "Reload page to see new tags."
+msgstr "Ricarica la pagina per vedere le nuove etichette."
+
+#: config/module.config.php:274
+msgid "Request too long to process."
+msgstr "Richiesta troppo lunga da elaborare."
+
+#: config/module.config.php:275
+msgid "The resource or the tag doesn’t exist."
+msgstr "Il contenuto o l’etichetta non esiste."
+
+#: config/module.config.php:306
+msgid "Tagging [Tag]"
+msgstr "Etichettatura [Tag]"
+
+#: config/module.config.php:312
+msgid "Tagging []"
+msgstr "Etichettatura []"
