@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Service\Form;
 
 use Folksonomy\Form\TaggingForm;

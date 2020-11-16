@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Folksonomy
  *
@@ -43,13 +43,13 @@ use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\ConfigForm;
 use Generic\AbstractModule;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Permissions\Assertion\OwnsEntityAssertion;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Renderer\PhpRenderer;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
+use Omeka\Permissions\Assertion\OwnsEntityAssertion;
 
 class Module extends AbstractModule
 {
@@ -63,14 +63,14 @@ class Module extends AbstractModule
         'taggings' => [],
     ];
 
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
         $this->addEntityManagerFilters();
         $this->addAclRules();
     }
 
-    protected function postInstall()
+    protected function postInstall(): void
     {
         $services = $this->getServiceLocator();
         $t = $services->get('MvcTranslator');
@@ -78,7 +78,7 @@ class Module extends AbstractModule
         $settings = $services->get('Omeka\Settings');
 
         $html = '<p>';
-        $html .= sprintf($t->translate('I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC BY-SA%s.'), // @translate
+        $html .= sprintf($t->translate("I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC\u{a0}BY-SA%s."), // @translate
             '<a rel="licence" href="#" target="_blank">', '</a>',
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
         );
@@ -89,7 +89,7 @@ class Module extends AbstractModule
     /**
      * Add tag and tagging visibility filters to the entity manager.
      */
-    protected function addEntityManagerFilters()
+    protected function addEntityManagerFilters(): void
     {
         $services = $this->getServiceLocator();
         $acl = $services->get('Omeka\Acl');
@@ -103,7 +103,7 @@ class Module extends AbstractModule
      *
      * @todo Simplify rules (see module Comment).
      */
-    protected function addAclRules()
+    protected function addAclRules(): void
     {
         $services = $this->getServiceLocator();
         $acl = $services->get('Omeka\Acl');
@@ -309,7 +309,7 @@ class Module extends AbstractModule
             );
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         // TODO Add a setting to limit resources (see module Comment).
 
@@ -523,7 +523,7 @@ class Module extends AbstractModule
         }
 
         $params = $params->toArray();
-        array_walk_recursive($params, function ($v, $k) use (&$params) {
+        array_walk_recursive($params, function ($v, $k) use (&$params): void {
             $params[$k] = $v;
         });
         unset($params['folksonomy_tag_page']);
@@ -538,14 +538,14 @@ class Module extends AbstractModule
         }
     }
 
-    public function handleApiContext(Event $event)
+    public function handleApiContext(Event $event): void
     {
         $context = $event->getParam('context');
         $context['o-module-folksonomy'] = 'http://omeka.org/s/vocabs/module/folksonomy#';
         $event->setParam('context', $context);
     }
 
-    public function handleSqlResourceVisibility(Event $event)
+    public function handleSqlResourceVisibility(Event $event): void
     {
         // Users can view taggings only if they have permission to view
         // the attached resource.
@@ -562,7 +562,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function cacheData(Event $event)
+    public function cacheData(Event $event): void
     {
         $resource = $event->getParam('response')->getContent();
         // Check if this is an api search or api read to get the list of ids.
@@ -597,7 +597,7 @@ class Module extends AbstractModule
      * @todo Use tag and tagging reference, not representation.
      * @param Event $event
      */
-    public function filterJsonLd(Event $event)
+    public function filterJsonLd(Event $event): void
     {
         $resourceId = $event->getTarget()->id();
         $jsonLd = $event->getParam('jsonLd');
@@ -618,7 +618,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function searchQuery(Event $event)
+    public function searchQuery(Event $event): void
     {
         // TODO Add option for tagging status in admin search view.
 
@@ -707,7 +707,7 @@ class Module extends AbstractModule
      * @todo Clarify and use acl only.
      * @param Event $event
      */
-    public function handleTagging(Event $event)
+    public function handleTagging(Event $event): void
     {
         $resourceAdapter = $event->getTarget();
         /** @var \Omeka\Api\Request $request */
@@ -802,7 +802,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function addHeadersAdmin(Event $event)
+    public function addHeadersAdmin(Event $event): void
     {
         $view = $event->getTarget();
         $assetUrl = $view->plugin('assetUrl');
@@ -817,7 +817,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function addTab(Event $event)
+    public function addTab(Event $event): void
     {
         $sectionNav = $event->getParam('section_nav');
         $sectionNav['tags'] = 'Tags'; // @translate
@@ -829,7 +829,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayListAndForm(Event $event)
+    public function displayListAndForm(Event $event): void
     {
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $allowed = $acl->userIsAllowed(Tagging::class, 'create');
@@ -848,7 +848,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayListAndFormPublic(Event $event)
+    public function displayListAndFormPublic(Event $event): void
     {
         $view = $event->getTarget();
         $resource = $view->resource;
@@ -861,7 +861,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function viewDetails(Event $event)
+    public function viewDetails(Event $event): void
     {
         $representation = $event->getParam('entity');
         $this->displayResourceFolksonomy($event, $representation, true);
@@ -872,7 +872,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayForm(Event $event)
+    public function displayForm(Event $event): void
     {
         $vars = $event->getTarget()->vars();
         // Manage add/edit form.
@@ -902,7 +902,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayTaggingQuickForm(Event $event)
+    public function displayTaggingQuickForm(Event $event): void
     {
         $view = $event->getTarget();
         $resource = $event->getTarget()->resource;
@@ -920,7 +920,7 @@ class Module extends AbstractModule
         Event $event,
         AbstractResourceEntityRepresentation $resource,
         $listAsDiv = false
-    ) {
+    ): void {
         $tags = $this->listResourceTagsByName($resource);
         $taggings = $this->listResourceTaggingsByName($resource);
         $partial = $listAsDiv
@@ -941,7 +941,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayAdvancedSearch(Event $event)
+    public function displayAdvancedSearch(Event $event): void
     {
         $query = $event->getParam('query', []);
         $query['has_tags'] = !empty($query['tag']);
@@ -958,7 +958,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function filterSearchFilters(Event $event)
+    public function filterSearchFilters(Event $event): void
     {
         $translate = $event->getTarget()->plugin('translate');
         $filters = $event->getParam('filters');

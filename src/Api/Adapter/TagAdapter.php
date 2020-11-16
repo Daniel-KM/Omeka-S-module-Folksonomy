@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
 use Folksonomy\Api\Representation\TagRepresentation;
 use Folksonomy\Entity\Tag;
 use Folksonomy\Entity\Tagging;
+use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Api\Response;
@@ -14,7 +15,6 @@ use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
 use Omeka\Stdlib\ErrorStore;
 use Omeka\Stdlib\Message;
-use Laminas\EventManager\Event;
 
 class TagAdapter extends AbstractEntityAdapter
 {
@@ -50,14 +50,14 @@ class TagAdapter extends AbstractEntityAdapter
 
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
-    ) {
+    ): void {
         if ($this->shouldHydrate($request, 'o:name')) {
             $name = trim($request->getValue('o:name'));
             $entity->setName($name);
         }
     }
 
-    public function validateRequest(Request $request, ErrorStore $errorStore)
+    public function validateRequest(Request $request, ErrorStore $errorStore): void
     {
         $data = $request->getContent();
         if (array_key_exists('o:name', $data)) {
@@ -65,7 +65,7 @@ class TagAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
         $name = $entity->getName();
         if ($this->validateTagName($name, $errorStore)) {
@@ -109,7 +109,7 @@ class TagAdapter extends AbstractEntityAdapter
         return $result;
     }
 
-    public function buildQuery(QueryBuilder $qb, array $query)
+    public function buildQuery(QueryBuilder $qb, array $query): void
     {
         $isOldOmeka = \Omeka\Module::VERSION < 2;
         $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
@@ -160,7 +160,7 @@ class TagAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function sortQuery(QueryBuilder $qb, array $query)
+    public function sortQuery(QueryBuilder $qb, array $query): void
     {
         if (is_string($query['sort_by'])) {
             $expr = $qb->expr();

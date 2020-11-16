@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Entity;
 
 use DateTime;
@@ -97,7 +97,7 @@ class Tagging extends AbstractEntity
         return $this->id;
     }
 
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         if (!in_array($status, [
             self::STATUS_PROPOSED,
@@ -115,7 +115,7 @@ class Tagging extends AbstractEntity
         return $this->status;
     }
 
-    public function setTag(Tag $tag = null)
+    public function setTag(Tag $tag = null): void
     {
         $this->tag = $tag;
     }
@@ -125,7 +125,7 @@ class Tagging extends AbstractEntity
         return $this->tag;
     }
 
-    public function setResource($resource = null)
+    public function setResource($resource = null): void
     {
         $this->resource = $resource;
     }
@@ -135,7 +135,7 @@ class Tagging extends AbstractEntity
         return $this->resource;
     }
 
-    public function setOwner(User $owner = null)
+    public function setOwner(User $owner = null): void
     {
         $this->owner = $owner;
     }
@@ -145,7 +145,7 @@ class Tagging extends AbstractEntity
         return $this->owner;
     }
 
-    public function setCreated(DateTime $dateTime)
+    public function setCreated(DateTime $dateTime): void
     {
         $this->created = $dateTime;
     }
@@ -155,7 +155,7 @@ class Tagging extends AbstractEntity
         return $this->created;
     }
 
-    public function setModified(DateTime $dateTime = null)
+    public function setModified(DateTime $dateTime = null): void
     {
         $this->modified = $dateTime;
     }
@@ -168,7 +168,7 @@ class Tagging extends AbstractEntity
     /**
      * @PrePersist
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $eventArgs): void
     {
         $this->created = new DateTime('now');
     }
@@ -176,7 +176,7 @@ class Tagging extends AbstractEntity
     /**
      * @PreUpdate
      */
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    public function preUpdate(PreUpdateEventArgs $eventArgs): void
     {
         $this->modified = new DateTime('now');
     }

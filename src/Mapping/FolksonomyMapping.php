@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace  Folksonomy\Mapping;
 
 use CSVImport\Mapping\AbstractMapping;
@@ -29,7 +29,7 @@ class FolksonomyMapping extends AbstractMapping
             if (array_key_exists($index, $multivalueMap) && strlen($multivalueMap[$index])) {
                 $values = explode($multivalueMap[$index], $values);
                 $values = array_map(function ($v) {
-                    return trim($v, "\t\n\r   ");
+                    return trim($v, "\t\n\r \u{a0}\u{202f}");
                 }, $values);
             } else {
                 $values = [$values];
@@ -43,7 +43,7 @@ class FolksonomyMapping extends AbstractMapping
         return $this->data;
     }
 
-    protected function processGlobalArgs()
+    protected function processGlobalArgs(): void
     {
         $data = &$this->data;
 
@@ -63,7 +63,7 @@ class FolksonomyMapping extends AbstractMapping
         }
     }
 
-    protected function processCell($index, array $values)
+    protected function processCell($index, array $values): void
     {
         $data = &$this->data;
 

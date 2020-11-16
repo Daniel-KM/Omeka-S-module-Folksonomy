@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Form;
 
-use Omeka\Form\Element\Ckeditor as Ckeditorinline;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
+use Omeka\Form\Element\Ckeditor as Ckeditorinline;
 
 class ConfigForm extends Form
 {
-    public function init()
+    public function init(): void
     {
         // TODO Use the elements of the block layout.
         $this->add([

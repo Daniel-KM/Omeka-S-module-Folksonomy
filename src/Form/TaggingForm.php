@@ -1,7 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Form;
 
-use Omeka\View\Helper\Setting;
 use Laminas\Form\Element\Button;
 use Laminas\Form\Element\Csrf;
 use Laminas\Form\Form;
@@ -9,6 +8,7 @@ use Laminas\Http\PhpEnvironment\RemoteAddress;
 use Laminas\ServiceManager\ServiceLocatorInterface as FormElementManager;
 use Laminas\Validator\StringLength;
 use Laminas\View\Helper\Url;
+use Omeka\View\Helper\Setting;
 
 class TaggingForm extends Form
 {
@@ -33,7 +33,7 @@ class TaggingForm extends Form
         'is_identified' => false,
     ];
 
-    public function init()
+    public function init(): void
     {
         $settingHelper = $this->getSettingHelper();
         $urlHelper = $this->getUrlHelper();
@@ -173,7 +173,7 @@ class TaggingForm extends Form
     /**
      * @param Setting $setting
      */
-    public function setSettingHelper(Setting $settingHelper)
+    public function setSettingHelper(Setting $settingHelper): void
     {
         $this->settingHelper = $settingHelper;
     }
@@ -189,7 +189,7 @@ class TaggingForm extends Form
     /**
      * @param Url $urlHelper
      */
-    public function setUrlHelper(Url $urlHelper)
+    public function setUrlHelper(Url $urlHelper): void
     {
         $this->urlHelper = $urlHelper;
     }
@@ -205,7 +205,7 @@ class TaggingForm extends Form
     /**
      * @param FormElementManager $formElementManager
      */
-    public function setFormElementManager(FormElementManager $formElementManager)
+    public function setFormElementManager(FormElementManager $formElementManager): void
     {
         $this->formElementManager = $formElementManager;
     }

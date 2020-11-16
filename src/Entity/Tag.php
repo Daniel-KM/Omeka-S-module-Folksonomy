@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -122,7 +122,7 @@ class Tag extends AbstractEntity
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

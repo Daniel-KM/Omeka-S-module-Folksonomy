@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Site\Navigation\Link;
 
 use Omeka\Api\Representation\SiteRepresentation;

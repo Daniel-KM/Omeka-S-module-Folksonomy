@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\View\Helper;
 
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\TaggingForm;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 class ShowTaggingForm extends AbstractHelper
 {

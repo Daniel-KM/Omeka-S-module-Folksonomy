@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Controller\Admin;
 
 use Folksonomy\Entity\Tagging;
-use Omeka\Form\ConfirmForm;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use Omeka\Form\ConfirmForm;
 
 class TaggingController extends AbstractActionController
 {
@@ -147,7 +147,7 @@ class TaggingController extends AbstractActionController
         return $this->redirect()->toRoute(null, ['action' => 'browse'], true);
     }
 
-    public function batchDeleteAllAction()
+    public function batchDeleteAllAction(): void
     {
         $this->messenger()->addError('Delete of all taggings is not supported currently.'); // @translate
     }

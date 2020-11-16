@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Db\Filter;
 
 use Doctrine\DBAL\Types\Type;
@@ -72,7 +72,7 @@ class TaggingVisibilityFilter extends SQLFilter
         return implode(' ', $constraints);
     }
 
-    public function setAcl(Acl $acl)
+    public function setAcl(Acl $acl): void
     {
         $this->acl = $acl;
     }

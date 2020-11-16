@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\View\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Folksonomy\Entity\Tag;
+use Laminas\View\Helper\AbstractHelper;
 use Omeka\Entity\Item;
 use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
 use Omeka\Entity\Resource;
-use Laminas\View\Helper\AbstractHelper;
 
 class TagCount extends AbstractHelper
 {
@@ -69,7 +69,7 @@ class TagCount extends AbstractHelper
             Item::class => Item::class,
             Media::class => Media::class,
         ];
-        $resourceType = isset($types[$resourceName]) ? $types[$resourceName] : '';
+        $resourceType = $types[$resourceName] ?? '';
 
         $eqTagTagging = $expr->eq('tag.id', 'tagging.tag_id');
         $eqResourceTagging = $expr->eq('resource.id', 'tagging.resource_id');

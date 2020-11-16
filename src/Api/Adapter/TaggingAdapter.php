@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
@@ -59,7 +59,7 @@ class TaggingAdapter extends AbstractEntityAdapter
 
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
-    ) {
+    ): void {
         $data = $request->getContent();
 
         // The owner, tag and resource can be null.
@@ -109,7 +109,7 @@ class TaggingAdapter extends AbstractEntityAdapter
         $this->updateTimestamps($request, $entity);
     }
 
-    public function validateRequest(Request $request, ErrorStore $errorStore)
+    public function validateRequest(Request $request, ErrorStore $errorStore): void
     {
         $data = $request->getContent();
         if (isset($data['o:status'])) {
@@ -131,7 +131,7 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
         $this->validateStatus($entity->getStatus(), $errorStore);
 
@@ -157,7 +157,7 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    protected function validateStatus($status, ErrorStore $errorStore)
+    protected function validateStatus($status, ErrorStore $errorStore): void
     {
         if (!in_array($status, $this->statuses)) {
             $errorStore->addError(
@@ -166,7 +166,7 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function buildQuery(QueryBuilder $qb, array $query)
+    public function buildQuery(QueryBuilder $qb, array $query): void
     {
         // TODO Check status according to admin/public.
         // TODO Check resource and owner visibility for public view.
@@ -194,7 +194,7 @@ class TaggingAdapter extends AbstractEntityAdapter
                     $tagAlias,
                     'WITH',
                     $expr->andX(
-                        $expr->eq($tagAlias . '.id', $alias. '.tag'),
+                        $expr->eq($tagAlias . '.id', $alias . '.tag'),
                         $expr->in(
                             $tagAlias . '.name',
                             $this->createNamedParameter($qb, $tags)
@@ -264,7 +264,7 @@ class TaggingAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function sortQuery(QueryBuilder $qb, array $query)
+    public function sortQuery(QueryBuilder $qb, array $query): void
     {
         if (is_string($query['sort_by'])) {
             switch ($query['sort_by']) {

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Controller\Site;
 
 use Folksonomy\Entity\Tagging;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 class TaggingController extends AbstractActionController
 {
@@ -76,7 +76,7 @@ class TaggingController extends AbstractActionController
      * @param AbstractResourceEntityRepresentation $resource
      * @param array $tags
      */
-    protected function notifyEmail(AbstractResourceEntityRepresentation $resource, $tags)
+    protected function notifyEmail(AbstractResourceEntityRepresentation $resource, $tags): void
     {
         $site = @$_SERVER['SERVER_NAME'] ?: sprintf('Server (%s)', @$_SERVER['SERVER_ADDR']); // @translate
         $subject = sprintf('[%s] New public tags', $site); // @translate

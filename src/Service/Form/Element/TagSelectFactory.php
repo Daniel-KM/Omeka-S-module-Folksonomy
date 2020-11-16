@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Service\Form\Element;
 
 use Folksonomy\Form\Element\TagSelect;

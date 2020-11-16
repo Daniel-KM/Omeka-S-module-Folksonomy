@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Service\ControllerPlugin;
 
 use Folksonomy\Mvc\Controller\Plugin\AddTags;

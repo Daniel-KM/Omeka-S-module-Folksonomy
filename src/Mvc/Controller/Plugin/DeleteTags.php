@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
 use Folksonomy\Entity\Tagging;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;
 use Omeka\Permissions\Acl;
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class DeleteTags extends AbstractPlugin
 {

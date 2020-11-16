@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Folksonomy\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\Query\FilterCollection;
 use Folksonomy\Entity\Tagging;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Adapter\Manager as ApiAdapterManager;
 use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;
 use Omeka\Permissions\Acl;
 use Omeka\Settings\Settings;
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class AddTags extends AbstractPlugin
 {
