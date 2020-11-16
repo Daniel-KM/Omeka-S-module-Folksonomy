@@ -3,7 +3,7 @@ namespace Folksonomy\Service\Form\Element;
 
 use Folksonomy\Form\Element\TagSelect;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TagSelectFactory implements FactoryInterface
 {

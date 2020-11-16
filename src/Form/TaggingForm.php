@@ -2,13 +2,13 @@
 namespace Folksonomy\Form;
 
 use Omeka\View\Helper\Setting;
-use Zend\Form\Element\Button;
-use Zend\Form\Element\Csrf;
-use Zend\Form\Form;
-use Zend\Http\PhpEnvironment\RemoteAddress;
-use Zend\ServiceManager\ServiceLocatorInterface as FormElementManager;
-use Zend\Validator\StringLength;
-use Zend\View\Helper\Url;
+use Laminas\Form\Element\Button;
+use Laminas\Form\Element\Csrf;
+use Laminas\Form\Form;
+use Laminas\Http\PhpEnvironment\RemoteAddress;
+use Laminas\ServiceManager\ServiceLocatorInterface as FormElementManager;
+use Laminas\Validator\StringLength;
+use Laminas\View\Helper\Url;
 
 class TaggingForm extends Form
 {

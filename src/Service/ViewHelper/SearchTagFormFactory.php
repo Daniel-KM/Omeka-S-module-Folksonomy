@@ -4,7 +4,7 @@ namespace Folksonomy\Service\ViewHelper;
 use Folksonomy\Form\SearchForm;
 use Folksonomy\View\Helper\SearchTagForm;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SearchTagFormFactory implements FactoryInterface
 {

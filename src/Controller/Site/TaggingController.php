@@ -3,9 +3,9 @@ namespace Folksonomy\Controller\Site;
 
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Zend\Http\Response;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
+use Laminas\Http\Response;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
 
 class TaggingController extends AbstractActionController
 {
@@ -100,7 +100,7 @@ class TaggingController extends AbstractActionController
             ->setBody($body);
         try {
             $mailer->send($message);
-        } catch (\Zend\Mail\Transport\Exception\RuntimeException $e) {
+        } catch (\Laminas\Mail\Transport\Exception\RuntimeException $e) {
             $this->logger()->err('Unable to send an email after tagging.'); // @translate
         }
     }

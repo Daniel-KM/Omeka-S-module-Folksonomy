@@ -6,7 +6,7 @@ use Folksonomy\Entity\Tagging;
 use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;
 use Omeka\Permissions\Acl;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class DeleteTags extends AbstractPlugin
 {

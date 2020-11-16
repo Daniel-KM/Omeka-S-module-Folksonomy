@@ -14,7 +14,7 @@ use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
 use Omeka\Stdlib\ErrorStore;
 use Omeka\Stdlib\Message;
-use Zend\EventManager\Event;
+use Laminas\EventManager\Event;
 
 class TagAdapter extends AbstractEntityAdapter
 {

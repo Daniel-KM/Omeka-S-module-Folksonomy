@@ -2,7 +2,7 @@
 namespace Folksonomy\View\Helper;
 
 use Folksonomy\Form\SearchForm;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 class SearchTagForm extends AbstractHelper
 {

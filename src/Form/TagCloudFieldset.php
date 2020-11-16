@@ -1,8 +1,8 @@
 <?php
 namespace Folksonomy\Form;
 
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 
 class TagCloudFieldset extends Fieldset
 {

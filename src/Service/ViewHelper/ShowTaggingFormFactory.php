@@ -3,7 +3,7 @@ namespace Folksonomy\Service\ViewHelper;
 
 use Folksonomy\View\Helper\ShowTaggingForm;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ShowTaggingFormFactory implements FactoryInterface
 {

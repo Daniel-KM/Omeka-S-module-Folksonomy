@@ -3,7 +3,7 @@ namespace Folksonomy\Service\ControllerPlugin;
 
 use Folksonomy\Mvc\Controller\Plugin\DeleteTags;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DeleteTagsFactory implements FactoryInterface
 {

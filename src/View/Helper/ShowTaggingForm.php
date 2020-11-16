@@ -4,7 +4,7 @@ namespace Folksonomy\View\Helper;
 use Folksonomy\Entity\Tagging;
 use Folksonomy\Form\TaggingForm;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 class ShowTaggingForm extends AbstractHelper
 {

@@ -3,7 +3,7 @@ namespace Folksonomy\Service\ViewHelper;
 
 use Folksonomy\View\Helper\TagCount;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TagCountFactory implements FactoryInterface
 {

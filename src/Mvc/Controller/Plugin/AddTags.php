@@ -8,7 +8,7 @@ use Omeka\Api\Manager as Api;
 use Omeka\Entity\Resource;
 use Omeka\Permissions\Acl;
 use Omeka\Settings\Settings;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class AddTags extends AbstractPlugin
 {

@@ -2,9 +2,9 @@
 namespace Folksonomy\View\Helper;
 
 use Folksonomy\Form\Element\TagSelect as Select;
-use Zend\Form\Factory;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Form\Factory;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * A select menu containing all tags.

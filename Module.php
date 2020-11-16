@@ -45,11 +45,11 @@ use Folksonomy\Form\ConfigForm;
 use Generic\AbstractModule;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Mvc\Controller\AbstractController;
-use Zend\Mvc\MvcEvent;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Mvc\Controller\AbstractController;
+use Laminas\Mvc\MvcEvent;
+use Laminas\View\Renderer\PhpRenderer;
 
 class Module extends AbstractModule
 {

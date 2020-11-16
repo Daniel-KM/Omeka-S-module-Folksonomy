@@ -2,7 +2,7 @@
 namespace  Folksonomy\Mapping;
 
 use CSVImport\Mapping\AbstractMapping;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class FolksonomyMapping extends AbstractMapping
 {

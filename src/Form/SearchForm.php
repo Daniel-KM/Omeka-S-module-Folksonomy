@@ -2,8 +2,8 @@
 namespace Folksonomy\Form;
 
 use Folksonomy\Form\Element\TagSelect;
-use Zend\Form\Element\Checkbox;
-use Zend\Form\Form;
+use Laminas\Form\Element\Checkbox;
+use Laminas\Form\Form;
 
 class SearchForm extends Form
 {

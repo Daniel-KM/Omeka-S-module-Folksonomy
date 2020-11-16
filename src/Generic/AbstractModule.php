@@ -31,10 +31,10 @@ namespace Generic;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Settings\SettingsInterface;
 use Omeka\Stdlib\Message;
-use Zend\EventManager\Event;
-use Zend\Mvc\Controller\AbstractController;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\EventManager\Event;
+use Laminas\Mvc\Controller\AbstractController;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Renderer\PhpRenderer;
 
 /**
  * This class allows to manage all methods that should run only once and that
@@ -380,7 +380,7 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
                 $id = $site()->id();
                 break;
             case 'user_settings':
-                /** @var \Zend\Router\RouteMatch $routeMatch */
+                /** @var \Laminas\Router\RouteMatch $routeMatch */
                 $routeMatch = $event->getRouteMatch();
                 if ($routeMatch->getMatchedRouteName() !== 'admin/site/slug/action'
                     || $routeMatch->getParam('controller') !== 'user'
