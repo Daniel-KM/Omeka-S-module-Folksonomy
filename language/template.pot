@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 00:00+0100\n"
+"POT-Creation-Date: 2020-11-16 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, php-format
 msgid ""
 "I agree with %sterms of use%s and I accept to free my contribution under the "
-"licence %sCC BY-SA%s."
+"licence %sCC&nbsp;BY-SA%s."
 msgstr ""
 
 #: Module.php:502
@@ -35,36 +35,40 @@ msgid ""
 "by Omeka yet."
 msgstr ""
 
-#: Module.php:967
+#: Module.php:965
 msgid "Has tags"
 msgstr ""
 
-#: Module.php:968
+#: Module.php:966
 msgid "true"
 msgstr ""
 
-#: Module.php:972 view/common/admin/folksonomy-mapping-sidebar.phtml:11
+#: Module.php:970 view/common/admin/folksonomy-mapping-sidebar.phtml:11
 #: view/common/admin/tagging-form.phtml:25
 #: view/folksonomy/admin/tag/browse.phtml:11
 #: view/folksonomy/admin/tag/browse.phtml:77
 #: view/folksonomy/admin/tag/show-details.phtml:9
-#: view/folksonomy/admin/tagging/browse.phtml:15
-#: view/folksonomy/admin/tagging/browse.phtml:90
-#: view/folksonomy/admin/tagging/show-details.phtml:14
+#: view/folksonomy/admin/tagging/browse.phtml:23
+#: view/folksonomy/admin/tagging/browse.phtml:99
+#: view/folksonomy/admin/tagging/show-details.phtml:16
 msgid "Tag"
 msgstr ""
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:66
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:538
+#: src/Generic/AbstractModule.php:73
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:606
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that connot be installed."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:710
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -72,12 +76,12 @@ msgid ""
 msgstr ""
 
 #: view/common/admin/folksonomy-mapping-sidebar.phtml:6
-#: view/folksonomy/site/tag/browse.phtml:11
+#: view/folksonomy/site/tag/browse.phtml:13
 msgid "Folksonomy"
 msgstr ""
 
 #: view/common/admin/folksonomy-mapping-sidebar.phtml:9
-#: view/folksonomy/admin/tagging/browse.phtml:37
+#: view/folksonomy/admin/tagging/browse.phtml:46
 msgid "Taggings"
 msgstr ""
 
@@ -96,14 +100,14 @@ msgstr ""
 #: view/common/admin/tag-resource.phtml:19
 #: view/common/admin/tagging-form.phtml:47
 #: view/common/admin/tagging-form.phtml:48
-#: view/folksonomy/admin/tagging/browse.phtml:133
-#: view/folksonomy/admin/tagging/browse.phtml:134
+#: view/folksonomy/admin/tagging/browse.phtml:142
+#: view/folksonomy/admin/tagging/browse.phtml:143
 msgid "Toggle status"
 msgstr ""
 
 #: view/common/admin/tag-resource.phtml:9
 #: view/common/admin/tagging-form.phtml:21
-#: view/common/site/tag-resource.phtml:19
+#: view/common/site/tag-resource.phtml:18
 #: view/folksonomy/admin/tag/browse.phtml:39
 msgid "Tags"
 msgstr ""
@@ -184,7 +188,7 @@ msgid "Recent"
 msgstr ""
 
 #: view/folksonomy/admin/tag/browse.phtml:66
-#: view/folksonomy/site/tag/browse.phtml:14
+#: view/folksonomy/site/tag/browse.phtml:16
 msgid "There are no tags."
 msgstr ""
 
@@ -209,56 +213,56 @@ msgstr ""
 msgid "Medias"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:5
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:11
 msgid "Delete taggings"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:6
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:12
 msgid "Are you sure you would like to delete the selected taggings?"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:7
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:13
 #, php-format
 msgid "Note: This won’t delete tags: check the %stags page%s to manage them."
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:23
-#: view/folksonomy/admin/tagging/browse.phtml:94
-#: view/folksonomy/admin/tagging/show-details.phtml:43
+#: view/folksonomy/admin/tagging/browse.phtml:31
+#: view/folksonomy/admin/tagging/browse.phtml:103
+#: view/folksonomy/admin/tagging/show-details.phtml:45
 msgid "Tagger"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:27
-#: view/folksonomy/admin/tagging/browse.phtml:95
+#: view/folksonomy/admin/tagging/browse.phtml:35
+#: view/folksonomy/admin/tagging/browse.phtml:104
 msgid "Date tagged"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:56
-#: view/folksonomy/admin/tagging/browse.phtml:57
+#: view/folksonomy/admin/tagging/browse.phtml:65
+#: view/folksonomy/admin/tagging/browse.phtml:66
 msgid "Approve"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:62
-#: view/folksonomy/admin/tagging/browse.phtml:63
+#: view/folksonomy/admin/tagging/browse.phtml:71
+#: view/folksonomy/admin/tagging/browse.phtml:72
 msgid "Reject"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:78
+#: view/folksonomy/admin/tagging/browse.phtml:87
 msgid "There are no taggings."
 msgstr ""
 
-#: view/folksonomy/admin/tagging/browse.phtml:122
-#: view/folksonomy/admin/tagging/browse.phtml:159
-#: view/folksonomy/admin/tagging/show-details.phtml:37
+#: view/folksonomy/admin/tagging/browse.phtml:131
+#: view/folksonomy/admin/tagging/browse.phtml:168
+#: view/folksonomy/admin/tagging/show-details.phtml:39
 msgid "Removed"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/show-details.phtml:12
+#: view/folksonomy/admin/tagging/show-details.phtml:14
 #, php-format
 msgid "Tagging #%d"
 msgstr ""
 
-#: view/folksonomy/admin/tagging/show-details.phtml:20
+#: view/folksonomy/admin/tagging/show-details.phtml:22
 msgid "[Removed]"
 msgstr ""
 
