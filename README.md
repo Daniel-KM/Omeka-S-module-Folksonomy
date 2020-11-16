@@ -67,7 +67,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -103,22 +103,22 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2013-2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2013-2019 (see [Daniel-KM] on GitLab)
 
 First version of this module has been built as a plugin for Omeka Classic for
 the digital library of [Mines ParisTech].
 
 
-[Folksonomy]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy
+[Folksonomy]: https://gitlab.com/Daniel-KM/Omeka-S-module-Folksonomy
 [Omeka S]: https://omeka.org/s
-[Tagging plugin]: https://github.com/Daniel-KM/Omeka-plugin-Tagging
+[Tagging plugin]: https://gitlab.com/Daniel-KM/Omeka-plugin-Tagging
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [Omeka Classic]: https://omeka.org
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-Folksonomy/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Folksonomy/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [Mines ParisTech]: https://patrimoine.mines-paristech.fr
 [GitLab]: https://gitlab.com/Daniel-KM
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
