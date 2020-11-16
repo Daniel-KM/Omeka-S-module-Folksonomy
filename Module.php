@@ -623,8 +623,6 @@ class Module extends AbstractModule
         // TODO Add option for tagging status in admin search view.
 
         $adapter = $event->getTarget();
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $resourceAlias = $isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
 
         $qb = $event->getParam('queryBuilder');
         $expr = $qb->expr();
@@ -641,7 +639,7 @@ class Module extends AbstractModule
                     $taggingAlias,
                     'WITH',
                     $expr->andX(
-                        $expr->eq($taggingAlias . '.' . $resourceName, $resourceAlias . '.id'),
+                        $expr->eq($taggingAlias . '.' . $resourceName, 'omeka_root.id'),
                         $expr->isNotNull($taggingAlias . '.tag')
                     )
                 );
@@ -689,7 +687,7 @@ class Module extends AbstractModule
                         $taggingAlias,
                         'WITH',
                         $expr->andX(
-                            $expr->eq($taggingAlias . '.resource', $resourceAlias . '.id'),
+                            $expr->eq($taggingAlias . '.resource', 'omeka_root.id'),
                             $expr->eq($taggingAlias . '.tag', $tagAlias . '.id')
                         )
                     )
@@ -728,7 +726,7 @@ class Module extends AbstractModule
 
         $resourceId = $request->getId();
         $resource = $event->getParam('entity');
-        $errorStore = $event->getParam('errorStore');
+        // $errorStore = $event->getParam('errorStore');
 
         $submittedTags = $request->getValue('o-module-folksonomy:tag') ?: [];
         // Normalized new tags if any.
