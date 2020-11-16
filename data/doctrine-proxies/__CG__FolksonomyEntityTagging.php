@@ -12,14 +12,14 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
      *      three parameters, being respectively the proxy object to be initialized, the method that triggered the
      *      initialization process and an array of ordered parameters that were passed to that method.
      *
-     * @see \Doctrine\Common\Persistence\Proxy::__setInitializer
+     * @see \Doctrine\Common\Proxy\Proxy::__setInitializer
      */
     public $__initializer__;
 
     /**
      * @var \Closure the callback responsible of loading properties that need to be copied in the cloned object
      *
-     * @see \Doctrine\Common\Persistence\Proxy::__setCloner
+     * @see \Doctrine\Common\Proxy\Proxy::__setCloner
      */
     public $__cloner__;
 
@@ -31,20 +31,22 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     public $__isInitialized__ = false;
 
     /**
-     * @var array properties to be lazy loaded, with keys being the property
-     *            names and values being their default values
-     *
-     * @see \Doctrine\Common\Persistence\Proxy::__getLazyProperties
+     * @var array<string, null> properties to be lazy loaded, indexed by property name
      */
-    public static $lazyPropertiesDefaults = [];
-
-
+    public static $lazyPropertiesNames = array (
+);
 
     /**
-     * @param \Closure $initializer
-     * @param \Closure $cloner
+     * @var array<string, mixed> default values of properties to be lazy loaded, with keys being the property names
+     *
+     * @see \Doctrine\Common\Proxy\Proxy::__getLazyProperties
      */
-    public function __construct($initializer = null, $cloner = null)
+    public static $lazyPropertiesDefaults = array (
+);
+
+
+
+    public function __construct(?\Closure $initializer = null, ?\Closure $cloner = null)
     {
 
         $this->__initializer__ = $initializer;
@@ -82,7 +84,7 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
 
                 $existingProperties = get_object_vars($proxy);
 
-                foreach ($proxy->__getLazyProperties() as $property => $defaultValue) {
+                foreach ($proxy::$lazyPropertiesDefaults as $property => $defaultValue) {
                     if ( ! array_key_exists($property, $existingProperties)) {
                         $proxy->$property = $defaultValue;
                     }
@@ -165,6 +167,7 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
+     * @deprecated no longer in use - generated code now relies on internal components rather than generated public API
      * @static
      */
     public function __getLazyProperties()
@@ -191,12 +194,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
 
-        return parent::setStatus($status);
+        parent::setStatus($status);
     }
 
     /**
@@ -213,12 +216,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setTag(\Folksonomy\Entity\Tag $tag = NULL)
+    public function setTag(\Folksonomy\Entity\Tag $tag = NULL): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTag', [$tag]);
 
-        return parent::setTag($tag);
+        parent::setTag($tag);
     }
 
     /**
@@ -235,12 +238,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setResource($resource = NULL)
+    public function setResource($resource = NULL): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setResource', [$resource]);
 
-        return parent::setResource($resource);
+        parent::setResource($resource);
     }
 
     /**
@@ -257,12 +260,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setOwner(\Omeka\Entity\User $owner = NULL)
+    public function setOwner(\Omeka\Entity\User $owner = NULL): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOwner', [$owner]);
 
-        return parent::setOwner($owner);
+        parent::setOwner($owner);
     }
 
     /**
@@ -279,12 +282,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setCreated(\DateTime $dateTime)
+    public function setCreated(\DateTime $dateTime): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCreated', [$dateTime]);
 
-        return parent::setCreated($dateTime);
+        parent::setCreated($dateTime);
     }
 
     /**
@@ -301,12 +304,12 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setModified(\DateTime $dateTime)
+    public function setModified(\DateTime $dateTime = NULL): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setModified', [$dateTime]);
 
-        return parent::setModified($dateTime);
+        parent::setModified($dateTime);
     }
 
     /**
@@ -323,23 +326,23 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
+    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'prePersist', [$eventArgs]);
 
-        return parent::prePersist($eventArgs);
+        parent::prePersist($eventArgs);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs)
+    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'preUpdate', [$eventArgs]);
 
-        return parent::preUpdate($eventArgs);
+        parent::preUpdate($eventArgs);
     }
 
     /**
