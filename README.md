@@ -103,7 +103,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2013-2019 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2013-2020 (see [Daniel-KM] on GitLab)
 
 First version of this module has been built as a plugin for Omeka Classic for
 the digital library of [Mines ParisTech].
