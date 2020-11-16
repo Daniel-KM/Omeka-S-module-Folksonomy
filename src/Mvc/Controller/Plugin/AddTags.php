@@ -192,7 +192,7 @@ class AddTags extends AbstractPlugin
     protected function sanitizeString($string)
     {
         // Quote is allowed.
-        $string = strip_tags($string);
+        $string = strip_tags((string) $string);
         $string = preg_replace('~^[\p{Z}/\\?<>:*%|"`&;]+|[\p{Z}/\\?<>:*%|"`&;]+$~u', '', $string);
         $string = preg_replace('/[\(\{]/', '[', $string);
         $string = preg_replace('/[\)\}]/', ']', $string);

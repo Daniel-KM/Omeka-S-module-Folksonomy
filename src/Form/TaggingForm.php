@@ -39,7 +39,7 @@ class TaggingForm extends Form
         $urlHelper = $this->getUrlHelper();
         $resourceId = $this->getOption('resource_id');
         $siteSlug = $this->getOption('site-slug');
-        $isPublic = (bool) strlen($siteSlug);
+        $isPublic = (bool) strlen((string) $siteSlug);
         $action = $isPublic
             ? $urlHelper('site/tagging', ['action' => 'add', 'site-slug' => $siteSlug])
             : $urlHelper('admin/tagging', ['action' => 'add']);
@@ -100,7 +100,7 @@ class TaggingForm extends Form
 
         if ($isPublic) {
             // The legal agreement is checked by default for logged users.
-            $legalText = $settingHelper('folksonomy_legal_text');
+            $legalText = $settingHelper('folksonomy_legal_text', '');
             if ($legalText) {
                 // TODO Allow html legal agreement in the tagging form help from here.
                 $legalText = str_replace('&nbsp;', ' ', strip_tags($legalText));

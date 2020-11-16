@@ -5,7 +5,7 @@
  * Add tags and tagging form to any resource to create uncontrolled vocabularies
  * and tag clouds.
  *
- * @copyright Daniel Berthereau, 2013-2019
+ * @copyright Daniel Berthereau, 2013-2020
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -78,7 +78,7 @@ class Module extends AbstractModule
         $settings = $services->get('Omeka\Settings');
 
         $html = '<p>';
-        $html .= sprintf($t->translate("I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC\u{a0}BY-SA%s."), // @translate
+        $html .= sprintf($t->translate("I agree with %sterms of use%s and I accept to free my contribution under the licence %sCC&nbsp;BY-SA%s."), // @translate
             '<a rel="licence" href="#" target="_blank">', '</a>',
             '<a rel="licence" href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">', '</a>'
         );
@@ -1080,7 +1080,7 @@ class Module extends AbstractModule
     protected function sanitizeString($string)
     {
         // Quote is allowed.
-        $string = strip_tags($string);
+        $string = strip_tags((string) $string);
         $string = preg_replace('~^[\p{Z}/\\?<>:*%|"`&;]+|[\p{Z}/\\?<>:*%|"`&;]+$~u', '', $string);
         $string = preg_replace('/[\(\{]/', '[', $string);
         $string = preg_replace('/[\)\}]/', ']', $string);
