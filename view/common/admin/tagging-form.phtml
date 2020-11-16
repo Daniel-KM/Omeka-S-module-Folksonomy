@@ -2,7 +2,7 @@
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
-$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'), 'text/javascript', ['defer' => 'defer']);
 $removeStr = $escape($translate('Remove tag'));
 $tagTemplate = '
 <tr>

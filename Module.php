@@ -807,7 +807,7 @@ class Module extends AbstractModule
         $view->headLink()
             ->appendStylesheet($assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
         $view->headScript()
-            ->appendFile($assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+            ->appendFile($assetUrl('js/folksonomy-admin.js', 'Folksonomy'), 'text/javascript', ['defer' => 'defer']);
     }
 
     /**

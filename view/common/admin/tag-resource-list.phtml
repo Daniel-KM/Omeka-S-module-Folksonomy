@@ -1,7 +1,7 @@
 <?php
 $translate = $this->plugin('translate');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
-$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'));
+$this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'), 'text/javascript', ['defer' => 'defer']);
 ?>
 <div class="folksonomy">
 <?php if (empty($tags)): ?>

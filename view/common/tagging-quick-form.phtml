@@ -11,7 +11,7 @@ $formElement = $plugins->get('formElement');
 $assetUrl = $plugins->get('assetUrl');
 
 $this->headLink()->appendStylesheet($assetUrl('css/folksonomy.css', 'Folksonomy'));
-$this->headScript()->appendFile($assetUrl('js/folksonomy.js', 'Folksonomy'));
+$this->headScript()->appendFile($assetUrl('js/folksonomy.js', 'Folksonomy'), 'text/javascript', ['defer' => 'defer']);
 $taggingForm->prepare();
 ?>
 
