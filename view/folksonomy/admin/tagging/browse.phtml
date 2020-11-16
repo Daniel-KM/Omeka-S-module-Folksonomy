@@ -1,11 +1,19 @@
 <?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Folksonomy\Api\Representation\TaggingRepresentation|] $taggings
+ * @var \Folksonomy\Api\Representation\TaggingRepresentation[] $resources
+ */
+
 use Folksonomy\Api\Adapter\TaggingAdapter;
 
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
+
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy-admin.css', 'Folksonomy'));
 $this->headScript()->appendFile($this->assetUrl('js/folksonomy-admin.js', 'Folksonomy'), 'text/javascript', ['defer' => 'defer']);
 $this->htmlElement('body')->appendAttribute('class', 'folksonomy taggings browse');
+
 $sortHeadings = [
     // [
     //     'label' => $translate('Resource'),
@@ -13,35 +21,36 @@ $sortHeadings = [
     // ],
     [
         'label' => $translate('Tag'),
-        'value' => 'tag_name'
+        'value' => 'tag_name',
     ],
     [
         'label' => $translate('Status'),
-        'value' => 'status'
+        'value' => 'status',
     ],
     [
         'label' => $translate('Tagger'),
-        'value' => 'owner_name'
+        'value' => 'owner_name',
     ],
     [
         'label' => $translate('Date tagged'),
-        'value' => 'created'
+        'value' => 'created',
     ],
 ];
+
 $batchEditRight = $this->userIsAllowed(TaggingAdapter::class, 'batch-update')
     || $this->userIsAllowed(TaggingAdapter::class, 'batch-delete');
 $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
     || $this->userIsAllowed(TaggingAdapter::class, 'delete');
 ?>
 
-<?php echo $this->pageTitle($translate('Taggings')); ?>
+<?= $this->pageTitle($translate('Taggings')) ?>
 
-<?php echo $this->searchFilters(); ?>
+<?= $this->searchFilters() ?>
 
  <div class="browse-controls">
-    <?php echo $this->pagination(); ?>
-    <?php // echo $this->hyperlink($translate('Advanced search'), $this->url(null, ['action' => 'search'], ['query' => $this->params()->fromQuery()], true), ['class' => 'advanced-search']); ?>
-    <?php echo $this->sortSelector($sortHeadings); ?>
+    <?= $this->pagination() ?>
+    <?php // echo $this->hyperlink($translate('Advanced search'), $this->url(null, ['action' => 'search'], ['query' => $this->params()->fromQuery()], true), ['class' => 'advanced-search']) ?>
+    <?= $this->sortSelector($sortHeadings) ?>
 </div>
 
 <form method="post" id="batch-form" class="disable-unsaved-warning">
@@ -51,23 +60,23 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
     <?php if ($this->userIsAllowed(TaggingAdapter::class, 'batch-update')): ?>
     <a href="#"
         class="button batch-actions status-batch"
-        data-status-batch-url="<?php echo $escape($this->url(null, ['action' => 'batch-approve'], true)); ?>"
+        data-status-batch-url="<?= $escape($this->url(null, ['action' => 'batch-approve'], true)) ?>"
         data-status="approve"
-        aria-label="<?php echo $escape($translate('Approve')); ?>"
-        title="<?php echo $escape($translate('Approve')); ?>"><?php echo $escape($translate('Approve')); ?></a>
+        aria-label="<?= $escape($translate('Approve')) ?>"
+        title="<?= $escape($translate('Approve')) ?>"><?= $escape($translate('Approve')) ?></a>
     <a href="#"
         class="button batch-actions status-batch"
-        data-status-batch-url="<?php echo $escape($this->url(null, ['action' => 'batch-reject'], true)); ?>"
+        data-status-batch-url="<?= $escape($this->url(null, ['action' => 'batch-reject'], true)) ?>"
         data-status="reject"
-        aria-label="<?php echo $escape($translate('Reject')); ?>"
-        title="<?php echo $escape($translate('Reject')); ?>"><?php echo $escape($translate('Reject')); ?></a>
+        aria-label="<?= $escape($translate('Reject')) ?>"
+        title="<?= $escape($translate('Reject')) ?>"><?= $escape($translate('Reject')) ?></a>
     <?php endif; ?>
     <?php if ($this->userIsAllowed(TaggingAdapter::class, 'batch-delete')): ?>
     <a href="#"
         class="button delete batch-actions sidebar-content"
-        data-sidebar-content-url="<?php echo $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)); ?>"
-        aria-label="<?php echo $escape($translate('Delete')); ?>"
-        title="<?php echo $escape($translate('Delete')); ?>"><?php echo $escape($translate('Delete')); ?></a>
+        data-sidebar-content-url="<?= $escape($this->url(null, ['action' => 'batch-delete-confirm'], true)) ?>"
+        aria-label="<?= $escape($translate('Delete')) ?>"
+        title="<?= $escape($translate('Delete')) ?>"><?= $escape($translate('Delete')) ?></a>
     <?php endif; ?>
 </div>
 <?php endif; ?>
@@ -75,9 +84,9 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
 <?php $this->trigger('view.browse.before'); ?>
 <?php if (empty($taggings)): ?>
 <div class="no-resources">
-    <p><?php echo $translate('There are no taggings.'); ?></p>
+    <p><?= $translate('There are no taggings.') ?></p>
 </div>
-<?php $this->trigger('view.browse.after'); ?>
+<?php $this->trigger('view.browse.after') ?>
 
 <?php else: ?>
 <table class="tablesaw <?php if ($batchEditRight) echo 'batch-edit'; ?>" data-tablesaw-mode="stack">
@@ -87,12 +96,12 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
                 <?php if ($batchEditRight): ?>
                 <input type="checkbox" class="select-all">
                 <?php endif; ?>
-                <?php echo $translate('Tag'); ?>
+                <?= $translate('Tag') ?>
             </th>
-            <th><?php echo $translate('Status'); ?></th>
-            <th><?php echo $translate('Resource'); ?></th>
-            <th><?php echo $translate('Tagger'); ?></th>
-            <th><?php echo $translate('Date tagged'); ?></th>
+            <th><?= $translate('Status') ?></th>
+            <th><?= $translate('Resource') ?></th>
+            <th><?= $translate('Tagger') ?></th>
+            <th><?= $translate('Date tagged') ?></th>
         </tr>
     </thead>
     <tbody>
@@ -113,25 +122,25 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
         <tr>
             <td>
                 <?php if ($batchEditRight): ?>
-                    <input type="checkbox" name="resource_ids[]" value="<?php echo $tagging->id(); ?>">
+                    <input type="checkbox" name="resource_ids[]" value="<?= $tagging->id() ?>">
                 <?php endif; ?>
                 <?php if ($tag): ?>
-                <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
-                <span class="is-public-or-not<?php if (!$tagging->isPublic()) echo ' o-icon-private'; ?>" aria-label="<?php echo $translate('Private'); ?>"></span>
+                <span class="tag-name"><?= $this->hyperlink($tag->name(), $tag->urlResources()) ?></span>
+                <span class="is-public-or-not<?php if (!$tagging->isPublic()) echo ' o-icon-private'; ?>" aria-label="<?= $translate('Private') ?>"></span>
                 <?php else: ?>
-                <span class="tag-name no-tag">[<?php echo $translate('Removed'); ?>]</span>
-                <span class="is-public-or-not o-icon-private" aria-label="<?php echo $translate('Private'); ?>"></span>
+                <span class="tag-name no-tag">[<?= $translate('Removed') ?>]</span>
+                <span class="is-public-or-not o-icon-private" aria-label="<?= $translate('Private') ?>"></span>
                 <?php endif;?>
                 <ul class="actions">
                 <?php $editRightTagging = $tagging->userIsAllowed('update'); ?>
                     <?php if ($editRightTagging): ?>
                         <?php if ($tag): ?>
                     <li><a href="#"
-                        class="status-toggle o-icon-<?php echo $status; ?>"
-                        data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
-                        data-status="<?php echo $status; ?>"
-                        aria-label="<?php echo $escape($translate('Toggle status')); ?>"
-                        title="<?php echo $escape($translate('Toggle status')); ?>"></a></li>
+                        class="status-toggle o-icon-<?= $status ?>"
+                        data-status-toggle-url="<?= $escape($tagging->url('toggle-status')) ?>"
+                        data-status="<?= $status ?>"
+                        aria-label="<?= $escape($translate('Toggle status')) ?>"
+                        title="<?= $escape($translate('Toggle status')) ?>"></a></li>
                         <?php else: ?>
                     <li><span class="status-toggle o-icon-none"></span></li>
                         <?php endif; ?>
@@ -139,29 +148,29 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
                     <?php if ($tagging->userIsAllowed('delete')): ?>
                     <li><a href="#"
                         class="o-icon-delete sidebar-content"
-                        data-sidebar-content-url="<?php echo $escape($tagging->url('delete-confirm')); ?>"
-                        aria-label="<?php echo $escape($translate('Delete')); ?>"
-                        title="<?php echo $escape($translate('Delete')); ?>"></a></li>
+                        data-sidebar-content-url="<?= $escape($tagging->url('delete-confirm')) ?>"
+                        aria-label="<?= $escape($translate('Delete')) ?>"
+                        title="<?= $escape($translate('Delete')) ?>"></a></li>
                     <?php endif; ?>
                 </ul>
             </td>
             <td class="status-label"><?php
             if (!$editRightTagging):
-            ?><span class="no-action o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"></span><?php
+            ?><span class="no-action o-icon-<?= $tagging->status() ?: 'undefined' ?>"></span><?php
             endif;
             echo $escape($tagging->statusLabel());
             ?></td>
             <td>
                 <?php if ($resource): ?>
-                    <?php echo $resource->link($resource->displayTitle()); ?>
-                <span class="resource-name <?php echo $resource->getControllerName(); ?>" aria-label="<?php echo $translate($resource->getControllerName()); ?>"></span>
+                    <?= $resource->link($resource->displayTitle()) ?>
+                <span class="resource-name <?= $resource->getControllerName() ?>" aria-label="<?= $translate($resource->getControllerName()) ?>"></span>
                 <?php else: ?>
-                    [<?php echo $translate('Removed'); ?>]
+                    [<?= $translate('Removed') ?>]
                 <span class="resource-name no-resource"></span>
                 <?php endif; ?>
             </td>
-            <td><?php echo $ownerText; ?></td>
-            <td><?php echo $escape($this->i18n()->dateFormat($tagging->created())); ?></td>
+            <td><?= $ownerText ?></td>
+            <td><?= $escape($this->i18n()->dateFormat($tagging->created())) ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>
@@ -171,14 +180,14 @@ $editRight = $this->userIsAllowed(TaggingAdapter::class, 'update')
 
 <?php $this->trigger('view.browse.after'); ?>
 <div class="browse-controls">
-    <?php echo $this->pagination(); ?>
+    <?= $this->pagination() ?>
 </div>
 
 <div class="sidebar">
     <a href="#"
         class="sidebar-close o-icon-close"
-        aria-label="<?php echo $escape($translate('Close')); ?>"
-        title="<?php echo $escape($translate('Close')); ?>"></a>
+        aria-label="<?= $escape($translate('Close')) ?>"
+        title="<?= $escape($translate('Close')) ?>"></a>
     <div class="sidebar-content"></div>
 </div>
 

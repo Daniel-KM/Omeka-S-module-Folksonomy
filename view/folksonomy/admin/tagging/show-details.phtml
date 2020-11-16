@@ -6,41 +6,43 @@
 
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
+
+$tagging = $resource;
 ?>
-<?php $tagging = $resource; ?>
+
 <div class="resource-details" data-resource-values="<?php //echo $escape($values); ?>">
-    <h3 class="o-module-folksonomy-tagging"><?php echo $tagging->link(sprintf($translate('Tagging #%d'), $tagging->id())); ?></h3>
+    <h3 class="o-module-folksonomy-tagging"><?= $tagging->link(sprintf($translate('Tagging #%d'), $tagging->id())) ?></h3>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Tag')); ?></h4>
+        <h4><?= $escape($translate('Tag')) ?></h4>
         <div class="value">
         <?php if ($tag = $tagging->tag()): ?>
-            <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
-            <span class="tag-internal-id">(#<?php echo $tag->internalId(); ?>)</span>
+            <span class="tag-name"><?= $this->hyperlink($tag->name(), $tag->urlResources()) ?></span>
+            <span class="tag-internal-id">(#<?= $tag->internalId() ?>)</span>
         <?php else: ?>
-            <span class="tag-name no-tag"><?php echo $translate('[Removed]'); ?></span>
+            <span class="tag-name no-tag"><?= $translate('[Removed]') ?></span>
         <?php endif;?>
         </div>
     </div>
     <div class="meta-group">
         <?php $resource = $tagging->resource(); ?>
-        <h4><?php echo $escape($translate('Resource')); ?> <span class="fa resource-name <?php echo $resource ? $resource->getControllerName() : 'no-resource'; ?>"></span></h4>
+        <h4><?= $escape($translate('Resource')) ?> <span class="fa resource-name <?= $resource ? $resource->getControllerName() : 'no-resource' ?>"></span></h4>
         <div class="value">
         <?php if ($resource): ?>
         <span class="resource-name">
-            <?php echo $resource->link($resource->displayTitle()); ?>
+            <?= $resource->link($resource->displayTitle()) ?>
         </span>
             <?php if (!$resource->isPublic()): ?>
         <span class="o-icon-private"></span>
             <?php endif; ?>
         <?php else: ?>
         <span class="resource-name no-resource">
-            [<?php echo $translate('Removed'); ?>]
+            [<?= $translate('Removed') ?>]
         </span>
         <?php endif; ?>
         </div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Tagger')); ?></h4>
+        <h4><?= $escape($translate('Tagger')) ?></h4>
         <div class="value"><?php
         if ($owner = $tagging->owner()) {
             echo $this->hyperlink(
@@ -53,15 +55,15 @@ $escape = $this->plugin('escapeHtml');
         ?></div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Status')); ?></h4>
-        <div class="value"><?php echo $tagging->statusLabel() . ' (' . ($tagging->isPublic() ? $translate('Public') : $translate('Private')) . ')'; ?></div>
+        <h4><?= $escape($translate('Status')) ?></h4>
+        <div class="value"><?= $tagging->statusLabel() . ' (' . ($tagging->isPublic() ? $translate('Public') : $translate('Private')) . ')' ?></div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $translate('Date Created'); ?></h4>
-        <div class="value"><?php echo $escape($this->i18n()->dateFormat($tagging->created())); ?></div>
+        <h4><?= $translate('Date Created') ?></h4>
+        <div class="value"><?= $escape($this->i18n()->dateFormat($tagging->created())) ?></div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $translate('Date Modified'); ?></h4>
-        <div class="value"><?php echo $escape($this->i18n()->dateFormat($tagging->modified())); ?></div>
+        <h4><?= $translate('Date Modified'); ?></h4>
+        <div class="value"><?= $escape($this->i18n()->dateFormat($tagging->modified())) ?></div>
     </div>
 </div>

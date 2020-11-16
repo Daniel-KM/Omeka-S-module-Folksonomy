@@ -20,7 +20,7 @@ $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folks
 if (!empty($tags) || is_null($tags)) {
     // Set default values.
     $resourceName = empty($resourceName) ? '' : $resourceName;
-    $statuses = isset($statuses) ? $statuses : ['allowed', 'approved'];
+    $statuses = $statuses ?? ['allowed', 'approved'];
     $orderBy = empty($orderBy) ? '' : $orderBy;
     $usedOnly = !empty($usedOnly);
     // Get the stats.
@@ -29,7 +29,7 @@ if (!empty($tags) || is_null($tags)) {
 
 if (empty($tags)): ?>
 <div class="no-resources">
-    <p><?php echo $translate('No tags are available.'); ?></p>
+    <p><?= $translate('No tags are available.') ?></p>
 </div>
 <?php else: ?>
 <?php
@@ -44,7 +44,7 @@ if (empty($tags)): ?>
     <?php
     // Get the largest value in the tags array.
     $largest = max(array_map(function ($v) { return $v['count']; }, $tags)) ?: 1;
-    if ($maxClasses > $largest ) {
+    if ($maxClasses > $largest) {
         $maxClasses = $largest;
     }
 
@@ -69,7 +69,7 @@ if (empty($tags)): ?>
         $urls['media'] = '';
     }
 
-    foreach( $tags as $name => $tag):
+    foreach ($tags as $name => $tag):
         $size = empty($tag['count'])
             ? -1
             // The check of the tag count and the "-1" avoid issues with round.
@@ -87,7 +87,7 @@ if (empty($tags)): ?>
                 foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media' */] as $resName => $resClass):
                     $tagHtml .= sprintf('<a href="%s">%s</a>',
                         $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($name), $urls[$resName])),
-                        '<span class="' . $resClass. ' count">' . $tag[$resName] . '</span>'
+                        '<span class="' . $resClass . ' count">' . $tag[$resName] . '</span>'
                     );
                 endforeach;
                 $tagHtml .= '<span class="media count">' . $tag['media'] . '</span>';
@@ -95,16 +95,16 @@ if (empty($tags)): ?>
                 $tagHtml .= '<span class="' . $resourceName . ' count">' . $tag['count'] . '</span>';
             endif;
         elseif ($link && !$resourceName):
-            foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media'*/] as $resName=> $resClass):
+            foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media'*/] as $resName => $resClass):
                 $tagHtml .= sprintf('<a href="%s">%s</a>',
                     $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($name), $urls[$resName])),
-                    '<span class="' . $resClass. '"></span>'
+                    '<span class="' . $resClass . '"></span>'
                 );
             endforeach;
             $tagHtml .= '<span class="media"></span>';
         endif;
     ?>
-        <li class="<?php echo $class; ?>"><?php
+        <li class="<?= $class ?>"><?php
             if ($mainUrl):
                 echo '<a href="' . $mainUrl . '">';
             endif;

@@ -2,17 +2,17 @@
 $translate = $this->plugin('translate');
 ?>
 <div id="folksonomy-module" class="mapping-group">
-    <a href="#" class="expand" aria-label="<?php echo $translate('Expand'); ?>">
-        <h4><?php echo $translate('Folksonomy'); ?></h4>
+    <a href="#" class="expand" aria-label="<?= $translate('Expand') ?>">
+        <h4><?= $translate('Folksonomy') ?></h4>
     </a>
     <div class="collapsible">
-        <select name="tagging" class="flags" data-flag-class="tagging" data-flag-unique="1" data-flag-label="<?php echo $translate('Taggings'); ?>">
-            <option><?php echo $translate('Select below'); ?></option>
-            <option value="1" data-flag-name="column-tag"><?php echo $translate('Tag'); ?></option>
+        <select name="tagging" class="flags" data-flag-class="tagging" data-flag-unique="1" data-flag-label="<?= $translate('Taggings') ?>">
+            <option><?= $translate('Select below') ?></option>
+            <option value="1" data-flag-name="column-tag"><?= $translate('Tag') ?></option>
             <?php /*
-            <option value="1" data-flag-name="column-tagging_owner"><?php echo $translate('Tagging owner'); ?></option>
-            <option value="1" data-flag-name="column-tagging_status"><?php echo $translate('Tagging status'); ?></option>
-            <option value="1" data-flag-name="column-tagging_created"><?php echo $translate('Tagging date'); ?></option>
+            <option value="1" data-flag-name="column-tagging_owner"><?= $translate('Tagging owner') ?></option>
+            <option value="1" data-flag-name="column-tagging_status"><?= $translate('Tagging status') ?></option>
+            <option value="1" data-flag-name="column-tagging_created"><?= $translate('Tagging date') ?></option>
             */ ?>
         </select>
     </div>

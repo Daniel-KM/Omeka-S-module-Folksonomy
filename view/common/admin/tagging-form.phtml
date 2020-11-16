@@ -18,11 +18,11 @@ $tagTemplate = '
 </tr>';
 ?>
 <fieldset id="tags" class="section folksonomy" aria-labelledby="tags-label">
-    <legend id="tags-legend"><?php echo $translate('Tags'); ?></legend>
-    <table id="resource-tags" data-tablesaw-mode="stack" class="tablesaw tablesaw-stack <?php echo ($resource && $tags) ? '' : 'empty'; ?>">
+    <legend id="tags-legend"><?= $translate('Tags') ?></legend>
+    <table id="resource-tags" data-tablesaw-mode="stack" class="tablesaw tablesaw-stack <?= ($resource && $tags) ? '' : 'empty' ?>">
         <thead>
         <tr>
-            <th><?php echo $translate('Tag'); ?></th>
+            <th><?= $translate('Tag') ?></th>
         </tr>
         </thead>
         <tbody>
@@ -36,25 +36,25 @@ $tagTemplate = '
         <?php $tagging = $taggings[$tag->name()]; ?>
         <tr>
             <td>
-                <span><?php echo $this->hyperlink($tag->name(), $tag->urlResources($resourceName)); ?></span>
+                <span><?= $this->hyperlink($tag->name(), $tag->urlResources($resourceName)) ?></span>
                 <ul class="actions">
                     <li>
                     <?php if ($updateRight): ?>
                     <span class="single actions"><a href="#"
-                        class="status-toggle o-icon-<?php echo $tagging->status() ?: 'undefined'; ?>"
-                        data-status-toggle-url="<?php echo $escape($tagging->url('toggle-status')); ?>"
-                        data-status="<?php echo $tagging->status(); ?>"
-                        aria-label="<?php echo $escape($translate('Toggle status')); ?>"
-                        title="<?php echo $escape($translate('Toggle status')); ?>"></a></span>
+                        class="status-toggle o-icon-<?= $tagging->status() ?: 'undefined' ?>"
+                        data-status-toggle-url="<?= $escape($tagging->url('toggle-status')) ?>"
+                        data-status="<?= $tagging->status() ?>"
+                        aria-label="<?= $escape($translate('Toggle status')) ?>"
+                        title="<?= $escape($translate('Toggle status')) ?>"></a></span>
                     <?php else: ?>
-                    <span class="no-action o-icon-<?php echo $tagging->status(); ?>"></span>
+                    <span class="no-action o-icon-<?= $tagging->status() ?>"></span>
                     <?php endif; ?>
                     </li>
                     <li>
-                        <a href="#" class="o-icon-delete" title="<?php echo $removeStr; ?>" aria-label="<?php echo $removeStr; ?>"></a>
+                        <a href="#" class="o-icon-delete" title="<?= $removeStr ?>" aria-label="<?= $removeStr ?>"></a>
                     </li>
                 </ul>
-                <input type="hidden" name="o-module-folksonomy:tag[]" value="<?php echo $escape($tag->name()) ?>">
+                <input type="hidden" name="o-module-folksonomy:tag[]" value="<?= $escape($tag->name()) ?>">
             </td>
         </tr>
         <?php endforeach; ?>
@@ -63,17 +63,17 @@ $tagTemplate = '
     </table>
     <div class="no-resources">
         <p>
-            <?php echo $translate('There are no tags for this resource.'); ?>
+            <?= $translate('There are no tags for this resource.') ?>
             <br />
-            <?php echo $translate('Add existing ones using the interface to the right or add new ones in the field below.'); ?>
+            <?= $translate('Add existing ones using the interface to the right or add new ones in the field below.') ?>
         </p>
     </div>
     <div class="field">
         <div class="inputs">
-            <input name="o-module-folksonomy:tag-new" value="" placeholder="<?php echo $translate('Add one or multiple comma-separated new tags'); ?>" class="touched" type="text">
+            <input name="o-module-folksonomy:tag-new" value="" placeholder="<?= $translate('Add one or multiple comma-separated new tags') ?>" class="touched" type="text">
         </div>
     </div>
-    <button id="tag-selector-button" class="mobile-only"><?php echo $translate('Add a tag'); ?></button>
-    <span id="tag-template" data-template="<?php echo $escape($tagTemplate); ?>"></span>
-    <?php echo $this->tagSelector(); ?>
+    <button id="tag-selector-button" class="mobile-only"><?= $translate('Add a tag') ?></button>
+    <span id="tag-template" data-template="<?= $escape($tagTemplate) ?>"></span>
+    <?= $this->tagSelector() ?>
 </fieldset>

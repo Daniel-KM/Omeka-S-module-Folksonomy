@@ -17,20 +17,20 @@ if (extension_loaded('mbstring')) {
 }
 ?>
 <div id="tag-selector" class='selector sidebar active'>
-    <a href="#" class="mobile-only sidebar-close o-icon-close"><span class="screen-reader-text"><?php echo $translate('Close Me'); ?></span></a>
-    <h3><?php echo $translate('Click on a tag to add it to the edit panel.'); ?></h3>
-    <input type="text" class="selector-filter" placeholder="<?php echo $escape($translate('Filter tags')); ?>">
+    <a href="#" class="mobile-only sidebar-close o-icon-close"><span class="screen-reader-text"><?= $translate('Close Me') ?></span></a>
+    <h3><?= $translate('Click on a tag to add it to the edit panel.') ?></h3>
+    <input type="text" class="selector-filter" placeholder="<?= $escape($translate('Filter tags')) ?>">
     <ul>
-        <li class="total-count-heading"><?php echo $translate('All tags'); ?> (<span class="selector-total-count"><?php echo count($tags); ?></span>)
+        <li class="total-count-heading"><?= $translate('All tags') ?> (<span class="selector-total-count"><?= count($tags) ?></span>)
             <ul class="selectable-list">
                 <?php foreach ($tagsByInitial as $initial => $tags): ?>
                     <li class="selector-parent">
-                        <span><?php echo $initial; ?></span>
-                        (<span class="selector-child-count"><?php echo count($tagsByInitial[$initial]); ?></span>)
+                        <span><?= $initial ?></span>
+                        (<span class="selector-child-count"><?= count($tagsByInitial[$initial]) ?></span>)
                         <ul>
-                        <?php foreach($tags as $tag): ?>
-                            <li class="selector-child" data-child-search="<?php echo $escape($tag->name()); ?>" data-tag-internal-id="<?php echo $escape($tag->internalId()); ?>">
-                                <span><?php echo $escape($tag->name()); ?></span>
+                        <?php foreach ($tags as $tag): ?>
+                            <li class="selector-child" data-child-search="<?= $escape($tag->name()) ?>" data-tag-internal-id="<?= $escape($tag->internalId()) ?>">
+                                <span><?= $escape($tag->name()) ?></span>
                             </li>
                         <?php endforeach; ?>
                         </ul>

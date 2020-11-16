@@ -4,21 +4,21 @@ $escape = $this->plugin('escapeHtml');
 ?>
 <?php $tag = $resource; ?>
 <div class="resource-details" data-resource-values="<?php //echo $escape($values); ?>">
-    <h3 class="o-module-folksonomy-tag"><?php echo $tag->link($tag->name()); ?></h3>
+    <h3 class="o-module-folksonomy-tag"><?= $tag->link($tag->name()) ?></h3>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Tag')); ?></h4>
+        <h4><?= $escape($translate('Tag')) ?></h4>
         <div class="value">
-            <span class="tag-name"><?php echo $this->hyperlink($tag->name(), $tag->urlResources()); ?></span>
+            <span class="tag-name"><?= $this->hyperlink($tag->name(), $tag->urlResources()) ?></span>
         </div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Internal id')); ?></h4>
+        <h4><?= $escape($translate('Internal id')) ?></h4>
         <div class="value">
-            <span class="tag-internal-id"><?php echo $tag->internalId(); ?></span>
+            <span class="tag-internal-id"><?= $tag->internalId() ?></span>
         </div>
     </div>
     <div class="meta-group">
-        <h4><?php echo $escape($translate('Stats')); ?></h4>
+        <h4><?= $escape($translate('Stats')) ?></h4>
         <div class="value"><?php echo sprintf('%s: %s',
             $escape($translate('Total')),
             $tagCount['count']);

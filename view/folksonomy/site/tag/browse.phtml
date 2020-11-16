@@ -6,16 +6,18 @@
  */
 
 $translate = $this->plugin('translate');
+
+$this->htmlElement('body')->appendAttribute('class', 'folksonomy tags browse');
 ?>
-<?php $this->htmlElement('body')->appendAttribute('class', 'folksonomy tags browse'); ?>
-<?php echo $this->pageTitle($translate('Folksonomy'), 2); ?>
+
+<?= $this->pageTitle($translate('Folksonomy'), 2) ?>
 <?php if (empty($tags)): ?>
 <div class="no-resources">
-    <p><?php echo $translate('There are no tags.'); ?></p>
+    <p><?= $translate('There are no tags.') ?></p>
 </div>
 <?php else: ?>
 <?php $this->trigger('view.browse.before'); ?>
-<?php echo $this->partial('common/tag-cloud', [
+<?= $this->partial('common/tag-cloud', [
     'tags' => $tags,
     'resourceName' => $options['resourceName'],
     // Never display "rejected" tags in public view, in all cases.
@@ -25,6 +27,6 @@ $translate = $this->plugin('translate');
     'link' => true,
     'maxClasses' => $options['maxClasses'],
     'tagNumbers' => $options['tagNumbers'],
-]); ?>
+]) ?>
 <?php $this->trigger('view.browse.after'); ?>
 <?php endif; ?>

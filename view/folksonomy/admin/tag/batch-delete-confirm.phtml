@@ -2,8 +2,8 @@
 $translate = $this->plugin('translate');
 ?>
 <div id="sidebar-confirm">
-    <h3><?php echo $translate('Delete tags'); ?></h3>
-    <p><?php echo $translate('Are you sure you would like to delete the selected tags?'); ?></p>
-    <p><?php echo $translate('WARNING: This will delete the associated taggings.'); ?></p>
-    <?php echo $this->form($this->form); ?>
+    <h3><?= $translate('Delete tags') ?></h3>
+    <p><?= $translate('Are you sure you would like to delete the selected tags?') ?></p>
+    <p><?= $translate('WARNING: This will delete the associated taggings.') ?></p>
+    <?= $this->form($this->form) ?>
 </div>
