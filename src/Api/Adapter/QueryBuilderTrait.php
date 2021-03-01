@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
@@ -195,7 +196,7 @@ trait QueryBuilderTrait
             $valueAlias = $this->createAlias();
             $qb
                 ->innerJoin(
-                    'omeka_root',
+                    $this->getEntityClass(),
                     $valueAlias,
                     'WITH',
                     $expr->eq(
