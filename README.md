@@ -2,7 +2,8 @@ Folksonomy (module for Omeka S)
 ===============================
 
 > __New versions of this module and support for Omeka S version 3.0 and above
-> are available on [GitLab], which seems to respect users and privacy better.__
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
 
 [Folksonomy] is a module for [Omeka S] that allows to add uncontrolled topics to
 any resource (item, item set, media) and that allows visitors to tag them in
@@ -103,7 +104,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2013-2020 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2013-2021 (see [Daniel-KM] on GitLab)
 
 First version of this module has been built as a plugin for Omeka Classic for
 the digital library of [Mines ParisTech].
