@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 00:00+0000\n"
-"PO-Revision-Date: 2020-11-16 00:00+0000\n"
+"POT-Creation-Date: 2021-03-01 00:00+0000\n"
+"PO-Revision-Date: 2021-03-01 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -74,13 +74,13 @@ msgstr "Ce module requiert les modules \"%s\"."
 msgid "This module has resources that connot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: src/Generic/AbstractModule.php:710
+#: src/Generic/AbstractModule.php:707
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
-"Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
+"Le module \"%s\" a été automatiquement désactivé car ses dépendances ne sont "
 "plus disponibles."
 
 #: view/common/admin/folksonomy-mapping-sidebar.phtml:6
@@ -129,8 +129,8 @@ msgid ""
 "Add existing ones using the interface to the right or add new ones in the "
 "field below."
 msgstr ""
-"Ajouter les mots-clés existants en utilisant l’interface à droite ou "
-"ajouter de nouveaux mots-clés avec le champ ci-dessous."
+"Ajouter les mots-clés existants en utilisant l’interface à droite ou ajouter "
+"de nouveaux mots-clés avec le champ ci-dessous."
 
 #: view/common/admin/tagging-form.phtml:73
 msgid "Add one or multiple comma-separated new tags"
