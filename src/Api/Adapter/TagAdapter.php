@@ -26,7 +26,8 @@ class TagAdapter extends AbstractEntityAdapter
         'name' => 'name',
         'tag' => 'name',
         // For info.
-        // 'count' => 'count',
+        // 'count' => 'total',
+        // 'total' => 'total',
         // 'item_sets' => 'item_sets',
         // 'items' => 'items',
         // 'media' => 'media',
@@ -161,7 +162,9 @@ class TagAdapter extends AbstractEntityAdapter
 
             // TODO Use Doctrine native queries (here: ORM query builder).
             switch ($query['sort_by']) {
+                // @deprecated Use "total" instead of "count".
                 case 'count':
+                case 'total':
                     $taggingAlias = $this->createAlias();
                     $orderAlias = $this->createAlias();
                     $orderBy = 'COUNT(' . $taggingAlias . '.tag)';

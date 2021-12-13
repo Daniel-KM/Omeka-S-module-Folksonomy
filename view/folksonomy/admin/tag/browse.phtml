@@ -13,7 +13,7 @@ $sortHeadings = [
     ],
     [
         'label' => $translate('Total count'),
-        'value' => 'count',
+        'value' => 'total',
     ],
     [
         'label' => $translate('Total item sets'),
@@ -113,7 +113,7 @@ $deleteRight = $this->userIsAllowed(TagAdapter::class, 'delete');
                     <?php endif; ?>
                 </ul>
             </td>
-            <td><?php if ($tagCount[$name]['count']) echo $tagCount[$name]['count']; ?></td>
+            <td><?php if ($tagCount[$name]['total']) echo $tagCount[$name]['total']; ?></td>
             <td><?php if ($tagCount[$name]['item_sets']) echo $this->hyperlink(
                 $tagCount[$name]['item_sets'], $tag->urlResources('item-set'), ['class' => 'tag-browse-item-sets']
             ); ?></td>

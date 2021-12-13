@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\View\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr\Join;
 use Folksonomy\Entity\Tag;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Entity\Item;
@@ -13,13 +16,13 @@ use Omeka\Entity\Resource;
 class TagCount extends AbstractHelper
 {
     /**
-     * @var Connection
+     * @var EntityManager
      */
-    protected $connection;
+    protected $entityManager;
 
-    public function __construct(Connection $connection)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->connection = $connection;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -27,8 +30,6 @@ class TagCount extends AbstractHelper
      *
      * The stats are available directly as method of Tag, so this helper is
      * mainly used for performance (one query for all stats).
-     *
-     * @todo Use Doctrine native queries (here: DBAL query builder) or repositories.
      *
      * @param array|string $tags If empty, return an array of all the tags. The
      * tag may be an entity, a representation or a name.
@@ -50,13 +51,19 @@ class TagCount extends AbstractHelper
         $orderBy = '',
         $keyPair = false
     ) {
-        $qb = $this->connection->createQueryBuilder();
+        // The entity manager is used instead of the DBAL connection in order to
+        // limit tags with an Omeka query.
+        // See previous commits to get the DBAL query instead of the ORM one.
+        $qb = $this->entityManager->createQueryBuilder();
         $expr = $qb->expr();
+
+        $qb
+            ->from(\Folksonomy\Entity\Tag::class, 'tag');
 
         $select = [];
         $select['name'] = 'tag.name';
 
-        $types = [
+        $entityClasses = [
             'item_sets' => ItemSet::class,
             'items' => Item::class,
             'media' => Media::class,
@@ -66,73 +73,68 @@ class TagCount extends AbstractHelper
             Item::class => Item::class,
             Media::class => Media::class,
         ];
-        $resourceType = $types[$resourceName] ?? '';
+        $resourceType = $entityClasses[$resourceName] ?? '';
 
-        $eqTagTagging = $expr->eq('tag.id', 'tagging.tag_id');
-        $eqResourceTagging = $expr->eq('resource.id', 'tagging.resource_id');
+        $eqTagTagging = $expr->eq('tag', 'tagging.tag');
+        $eqResourceTagging = $expr->eq('resource', 'tagging.resource');
+
+        // The resource type is not available in doctrine directly, because it
+        // is the discriminator column.
 
         // Select all types of resource separately and together.
         if (empty($resourceType)) {
-            $select['count'] = 'COUNT(resource.resource_type) AS "count"';
-            $select['item_sets'] = 'SUM(CASE WHEN resource.resource_type = "Omeka\\\\Entity\\\\ItemSet" THEN 1 ELSE 0 END) AS "item_sets"';
-            $select['items'] = 'SUM(CASE WHEN resource.resource_type = "Omeka\\\\Entity\\\\Item" THEN 1 ELSE 0 END) AS "items"';
-            $select['media'] = 'SUM(CASE WHEN resource.resource_type = "Omeka\\\\Entity\\\\Media" THEN 1 ELSE 0 END) AS "media"';
+            $select['total'] = 'COUNT(resource) AS total';
+            $select['item_sets'] = 'SUM(CASE WHEN resource INSTANCE OF :class_item_set THEN 1 ELSE 0 END) AS item_sets';
+            $select['items'] = 'SUM(CASE WHEN resource INSTANCE OF :class_item THEN 1 ELSE 0 END) AS items';
+            $select['media'] = 'SUM(CASE WHEN resource INSTANCE OF :class_media THEN 1 ELSE 0 END) AS media';
+            $qb
+                ->setParameter('class_item_set', \Omeka\Entity\ItemSet::class)
+                ->setParameter('class_item', \Omeka\Entity\Item::class)
+                ->setParameter('class_media', \Omeka\Entity\Media::class);
             if ($usedOnly) {
                 $qb
-                    ->innerJoin('tag', 'tagging', 'tagging', $eqTagTagging)
-                    ->innerJoin('tagging', 'resource', 'resource', $eqResourceTagging);
+                    ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging)
+                    ->innerJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $eqResourceTagging);
             } else {
                 $qb
-                    ->leftJoin('tag', 'tagging', 'tagging', $eqTagTagging)
-                    ->leftJoin('tagging', 'resource', 'resource', $eqResourceTagging);
+                    ->leftJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging)
+                    ->leftJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $eqResourceTagging);
             }
         }
 
         // Select all resources together.
         elseif ($resourceType === Resource::class) {
-            $select['count'] = 'COUNT(tagging.tag_id) AS "count"';
+            $select['total'] = 'COUNT(tagging.tag) AS total';
             if ($usedOnly) {
                 $qb
-                    ->innerJoin(
-                        'tag',
-                        'tagging',
-                        'tagging',
-                        $expr->andX(
-                            $eqTagTagging,
-                            $expr->isNotNull('tagging.resource_id')
+                    ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $expr->andX(
+                        $eqTagTagging,
+                        $expr->isNotNull('tagging.resource')
                     ));
             } else {
                 $qb
-                    ->leftJoin('tag', 'tagging', 'tagging', $eqTagTagging);
+                    ->leftJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging);
             }
         }
 
         // Select one type of resource.
         else {
-            $eqResourceType = $expr->eq('resource.resource_type', ':resource_type');
+            $eqResourceType = 'resource INSTANCE OF :class_resource';
             $qb
-                ->setParameter('resource_type', $resourceType);
+                ->setParameter('class_resource', $resourceType);
             if ($usedOnly) {
-                $select['count'] = 'COUNT(tagging.tag_id) AS "count"';
+                $select['total'] = 'COUNT(tagging.tag) AS total';
                 $qb
-                    ->innerJoin('tag', 'tagging', 'tagging', $eqTagTagging)
-                    ->innerJoin(
-                        'tagging',
-                        'resource',
-                        'resource',
-                        $expr->andX(
+                    ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging)
+                    ->innerJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $expr->andX(
                             $eqResourceTagging,
                             $eqResourceType
                     ));
             } else {
-                $select['count'] = 'COUNT(resource.resource_type) AS "count"';
+                $select['total'] = 'COUNT(resource) AS total';
                 $qb
-                    ->leftJoin('tag', 'tagging', 'tagging', $eqTagTagging)
-                    ->leftJoin(
-                        'tagging',
-                        'resource',
-                        'resource',
-                        $expr->andX(
+                    ->leftJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging)
+                    ->leftJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $expr->andX(
                             $eqResourceTagging,
                             $eqResourceType
                     ));
@@ -146,26 +148,25 @@ class TagCount extends AbstractHelper
                 return is_object($v) ? ($v instanceof Tag ? $v->getName() : $v->name()) : $v;
             }, is_array($tags) || $tags instanceof ArrayCollection ? $tags : [$tags]));
 
-            // TODO How to do a "WHERE IN" with doctrine and strings?
-            $quotedTags = array_map([$this->connection, 'quote'], $tags);
             $qb
-                ->andWhere($expr->in('tag.name', $quotedTags));
+                ->andWhere($expr->in('tag.name', ':tags'))
+                ->setParameter('tags', $tags, Connection::PARAM_STR_ARRAY);
         }
 
         if ($statuses) {
-            // TODO How to do a "WHERE IN" with doctrine and strings?
-            $statuses = array_map([$this->connection, 'quote'], (array) $statuses);
             if ($usedOnly) {
                 $qb
-                   ->andWhere($expr->in('tagging.status', $statuses));
+                   ->andWhere($expr->in('tagging.status', ':statuses'));
             } else {
                 $qb
                     ->andWhere(
                         $expr->orX(
-                            $expr->in('tagging.status', $statuses),
+                            $expr->in('tagging.status', ':statuses'),
                             $expr->isNull('tagging.status')
                     ));
             }
+            $qb
+                ->setParameter('statuses', $statuses, Connection::PARAM_STR_ARRAY);
         }
 
         $orderBy = trim((string) $orderBy);
@@ -179,16 +180,14 @@ class TagCount extends AbstractHelper
         }
 
         $qb
-            ->select($select)
-            ->from('tag', 'tag')
+            ->select(...array_values($select))
             ->groupBy('tag.id')
             ->orderBy($orderBy, $orderDir);
 
-        $stmt = $this->connection->executeQuery($qb, $qb->getParameters());
-        $fetchMode = $keyPair && $resourceType
-            ? \PDO::FETCH_KEY_PAIR
-            : (\PDO::FETCH_GROUP | \PDO::FETCH_UNIQUE);
-        $result = $stmt->fetchAll($fetchMode);
-        return $result;
+        $result = $qb->getQuery()->getScalarResult();
+        return $keyPair && $resourceType
+            ? array_column($result, 'total', 'name')
+            // Combine is possible because tag names are unique.
+            : array_combine(array_column($result, 'name'), $result);
     }
 }

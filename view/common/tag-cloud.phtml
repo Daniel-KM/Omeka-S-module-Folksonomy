@@ -44,7 +44,7 @@ if (empty($tags)): ?>
     <ul class="popularity">
     <?php
     // Get the largest value in the tags array.
-    $largest = max(array_map(function ($v) { return $v['count']; }, $tags)) ?: 1;
+    $largest = max(array_map(function ($v) { return $v['total']; }, $tags)) ?: 1;
     if ($maxClasses > $largest) {
         $maxClasses = $largest;
     }
@@ -71,12 +71,12 @@ if (empty($tags)): ?>
     }
 
     foreach ($tags as $name => $tag):
-        $size = empty($tag['count'])
+        $size = empty($tag['total'])
             ? -1
             // The check of the tag count and the "-1" avoid issues with round.
-            : (($largest == 1 || $maxClasses == 1 || $tag['count'] == 1)
+            : (($largest == 1 || $maxClasses == 1 || $tag['total'] == 1)
                 ? 0
-                : (int) (($tag['count'] - 1) * $maxClasses / $largest));
+                : (int) (($tag['total'] - 1) * $maxClasses / $largest));
         $class = $size < 0 ? 'unused' : ($size ? str_repeat('v', $size) . '-' : '') . 'popular';
         $mainUrl = $link && $resourceName && !empty($urls[$resourceName])
             ? $escape(str_replace('__FOLKSONOMY_TAGNAME__', rawurlencode($name), $urls[$resourceName]))
@@ -93,7 +93,7 @@ if (empty($tags)): ?>
                 endforeach;
                 $tagHtml .= '<span class="media count">' . $tag['media'] . '</span>';
             else:
-                $tagHtml .= '<span class="' . $resourceName . ' count">' . $tag['count'] . '</span>';
+                $tagHtml .= '<span class="' . $resourceName . ' count">' . $tag['total'] . '</span>';
             endif;
         elseif ($link && !$resourceName):
             foreach (['item_sets' => 'item-sets', 'items' => 'items'/*, 'media' => 'media'*/] as $resName => $resClass):
