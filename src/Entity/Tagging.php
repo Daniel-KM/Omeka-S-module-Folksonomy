@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Entity;
 
 use DateTime;
@@ -6,6 +7,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Omeka\Entity\AbstractEntity;
 use Omeka\Entity\Exception\InvalidArgumentException;
+use Omeka\Entity\Resource;
 use Omeka\Entity\User;
 
 /**
@@ -41,7 +43,10 @@ class Tagging extends AbstractEntity
 
     /**
      * Note: Doctrine doesn't recommand enums.
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $status;
 
@@ -97,7 +102,7 @@ class Tagging extends AbstractEntity
         return $this->id;
     }
 
-    public function setStatus($status): void
+    public function setStatus(string $status): self
     {
         if (!in_array($status, [
             self::STATUS_PROPOSED,
@@ -105,62 +110,68 @@ class Tagging extends AbstractEntity
             self::STATUS_APPROVED,
             self::STATUS_REJECTED,
         ])) {
-            throw new InvalidArgumentException('Invalid tagging status.');
+            throw new InvalidArgumentException('Invalid tagging status.'); // @translate
         }
         $this->status = $status;
+        return $this;
     }
 
-    public function getStatus()
+    public function getStatus(): string
     {
-        return $this->status;
+        return (string) $this->status;
     }
 
-    public function setTag(Tag $tag = null): void
+    public function setTag(?Tag $tag): self
     {
         $this->tag = $tag;
+        return $this;
     }
 
-    public function getTag()
+    public function getTag(): ?Tag
     {
         return $this->tag;
     }
 
-    public function setResource($resource = null): void
+    public function setResource(?Resource $resource): self
     {
         $this->resource = $resource;
+        return $this;
     }
 
-    public function getResource()
+    public function getResource(): ?Resource
     {
         return $this->resource;
     }
 
-    public function setOwner(User $owner = null): void
+    public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+        return $this;
     }
 
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    public function setCreated(DateTime $dateTime): void
+    public function setCreated(DateTime $dateTime): self
     {
         $this->created = $dateTime;
+        return $this;
     }
 
-    public function getCreated()
+    public function getCreated(): DateTime
     {
         return $this->created;
     }
 
-    public function setModified(DateTime $dateTime = null): void
+    public function setModified(?DateTime $dateTime): self
     {
         $this->modified = $dateTime;
+        return $this;
     }
 
-    public function getModified()
+    public function getModified(): ?DateTime
     {
         return $this->modified;
     }

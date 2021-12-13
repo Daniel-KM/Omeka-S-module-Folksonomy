@@ -26,7 +26,7 @@ class Tag extends \Folksonomy\Entity\Tag implements \Doctrine\ORM\Proxy\Proxy
     /**
      * @var boolean flag indicating if this object was already initialized
      *
-     * @see \Doctrine\Common\Persistence\Proxy::__isInitialized
+     * @see \Doctrine\Persistence\Proxy::__isInitialized
      */
     public $__isInitialized__ = false;
 
@@ -194,18 +194,18 @@ class Tag extends \Folksonomy\Entity\Tag implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
-    public function setName($name): void
+    public function setName($name): \Folksonomy\Entity\Tag
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', [$name]);
 
-        parent::setName($name);
+        return parent::setName($name);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', []);
@@ -216,7 +216,7 @@ class Tag extends \Folksonomy\Entity\Tag implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
-    public function getTaggings()
+    public function getTaggings(): \Doctrine\Common\Collections\ArrayCollection
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTaggings', []);
@@ -227,7 +227,7 @@ class Tag extends \Folksonomy\Entity\Tag implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
-    public function getResources()
+    public function getResources(): \Doctrine\Common\Collections\ArrayCollection
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getResources', []);
@@ -238,7 +238,7 @@ class Tag extends \Folksonomy\Entity\Tag implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
-    public function getOwners()
+    public function getOwners(): \Doctrine\Common\Collections\ArrayCollection
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOwners', []);

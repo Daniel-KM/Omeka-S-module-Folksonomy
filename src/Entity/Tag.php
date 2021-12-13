@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -122,27 +123,28 @@ class Tag extends AbstractEntity
         return $this->id;
     }
 
-    public function setName($name): void
+    public function setName($name): self
     {
-        $this->name = $name;
+        $this->name = (string) $name;
+        return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return (string) $this->name;
     }
 
-    public function getTaggings()
+    public function getTaggings(): ArrayCollection
     {
         return $this->taggings;
     }
 
-    public function getResources()
+    public function getResources(): ArrayCollection
     {
         return $this->resources;
     }
 
-    public function getOwners()
+    public function getOwners(): ArrayCollection
     {
         return $this->owners;
     }

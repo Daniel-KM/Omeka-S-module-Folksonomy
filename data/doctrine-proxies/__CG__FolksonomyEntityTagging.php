@@ -26,7 +26,7 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * @var boolean flag indicating if this object was already initialized
      *
-     * @see \Doctrine\Common\Persistence\Proxy::__isInitialized
+     * @see \Doctrine\Persistence\Proxy::__isInitialized
      */
     public $__isInitialized__ = false;
 
@@ -194,18 +194,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status): void
+    public function setStatus(string $status): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
 
-        parent::setStatus($status);
+        return parent::setStatus($status);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getStatus()
+    public function getStatus(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getStatus', []);
@@ -216,18 +216,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setTag(\Folksonomy\Entity\Tag $tag = NULL): void
+    public function setTag(?\Folksonomy\Entity\Tag $tag): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTag', [$tag]);
 
-        parent::setTag($tag);
+        return parent::setTag($tag);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getTag()
+    public function getTag(): ?\Folksonomy\Entity\Tag
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTag', []);
@@ -238,18 +238,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setResource($resource = NULL): void
+    public function setResource(?\Omeka\Entity\Resource $resource): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setResource', [$resource]);
 
-        parent::setResource($resource);
+        return parent::setResource($resource);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getResource()
+    public function getResource(): ?\Omeka\Entity\Resource
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getResource', []);
@@ -260,18 +260,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setOwner(\Omeka\Entity\User $owner = NULL): void
+    public function setOwner(?\Omeka\Entity\User $owner): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOwner', [$owner]);
 
-        parent::setOwner($owner);
+        return parent::setOwner($owner);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getOwner()
+    public function getOwner(): ?\Omeka\Entity\User
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOwner', []);
@@ -282,18 +282,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setCreated(\DateTime $dateTime): void
+    public function setCreated(\DateTime $dateTime): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCreated', [$dateTime]);
 
-        parent::setCreated($dateTime);
+        return parent::setCreated($dateTime);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getCreated()
+    public function getCreated(): \DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCreated', []);
@@ -304,18 +304,18 @@ class Tagging extends \Folksonomy\Entity\Tagging implements \Doctrine\ORM\Proxy\
     /**
      * {@inheritDoc}
      */
-    public function setModified(\DateTime $dateTime = NULL): void
+    public function setModified(?\DateTime $dateTime): \Folksonomy\Entity\Tagging
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setModified', [$dateTime]);
 
-        parent::setModified($dateTime);
+        return parent::setModified($dateTime);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getModified()
+    public function getModified(): ?\DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getModified', []);
