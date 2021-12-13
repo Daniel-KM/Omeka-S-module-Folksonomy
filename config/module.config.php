@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy;
 
 return [
@@ -340,6 +341,7 @@ return [
             'tagCloud' => [
                 'heading' => '',
                 'resource_name' => 'items',
+                'query' => '',
                 'max_classes' => 9,
                 'tag_numbers' => false,
             ],

@@ -3,6 +3,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $tags
  * @var string $resourceName
+ * @var string $query
  * @var array $statuses
  * @var string $orderBy
  * @var bool  $link
@@ -25,7 +26,7 @@ if (!empty($tags) || is_null($tags)) {
     $orderBy = empty($orderBy) ? '' : $orderBy;
     $usedOnly = !empty($usedOnly);
     // Get the stats.
-    $tags = $this->tagCount($tags, $resourceName, $statuses, $orderBy, $usedOnly);
+    $tags = $this->tagCount($tags, $resourceName, $statuses, $usedOnly, $orderBy, false, $query);
 }
 
 if (empty($tags)): ?>

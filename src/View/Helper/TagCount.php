@@ -7,7 +7,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
 use Folksonomy\Entity\Tag;
+use Laminas\EventManager\Event;
 use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Adapter\Manager as AdapterManager;
+use Omeka\Api\Request;
 use Omeka\Entity\Item;
 use Omeka\Entity\ItemSet;
 use Omeka\Entity\Media;
@@ -20,9 +23,15 @@ class TagCount extends AbstractHelper
      */
     protected $entityManager;
 
-    public function __construct(EntityManager $entityManager)
+    /**
+     * @var \Omeka\Api\Adapter\Manager
+     */
+    protected $adapterManager;
+
+    public function __construct(EntityManager $entityManager, AdapterManager $adapterManager)
     {
         $this->entityManager = $entityManager;
+        $this->adapterManager = $adapterManager;
     }
 
     /**
@@ -30,6 +39,10 @@ class TagCount extends AbstractHelper
      *
      * The stats are available directly as method of Tag, so this helper is
      * mainly used for performance (one query for all stats).
+     *
+     * @todo It's not possible to use a query with resources (core limitation).
+     * @todo Manage query with "full_text_search". See \Reference\Mvc\Controller\PluginReferences.
+     * @todo Manage visibility too.
      *
      * @param array|string $tags If empty, return an array of all the tags. The
      * tag may be an entity, a representation or a name.
@@ -41,6 +54,8 @@ class TagCount extends AbstractHelper
      * (default), "count asc", "item_sets", "items" or "media".
      * @param bool $keyPair Returns a flat array of names and counts when a
      * resource name is set.
+     * @param array|string $query Limit tags to resources. Cannot be used with
+     * resources for now.
      * @return array Associative array with names as keys.
      */
     public function __invoke(
@@ -49,7 +64,8 @@ class TagCount extends AbstractHelper
         $statuses = [],
         $usedOnly = false,
         $orderBy = '',
-        $keyPair = false
+        $keyPair = false,
+        $query = null
     ) {
         // The entity manager is used instead of the DBAL connection in order to
         // limit tags with an Omeka query.
@@ -73,16 +89,31 @@ class TagCount extends AbstractHelper
             Item::class => Item::class,
             Media::class => Media::class,
         ];
-        $resourceType = $entityClasses[$resourceName] ?? '';
+        $entityClass = $entityClasses[$resourceName] ?? '';
 
-        $eqTagTagging = $expr->eq('tag', 'tagging.tag');
-        $eqResourceTagging = $expr->eq('resource', 'tagging.resource');
+        $resourceNames = [
+            ItemSet::class => 'item_sets',
+            Item::class => 'items',
+            Media::class => 'media',
+        ];
+        $resourceName = $resourceNames[$entityClass] ?? 'resources';
 
         // The resource type is not available in doctrine directly, because it
         // is the discriminator column.
 
+        if ($query && !is_array($query)) {
+            $queryArray = [];
+            parse_str(ltrim((string) $query, "? \t\n\r\0\x0B"), $queryArray);
+            $query = $queryArray;
+        }
+        // TODO Clean the query from empty values ("") to avoid useless querying.
+        $hasQuery = !empty($query);
+
+        $eqTagTagging = $expr->eq('tag', 'tagging.tag');
+        $eqResourceTagging = $expr->eq('resource', 'tagging.resource');
+
         // Select all types of resource separately and together.
-        if (empty($resourceType)) {
+        if (empty($entityClass)) {
             $select['total'] = 'COUNT(resource) AS total';
             $select['item_sets'] = 'SUM(CASE WHEN resource INSTANCE OF :class_item_set THEN 1 ELSE 0 END) AS item_sets';
             $select['items'] = 'SUM(CASE WHEN resource INSTANCE OF :class_item THEN 1 ELSE 0 END) AS items';
@@ -103,17 +134,27 @@ class TagCount extends AbstractHelper
         }
 
         // Select all resources together.
-        elseif ($resourceType === Resource::class) {
+        elseif ($entityClass === Resource::class) {
             $select['total'] = 'COUNT(tagging.tag) AS total';
             if ($usedOnly) {
-                $qb
-                    ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $expr->andX(
-                        $eqTagTagging,
-                        $expr->isNotNull('tagging.resource')
-                    ));
+                if ($hasQuery) {
+                    $qb
+                        ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging)
+                        ->innerJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $eqResourceTagging);
+                } else {
+                    $qb
+                        ->innerJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $expr->andX(
+                            $eqTagTagging,
+                            $expr->isNotNull('tagging.resource')
+                        ));
+                }
             } else {
                 $qb
                     ->leftJoin(\Folksonomy\Entity\Tagging::class, 'tagging', JOIN::WITH, $eqTagTagging);
+                if ($hasQuery) {
+                    $qb
+                        ->leftJoin(\Omeka\Entity\Resource::class, 'resource', JOIN::WITH, $eqResourceTagging);
+                }
             }
         }
 
@@ -121,7 +162,7 @@ class TagCount extends AbstractHelper
         else {
             $eqResourceType = 'resource INSTANCE OF :class_resource';
             $qb
-                ->setParameter('class_resource', $resourceType);
+                ->setParameter('class_resource', $entityClass);
             if ($usedOnly) {
                 $select['total'] = 'COUNT(tagging.tag) AS total';
                 $qb
@@ -179,13 +220,53 @@ class TagCount extends AbstractHelper
             $orderDir = 'ASC';
         }
 
+        if ($query) {
+            // It's not possible to search resources for now, so use items.
+            $entityClassF = in_array($entityClass, [Item::class, ItemSet::class, Media::class]) ? $entityClass : Item::class;
+            $resourceNameF = $resourceName === 'resources' ? 'items' : $resourceName;
+            /** @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter $adapter */
+            $adapter = $this->adapterManager->get($resourceNameF);
+
+            // TODO Get the qb from the adapter.
+            $subQb = $adapter->getEntityManager()
+                ->createQueryBuilder()
+                ->select('omeka_root.id')
+                ->from($entityClassF, 'omeka_root');
+            $adapter->buildBaseQuery($subQb, $query);
+            $adapter->buildQuery($subQb, $query);
+            $subQb->groupBy('omeka_root.id');
+
+            $request = new Request('search', $resourceNameF);
+            $request->setContent($query);
+            $event = new Event('api.search.query', $adapter, [
+                'queryBuilder' => $subQb,
+                'request' => $request,
+            ]);
+            $adapter->getEventManager()->triggerEvent($event);
+
+            $subQb->select('omeka_root.id');
+            $subQb->andWhere($expr->eq('omeka_root.isPublic', true));
+
+            // There is already a inner or left join when a query is set.
+            $qb
+                ->andWhere($expr->in('resource.id', $subQb->getDQL()));
+            foreach ($subQb->getParameters() as $parameter) {
+                $qb
+                    ->setParameter(
+                        $parameter->getName(),
+                        $parameter->getValue(),
+                        $parameter->getType()
+                    );
+            }
+        }
+
         $qb
             ->select(...array_values($select))
             ->groupBy('tag.id')
             ->orderBy($orderBy, $orderDir);
 
         $result = $qb->getQuery()->getScalarResult();
-        return $keyPair && $resourceType
+        return $keyPair && $entityClass
             ? array_column($result, 'total', 'name')
             // Combine is possible because tag names are unique.
             : array_combine(array_column($result, 'name'), $result);

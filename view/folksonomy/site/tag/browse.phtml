@@ -19,14 +19,15 @@ $this->htmlElement('body')->appendAttribute('class', 'folksonomy tags browse');
 <?php $this->trigger('view.browse.before'); ?>
 <?= $this->partial('common/tag-cloud', [
     'tags' => $tags,
-    'resourceName' => $options['resourceName'],
+    'resourceName' => $options['resourceName'] ?? null,
+    'query' => $options['query'] ?? [],
     // Never display "rejected" tags in public view, in all cases.
     // The "proposed" status may be filtered via the visibility filter.
     'statuses' => ['allowed', 'approved', 'proposed'],
     'orderBy' => 'tag.name',
     'link' => true,
-    'maxClasses' => $options['maxClasses'],
-    'tagNumbers' => $options['tagNumbers'],
+    'maxClasses' => (int) ($options['maxClasses'] ?? 0),
+    'tagNumbers' => !empty($options['tagNumbers']),
 ]) ?>
 <?php $this->trigger('view.browse.after'); ?>
 <?php endif; ?>
