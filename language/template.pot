@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-01 00:00+0000\n"
+"POT-Creation-Date: 2021-12-13 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,10 +65,10 @@ msgid "This module requires modules \"%s\"."
 msgstr ""
 
 #: src/Generic/AbstractModule.php:80
-msgid "This module has resources that connot be installed."
+msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:707
+#: src/Generic/AbstractModule.php:725
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Add a tag"
 msgstr ""
 
-#: view/common/tag-cloud.phtml:32
+#: view/common/tag-cloud.phtml:34
 msgid "No tags are available."
 msgstr ""
 
@@ -266,6 +266,17 @@ msgstr ""
 msgid "[Removed]"
 msgstr ""
 
+#: data/scripts/upgrade.php:67
+msgid ""
+"It’s now possible to limit tag cloud to the current site or with a query."
+msgstr ""
+
+#: data/scripts/upgrade.php:71
+msgid ""
+"The key for the count of tags has been renamed from \"count\" to \"total\". "
+"Check your theme if you modified the template."
+msgstr ""
+
 #: src/Form/TaggingForm.php:65
 msgid "Add tags"
 msgstr ""
@@ -299,31 +310,33 @@ msgstr ""
 msgid "Tag it!"
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:16
+#: src/Form/TagCloudFieldset.php:18
 msgid "Block title"
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:17
-msgid "Heading for the block, if any."
-msgstr ""
-
-#: src/Form/TagCloudFieldset.php:28
+#: src/Form/TagCloudFieldset.php:29
 msgid "Browse links are available only for item sets and items."
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:30 src/Form/ConfigForm.php:29
+#: src/Form/TagCloudFieldset.php:31 src/Form/ConfigForm.php:29
 msgid "All resources (separately)"
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:31 src/Form/ConfigForm.php:30
+#: src/Form/TagCloudFieldset.php:32 src/Form/ConfigForm.php:30
 msgid "All resources (together)"
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:45 src/Form/ConfigForm.php:44
+#: src/Form/TagCloudFieldset.php:47
+msgid ""
+"Display resources using this search query. The query is limited to items "
+"when resources are selected."
+msgstr ""
+
+#: src/Form/TagCloudFieldset.php:59 src/Form/ConfigForm.php:44
 msgid "Max classes"
 msgstr ""
 
-#: src/Form/TagCloudFieldset.php:57 src/Form/ConfigForm.php:56
+#: src/Form/TagCloudFieldset.php:71 src/Form/ConfigForm.php:56
 msgid "Display tag numbers"
 msgstr ""
 
@@ -418,7 +431,7 @@ msgstr ""
 msgid "Unable to send an email after tagging."
 msgstr ""
 
-#: src/Controller/Site/TaggingController.php:112 config/module.config.php:270
+#: src/Controller/Site/TaggingController.php:112 config/module.config.php:271
 msgid "You should accept the legal agreement."
 msgstr ""
 
@@ -500,63 +513,67 @@ msgstr ""
 msgid "Select tag…"
 msgstr ""
 
-#: src/Api/Representation/TaggingRepresentation.php:15
-#: config/module.config.php:266
+#: src/Api/Representation/TaggingRepresentation.php:17
+#: config/module.config.php:267
 msgid "Proposed"
 msgstr ""
 
-#: src/Api/Representation/TaggingRepresentation.php:16
-#: config/module.config.php:267
+#: src/Api/Representation/TaggingRepresentation.php:18
+#: config/module.config.php:268
 msgid "Allowed"
 msgstr ""
 
-#: src/Api/Representation/TaggingRepresentation.php:17
-#: config/module.config.php:268
+#: src/Api/Representation/TaggingRepresentation.php:19
+#: config/module.config.php:269
 msgid "Approved"
 msgstr ""
 
-#: src/Api/Representation/TaggingRepresentation.php:18
-#: config/module.config.php:269
+#: src/Api/Representation/TaggingRepresentation.php:20
+#: config/module.config.php:270
 msgid "Rejected"
 msgstr ""
 
-#: src/Api/Representation/TaggingRepresentation.php:84
+#: src/Api/Representation/TaggingRepresentation.php:83
 msgid "Undefined"
 msgstr ""
 
-#: src/Api/Adapter/TaggingAdapter.php:124
+#: src/Api/Adapter/TaggingAdapter.php:125
 msgid "The name of the tag must be set."
 msgstr ""
 
-#: src/Api/Adapter/TaggingAdapter.php:129
+#: src/Api/Adapter/TaggingAdapter.php:130
 msgid "The tagged resource must be set."
 msgstr ""
 
-#: src/Api/Adapter/TaggingAdapter.php:153
+#: src/Api/Adapter/TaggingAdapter.php:154
 #, php-format
 msgid "The user #%d has already added the tag \"%s\" on the resource #%d."
 msgstr ""
 
-#: src/Api/Adapter/TaggingAdapter.php:165
+#: src/Api/Adapter/TaggingAdapter.php:166
 #, php-format
 msgid "The status \"%s\" is unknown."
 msgstr ""
 
-#: src/Api/Adapter/TagAdapter.php:77
+#: src/Api/Adapter/TagAdapter.php:78
 #, php-format
 msgid "The tag \"%s\" is already taken."
 msgstr ""
 
-#: src/Api/Adapter/TagAdapter.php:100
+#: src/Api/Adapter/TagAdapter.php:97
 #, php-format
 msgid "The tag \"%s\" contains forbidden characters."
 msgstr ""
 
-#: src/Api/Adapter/TagAdapter.php:106
+#: src/Api/Adapter/TagAdapter.php:103
 msgid "A tag must have a name."
 msgstr ""
 
-#: src/Site/BlockLayout/TagCloud.php:19
+#: src/Entity/Tagging.php:113
+msgid "Invalid tagging status."
+msgstr ""
+
+#: src/Site/BlockLayout/TagCloud.php:22
 msgid "Tag cloud"
 msgstr ""
 
@@ -564,30 +581,30 @@ msgstr ""
 msgid "Browse tags"
 msgstr ""
 
-#: config/module.config.php:271
+#: config/module.config.php:272
 msgid "Data were added to the resource."
 msgstr ""
 
-#: config/module.config.php:272
+#: config/module.config.php:273
 msgid "They will be displayed definitely when approved."
 msgstr ""
 
-#: config/module.config.php:273
+#: config/module.config.php:274
 msgid "Reload page to see new tags."
 msgstr ""
 
-#: config/module.config.php:274
+#: config/module.config.php:275
 msgid "Request too long to process."
 msgstr ""
 
-#: config/module.config.php:275
+#: config/module.config.php:276
 msgid "The resource or the tag doesn’t exist."
 msgstr ""
 
-#: config/module.config.php:306
+#: config/module.config.php:307
 msgid "Tagging [Tag]"
 msgstr ""
 
-#: config/module.config.php:312
+#: config/module.config.php:313
 msgid "Tagging []"
 msgstr ""
