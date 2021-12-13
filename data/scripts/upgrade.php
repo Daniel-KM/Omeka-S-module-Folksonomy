@@ -60,3 +60,15 @@ WHERE id IN ("folksonomy_append_item_set_show", "folksonomy_append_item_show", "
 SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.3.11.0', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'It’s now possible to limit tag cloud to the current site or with a query.' // @translate
+    );
+    $messenger->addSuccess($message);
+    $message = new Message(
+        'The key for the count of tags has been renamed from "count" to "total". Check your theme if you modified the template.' // @translate
+    );
+    $messenger->addWarning($message);
+}
