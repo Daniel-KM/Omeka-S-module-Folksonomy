@@ -83,12 +83,8 @@ class TagAdapter extends AbstractEntityAdapter
 
     /**
      * Validate a name.
-     *
-     * @param string $name
-     * @param ErrorStore $errorStore
-     * @return bool
      */
-    protected function validateTagName($name, ErrorStore $errorStore)
+    protected function validateTagName($name, ErrorStore $errorStore): bool
     {
         $result = true;
         $sanitized = $this->sanitizeLightString($name);
@@ -257,7 +253,7 @@ class TagAdapter extends AbstractEntityAdapter
      * @param string $string The string to sanitize.
      * @return string The sanitized string.
      */
-    protected function sanitizeString($string)
+    protected function sanitizeString($string): string
     {
         // Quote is allowed.
         $string = strip_tags((string) $string);
@@ -274,9 +270,9 @@ class TagAdapter extends AbstractEntityAdapter
      * @param string $string The string to sanitize.
      * @return string The sanitized string.
      */
-    protected function sanitizeLightString($string)
+    protected function sanitizeLightString($string): string
     {
-        return trim(preg_replace('/\s+/', ' ', $string));
+        return trim(preg_replace('/\s+/', ' ', (string) $string));
     }
 
     /**

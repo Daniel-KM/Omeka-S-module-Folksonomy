@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Api\Representation;
 
+use DateTime;
 use Folksonomy\Entity\Tagging;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 use Omeka\Api\Representation\AbstractResourceRepresentation;
@@ -70,44 +72,43 @@ class TaggingRepresentation extends AbstractEntityRepresentation
         ];
     }
 
-    public function status()
+    public function status(): string
     {
         return $this->resource->getStatus();
     }
 
-    public function statusLabel()
+    public function statusLabel(): string
     {
         $status = $this->resource->getStatus();
         return $this->statusLabels[$status] ?? 'Undefined'; // @translate
     }
 
-    public function isPublic()
+    public function isPublic(): bool
     {
         return in_array($this->status(), [Tagging::STATUS_ALLOWED, Tagging::STATUS_APPROVED])
             && !empty($this->resource->getTag());
     }
 
     /**
-     * Get the tag representation of this resource.
-     *
-     * @return TagRepresentation
+     * Get the tag representation of this tagging.
      */
-    public function tag()
+    public function tag(): ?TagRepresentation
     {
-        return $this->getAdapter('tags')
-            ->getRepresentation($this->resource->getTag());
+        $tag = $this->resource->getTag();
+        return $tag
+            ? $this->getAdapter('tags')->getRepresentation($tag)
+            : null;
     }
 
     /**
      * Get the tag representation of this resource.
-     *
-     * @return AbstractResourceRepresentation
      */
-    public function resource()
+    public function resource(): ?AbstractResourceRepresentation
     {
-        // TODO Check if true resource.
-        return $this->getAdapter('resources')
-            ->getRepresentation($this->resource->getResource());
+        $taggedResource = $this->resource->getResource();
+        return $taggedResource
+            ? $this->getAdapter('resources')->getRepresentation($taggedResource)
+            : null;
     }
 
     /**
@@ -115,18 +116,20 @@ class TaggingRepresentation extends AbstractEntityRepresentation
      *
      * @return UserRepresentation
      */
-    public function owner()
+    public function owner(): ?UserRepresentation
     {
-        return $this->getAdapter('users')
-            ->getRepresentation($this->resource->getOwner());
+        $owner = $this->resource->getOwner();
+        return $owner
+            ? $this->getAdapter('users')->getRepresentation($owner)
+            : null;
     }
 
-    public function created()
+    public function created(): DateTime
     {
         return $this->resource->getCreated();
     }
 
-    public function modified()
+    public function modified(): ?DateTime
     {
         return $this->resource->getModified();
     }

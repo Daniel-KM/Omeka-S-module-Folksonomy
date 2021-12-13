@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Api\Representation;
 
 use Omeka\Api\Adapter\AdapterInterface;

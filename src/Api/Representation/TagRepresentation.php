@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Api\Representation;
 
 use Omeka\Api\Adapter\AdapterInterface;
@@ -22,34 +23,10 @@ class TagRepresentation extends AbstractEntityRepresentation
      */
     protected $cacheCounts = [];
 
-    /**
-     * @param ResourceInterface $resource
-     * @param AdapterInterface $adapter
-     */
     public function __construct(ResourceInterface $resource, AdapterInterface $adapter)
     {
         parent::__construct($resource, $adapter);
         $this->setId($resource->getName());
-    }
-
-    /**
-     * Get the internal database id.
-     *
-     * @return int
-     */
-    public function internalId()
-    {
-        return $this->resource->getId();
-    }
-
-    /**
-     * Get the name of the tag (alias of the id for representation).
-     *
-     * @return string
-     */
-    public function name()
-    {
-        return $this->resource->getName();
     }
 
     public function getControllerName()
@@ -69,17 +46,33 @@ class TagRepresentation extends AbstractEntityRepresentation
         ];
     }
 
-    public function getReference()
+    public function getReference(): TagReference
     {
         return new TagReference($this->resource, $this->getAdapter());
     }
 
     /**
+     * Get the internal database id.
+     */
+    public function internalId(): int
+    {
+        return $this->resource->getId();
+    }
+
+    /**
+     * Get the name of the tag (alias of the id for representation).
+     */
+    public function name(): string
+    {
+        return $this->resource->getName();
+    }
+
+    /**
      * Get the taggings associated with this tag.
      *
-     * @return array Array of TaggingRepresentations
+     * @return TaggingRepresentation[] Associated by tagging ids.
      */
-    public function taggings()
+    public function taggings(): array
     {
         $taggings = [];
         $taggingAdapter = $this->getAdapter('taggings');
@@ -93,9 +86,9 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the resources associated with this tag.
      *
-     * @return array Array of AbstractResourceEntityRepresentation
+     * @return AbstractResourceEntityRepresentation[] Associated by resource ids.
      */
-    public function resources()
+    public function resources(): array
     {
         // Note: Use a workaround because the reverse doctrine relation cannot
         // be set. See the entity.
@@ -118,9 +111,9 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the owners associated with this tag.
      *
-     * @return array Array of UserRepresentation
+     * @return UserRepresentation[] Associated by user ids.
      */
-    public function owners()
+    public function owners(): array
     {
         // Note: Use a workaround because the reverse doctrine relation cannot
         // be set. See the entity.
@@ -142,11 +135,8 @@ class TagRepresentation extends AbstractEntityRepresentation
 
     /**
      * Get this tag's specific resource count.
-     *
-     * @param string $resourceType
-     * @return int
      */
-    public function count($resourceType = 'resources')
+    public function count(string $resourceType = 'resources'): int
     {
         if (!isset($this->cacheCounts[$resourceType])) {
             $response = $this->getServiceLocator()->get('Omeka\ApiManager')
@@ -199,7 +189,7 @@ class TagRepresentation extends AbstractEntityRepresentation
      * @param bool $canonical Whether to return an absolute URL
      * @return string
      */
-    public function urlResources($resourceType = null, $canonical = false)
+    public function urlResources($resourceType = null, $canonical = false): string
     {
         $mapResource = [
             'resources' => 'resource',
