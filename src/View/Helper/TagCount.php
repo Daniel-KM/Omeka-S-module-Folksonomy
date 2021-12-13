@@ -234,6 +234,11 @@ class TagCount extends AbstractHelper
                 ->from($entityClassF, 'omeka_root');
             $adapter->buildBaseQuery($subQb, $query);
             $adapter->buildQuery($subQb, $query);
+
+            // Full text search is not managed by adapters, but by a special event.
+            if (isset($query['fulltext_search'])) {
+                $this->buildFullTextSearchQuery($subQb, $adapter);
+            }
             $subQb->groupBy('omeka_root.id');
 
             $request = new Request('search', $resourceNameF);
@@ -245,8 +250,24 @@ class TagCount extends AbstractHelper
             $adapter->getEventManager()->triggerEvent($event);
 
             $subQb->select('omeka_root.id');
-            $subQb->andWhere($expr->eq('omeka_root.isPublic', true));
 
+            // TODO Manage not only standard visibility, but modules ones.
+            // Set visibility constraints for users without "view-all" privilege.
+            $view = $this->getView();
+            if (!$view->userIsAllowed(\Omeka\Entity\Resource::class, 'view-all')) {
+                $constraints = $expr->eq('omeka_root.isPublic', true);
+                $user = $view->identity();
+                if ($user) {
+                    // Users can view all resources they own.
+                    $constraints = $expr->orX(
+                        $constraints,
+                        $expr->eq('omeka_root.owner', $user->getId())
+                    );
+                }
+                $subQb->andWhere($constraints);
+            }
+
+            // There is no colision: the adapter query uses alias "omeka_" + index.
             // There is already a inner or left join when a query is set.
             $qb
                 ->andWhere($expr->in('resource.id', $subQb->getDQL()));
@@ -270,5 +291,51 @@ class TagCount extends AbstractHelper
             ? array_column($result, 'total', 'name')
             // Combine is possible because tag names are unique.
             : array_combine(array_column($result, 'name'), $result);
+    }
+
+    /**
+     * Manage full text search.
+     *
+     * Full text search is not managed by adapters, but by a special event.
+     *
+     * This is an adaptation of the core method, except rights check.
+     * @see \Omeka\Module::searchFulltext()
+     * @see \Reference\Mvc\Controller\Plugin\References
+     */
+    protected function buildFullTextSearchQuery(QueryBuilder $qb, AbstractResourceEntityAdapter $adapter): self
+    {
+        if (!($adapter instanceof \Omeka\Api\Adapter\FulltextSearchableInterface)) {
+            return $this;
+        }
+
+        if (!isset($this->query['fulltext_search']) || ('' === trim($this->query['fulltext_search']))) {
+            return $this;
+        }
+
+        $searchAlias = $adapter->createAlias();
+
+        $match = sprintf(
+            'MATCH(%s.title, %s.text) AGAINST (%s)',
+            $searchAlias,
+            $searchAlias,
+            $adapter->createNamedParameter($qb, $this->query['fulltext_search'])
+        );
+        $joinConditions = sprintf(
+            '%s.id = omeka_root.id AND %s.resource = %s',
+            $searchAlias,
+            $searchAlias,
+            $adapter->createNamedParameter($qb, $adapter->getResourceName())
+        );
+
+        $qb
+            ->innerJoin(\Omeka\Entity\FulltextSearch::class, $searchAlias, Join::WITH, $joinConditions)
+            // Filter out resources with no similarity.
+            ->andWhere(sprintf('%s > 0', $match))
+            // Order by the relevance. Note the use of orderBy() and not
+            // addOrderBy(). This should ensure that ordering by relevance
+            // is the first thing being ordered.
+            ->orderBy($match, 'DESC');
+
+        return $this;
     }
 }
