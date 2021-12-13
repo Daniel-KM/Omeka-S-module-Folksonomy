@@ -7,14 +7,15 @@
  * @var string $orderBy
  * @var bool  $link
  * @var string|int $maxClasses
- * @var array $tagNumbers
+ * @var string $tagNumbers
  * @var bool $usedOnly
  */
 
 // Inspired from the function tag_cloud() of Omeka Classic.
 
-$translate = $this->plugin('translate');
-$escape = $this->plugin('escapeHtml');
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
 $this->headLink()->appendStylesheet($this->assetUrl('css/folksonomy.css', 'Folksonomy'));
 
 if (!empty($tags) || is_null($tags)) {
@@ -104,21 +105,13 @@ if (empty($tags)): ?>
             $tagHtml .= '<span class="media"></span>';
         endif;
     ?>
-        <li class="<?= $class ?>"><?php
-            if ($mainUrl):
-                echo '<a href="' . $mainUrl . '">';
-            endif;
-            if ($tagNumbers == 'before'):
-                echo $tagHtml;
-            endif;
-            echo $escape($name);
-            if ($tagHtml || $tagNumbers == 'after'):
-                echo $tagHtml;
-            endif;
-            if ($mainUrl):
-                echo '</a>';
-            endif;
-    ?></li>
+        <li class="<?= $class ?>"><?= sprintf('%s%s%s%s%s',
+            $mainUrl ? '<a href="' . $mainUrl . '">' : '',
+            $tagNumbers === 'before' ? $tagHtml : '',
+            $escape($name),
+            $tagHtml || $tagNumbers === 'after' ? $tagHtml : '',
+            $mainUrl ? '</a>' : ''
+        ) ?></li>
     <?php endforeach; ?>
     </ul>
 </div>

@@ -24,7 +24,7 @@ class FolksonomyMapping extends AbstractMapping
         // First, pull in the global settings.
         $this->processGlobalArgs();
 
-        $multivalueMap = isset($this->args['column-multivalue']) ? $this->args['column-multivalue'] : [];
+        $multivalueMap = $this->args['column-multivalue'] ?? [];
         foreach ($row as $index => $values) {
             if (array_key_exists($index, $multivalueMap) && strlen($multivalueMap[$index])) {
                 $values = explode($multivalueMap[$index], $values);
