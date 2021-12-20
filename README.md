@@ -115,6 +115,8 @@ the digital library of [Mines ParisTech].
 [Tagging plugin]: https://gitlab.com/Daniel-KM/Omeka-plugin-Tagging
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [Omeka Classic]: https://omeka.org
+[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Blocks Disposition]: https://gitlab.com/Daniel-KM/Omeka-S-module-BlocksDisposition
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Folksonomy/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
