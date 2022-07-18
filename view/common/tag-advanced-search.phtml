@@ -1,8 +1,10 @@
 <?php
-$this->headLink()->prependStylesheet($this->assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
-$this->headScript()
-    ->prependFile($this->assetUrl('js/chosen-options.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-    ->prependFile($this->assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+if (!$this->status()->isAdminRequest()) {
+    $this->headLink()->prependStylesheet($this->assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
+    $this->headScript()
+        ->prependFile($this->assetUrl('js/chosen-options.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+        ->prependFile($this->assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+}
 
 $hasTags = !empty($query['has_tags']);
 $tags = empty($query['tag']) ? [] : $query['tag'];
