@@ -15,19 +15,19 @@ $this->headScript()->appendFile($assetUrl('js/folksonomy.js', 'Folksonomy'), 'te
 $taggingForm->prepare();
 ?>
 
-<div class="property">
+<div class="properties">
     <h4><?= $translate('New Tags') ?></h4>
     <?php // echo $this->form($taggingForm); ?>
     <?= $this->form()->openTag($taggingForm) ?>
     <?php $element = $taggingForm->get('o-module-folksonomy:tag-new'); ?>
-    <div class="field">
+    <div class="tag-field">
         <div class="inputs">
             <?= $this->formText($element) ?>
         </div>
     </div>
     <?php if ($taggingForm->has('recaptcha')): ?>
     <?php $element = $taggingForm->get('recaptcha'); ?>
-    <div class="field">
+    <div class="tag-field">
         <div class="inputs required">
             <?= $formElement($element) ?>
         </div>
@@ -35,20 +35,18 @@ $taggingForm->prepare();
     <?php endif; ?>
     <?php if ($taggingForm->has('o-module-folksonomy:check')): /* honeyspot */ ?>
     <?php $element = $taggingForm->get('o-module-folksonomy:check'); ?>
-    <div class="field">
+    <div class="tag-field">
         <div class="inputs required">
             <?= $formElement($element) ?>
         </div>
     </div>
-    <?php endif; ?>
     <?php if ($taggingForm->has('legal_agreement')): ?>
     <?php $element = $taggingForm->get('legal_agreement'); ?>
-    <div class="field">
-        <div class="inputs required">
+        <div id ="terms-check" class="inputs required">
             <?= $this->setting('folksonomy_legal_text') ?>
             <?= $this->formCheckbox($element) ?>
         </div>
-    </div>
+    <?php endif; ?>
     <?php endif; ?>
     <?= $formElement($taggingForm->get('resource_id')) ?>
     <?= $formElement($taggingForm->get('csrf_' . $resource->id())) ?>

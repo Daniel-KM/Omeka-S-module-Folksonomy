@@ -1,4 +1,11 @@
 $(document).ready(function() {
+    var terms = $('#terms-check');
+    var targetInput = terms.find('input[name="legal_agreement"]');
+    if (terms && targetInput) {
+        $(terms).css("display", "flex");
+        $(targetInput).css("order", "-1").css("margin-right", "1em");
+    }
+
     function taggingValidate(form) {
         var button = form.find('button');
         var field = form.find('[name="o-module-folksonomy:tag-new"]');
