@@ -22,7 +22,7 @@ class TagCloud extends AbstractBlockLayout
         return 'Tag cloud'; // @translate
     }
 
-    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
+    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
         $data = $block->getData();
         $data['query'] = ltrim((string) $data['query'], "? \t\n\r\0\x0B");
