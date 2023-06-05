@@ -143,6 +143,7 @@ class TagRepresentation extends AbstractEntityRepresentation
                 ->search('taggings', [
                     'tag' => $this->id(),
                     'resource_type' => $resourceType,
+                    'limit' => 0,
                 ]);
             $this->cacheCounts[$resourceType] = $response->getTotalResults();
         }
@@ -180,7 +181,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * Return the public or admin URL to the resouce browse page for this tag.
+     * Return the public or admin URL to the resource browse page for this tag.
      *
      * Similar to url(), but with the type of resource.
      *
