@@ -5,7 +5,7 @@
  * Add tags and tagging form to any resource to create uncontrolled vocabularies
  * and tag clouds.
  *
- * @copyright Daniel Berthereau, 2013-2020
+ * @copyright Daniel Berthereau, 2013-2023
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
