@@ -14,10 +14,10 @@ if ($tags):
     // In public view, only items (default) and item sets are available.
     $resourceName = $resource->getControllerName() === 'item-set' ? 'item-set' : null;
 ?>
-<div class="property tags">
+<div class="properties tag">
     <h4><?= $translate('Tags') ?></h4>
     <?php foreach ($tags as $tag): ?>
-    <div class="value tag"><?= $hyperlink($tag->name(), $tag->urlResources($resourceName)) ?></div>
+    <span class="values tag"><?= $hyperlink($tag->name(), $tag->urlResources($resourceName)) ?></span>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
