@@ -36,6 +36,16 @@ class TaggingAdapter extends AbstractEntityAdapter
         // // 'resource_title' => 'resource',
     ];
 
+    protected $scalarFields = [
+        'id' => 'id',
+        'status' => 'status',
+        'tag' => 'tag',
+        'resource' => 'resource',
+        'owner' => 'owner',
+        'created' => 'created',
+        'modified' => 'modified',
+    ];
+
     protected $statuses = [
         Tagging::STATUS_PROPOSED,
         Tagging::STATUS_ALLOWED,

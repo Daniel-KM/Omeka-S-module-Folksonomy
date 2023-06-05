@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
@@ -32,6 +33,12 @@ class TagAdapter extends AbstractEntityAdapter
         // 'items' => 'items',
         // 'media' => 'media',
         // 'recent' => 'recent',
+    ];
+
+    protected $scalarFields = [
+        'id' => 'id',
+        'name' => 'name',
+        'tag' => 'name',
     ];
 
     public function getResourceName()
