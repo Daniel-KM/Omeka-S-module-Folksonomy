@@ -46,6 +46,11 @@ return [
             'tagCloud' => Site\BlockLayout\TagCloud::class,
         ],
     ],
+    'resource_page_block_layouts' => [
+        'invokables' => [
+            'tagging' => Site\ResourcePageBlockLayout\Tagging::class,
+        ],
+    ],
     'navigation_links' => [
         'invokables' => [
             'browseTags' => Site\Navigation\Link\BrowseTags::class,
