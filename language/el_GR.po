@@ -1,0 +1,644 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-13 00:00+0000\n"
+"PO-Revision-Date: 2023-02-13 20:53+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: el_GR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: Module.php:81
+#, php-format
+msgid ""
+"I agree with %sterms of use%s and I accept to free my contribution under the "
+"licence %sCC&nbsp;BY-SA%s."
+msgstr ""
+"Συμφωνώ με τους %sόρους χρήσης%s και αποδέχομαι την αδειοδότηση των "
+"συνεισφορών μου με την άδεια %sCC&nbsp;BY-SA%s."
+
+#: Module.php:502
+msgid ""
+"It is recommended to create tag clouds with the blocks of the site pages."
+msgstr ""
+"Συνιστάται η δημιουργία σύννεφων ετικετών με τα μπλοκ των σελίδων του "
+"ιστότοπου."
+
+#: Module.php:503
+msgid ""
+"So first options are used only to create global pages, that are not provided "
+"by Omeka yet."
+msgstr ""
+"Έτσι, οι πρώτες επιλογές χρησιμοποιούνται μόνο για τη δημιουργία καθολικών "
+"σελίδων, που δεν παρέχονται ακόμη από την Omeka."
+
+#: Module.php:965
+msgid "Has tags"
+msgstr "Έχει ετικέτες"
+
+#: Module.php:966
+msgid "true"
+msgstr "αληθές"
+
+#: Module.php:970 view/common/admin/folksonomy-mapping-sidebar.phtml:11
+#: view/common/admin/tagging-form.phtml:25
+#: view/folksonomy/admin/tag/browse.phtml:11
+#: view/folksonomy/admin/tag/browse.phtml:77
+#: view/folksonomy/admin/tag/show-details.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:23
+#: view/folksonomy/admin/tagging/browse.phtml:99
+#: view/folksonomy/admin/tagging/show-details.phtml:16
+msgid "Tag"
+msgstr "Ετικέτα"
+
+#: src/Generic/AbstractModule.php:66
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr "Αυτό το πρόσθετο απαιτεί το πρόσθετο \"%s\"."
+
+#: src/Generic/AbstractModule.php:73
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr "Αυτό το πρόσθετο απαιτεί τα πρόσθετα \"%s\"."
+
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that cannot be installed."
+msgstr "Αυτό το πρόσθετο έχει πόρους που δεν μπορούν να εγκατασταθούν."
+
+#: src/Generic/AbstractModule.php:725
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+"Το πρόσθετο \"%s\" απενεργοποιήθηκε αυτόματα επειδή οι εξαρτήσεις δεν είναι "
+"διαθέσιμες."
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:6
+#: view/folksonomy/site/tag/browse.phtml:13
+msgid "Folksonomy"
+msgstr "Folksonomy"
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:9
+#: view/folksonomy/admin/tagging/browse.phtml:46
+msgid "Taggings"
+msgstr "Ετικετοποιήσεις"
+
+#: view/common/admin/folksonomy-mapping-sidebar.phtml:10
+msgid "Select below"
+msgstr "Επιλογή παρακάτω"
+
+#: view/common/admin/tag-resource-list.phtml:9
+#: view/common/admin/tagging-form.phtml:66
+msgid "There are no tags for this resource."
+msgstr "Δεν υπάρχουν ετικέτες για αυτόν τον πόρο."
+
+#: view/common/admin/tag-resource-list.phtml:26
+#: view/common/admin/tag-resource-list.phtml:27
+#: view/common/admin/tag-resource.phtml:18
+#: view/common/admin/tag-resource.phtml:19
+#: view/common/admin/tagging-form.phtml:47
+#: view/common/admin/tagging-form.phtml:48
+#: view/folksonomy/admin/tagging/browse.phtml:142
+#: view/folksonomy/admin/tagging/browse.phtml:143
+msgid "Toggle status"
+msgstr "Εναλλαγή κατάστασης"
+
+#: view/common/admin/tag-resource.phtml:9
+#: view/common/admin/tagging-form.phtml:21
+#: view/common/site/tag-resource.phtml:18
+#: view/folksonomy/admin/tag/browse.phtml:39
+msgid "Tags"
+msgstr "Ετικέτες"
+
+#: view/common/admin/tagging-form.phtml:6
+msgid "Remove tag"
+msgstr "Αφαίρεση ετικέτας"
+
+#: view/common/admin/tagging-form.phtml:68
+msgid ""
+"Add existing ones using the interface to the right or add new ones in the "
+"field below."
+msgstr ""
+"Μπορείτε να προσθέσετε από τις υπάρχουσες ετικέτες του πλαισίου δεξιά ή να "
+"δημιουργήσετε νέες στο παρακάτω πεδίο."
+
+#: view/common/admin/tagging-form.phtml:73
+msgid "Add one or multiple comma-separated new tags"
+msgstr "Προσθέστε μία ή πολλές νέες ετικέτες διαχωρισμένες με κόμματα"
+
+#: view/common/admin/tagging-form.phtml:76
+msgid "Add a tag"
+msgstr "Προσθήκη ετικέτας"
+
+#: view/common/tag-cloud.phtml:34
+msgid "No tags are available."
+msgstr "Δεν υπάρχουν διαθέσιμες ετικέτες."
+
+#: view/common/tag-selector.phtml:20
+msgid "Close Me"
+msgstr "Κλείσε με"
+
+#: view/common/tag-selector.phtml:21
+msgid "Click on a tag to add it to the edit panel."
+msgstr ""
+"Κάντε κλικ σε μια ετικέτα για να την προσθέσετε στο πεδίο επεξεργασίας."
+
+#: view/common/tag-selector.phtml:22
+msgid "Filter tags"
+msgstr "Φιλτράρισμα ετικετών"
+
+#: view/common/tag-selector.phtml:24
+msgid "All tags"
+msgstr "Όλες οι ετικέτες"
+
+#: view/common/tagging-quick-form.phtml:19
+msgid "New Tags"
+msgstr "Νέες ετικέτες"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:5
+msgid "Delete tags"
+msgstr "Διαγραφή ετικετών"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:6
+msgid "Are you sure you would like to delete the selected tags?"
+msgstr "Θέλετε σίγουρα να διαγράψετε τις επιλεγμένες ετικέτες;"
+
+#: view/folksonomy/admin/tag/batch-delete-confirm.phtml:7
+msgid "WARNING: This will delete the associated taggings."
+msgstr ""
+"ΠΡΟΕΙΔΟΠΟΙΗΣΗ: Με αυτή την ενέργεια θα διαγραφούν όλες οι σχετικές ετικέτες."
+
+#: view/folksonomy/admin/tag/browse.phtml:15
+#: view/folksonomy/admin/tag/browse.phtml:79
+msgid "Total count"
+msgstr "Συνολικός αριθμός"
+
+#: view/folksonomy/admin/tag/browse.phtml:19
+msgid "Total item sets"
+msgstr "Σύνολο ομάδων αντικειμένων"
+
+#: view/folksonomy/admin/tag/browse.phtml:23
+msgid "Total items"
+msgstr "Σύνολο αντικειμένων"
+
+#: view/folksonomy/admin/tag/browse.phtml:27
+msgid "Total media"
+msgstr "Σύνολο πολυμέσων"
+
+#: view/folksonomy/admin/tag/browse.phtml:31
+msgid "Recent"
+msgstr "Πρόσφατο"
+
+#: view/folksonomy/admin/tag/browse.phtml:66
+#: view/folksonomy/site/tag/browse.phtml:16
+msgid "There are no tags."
+msgstr "Δεν υπάρχουν ετικέτες."
+
+#: view/folksonomy/admin/tag/browse.phtml:104
+#: view/folksonomy/admin/tag/browse.phtml:105
+msgid "Edit name"
+msgstr "Επεξεργασία ονόματος"
+
+#: view/folksonomy/admin/tag/show-details.phtml:15
+msgid "Internal id"
+msgstr "Εσωτερικό id"
+
+#: view/folksonomy/admin/tag/show-details.phtml:21
+msgid "Stats"
+msgstr "Στατιστικά"
+
+#: view/folksonomy/admin/tag/show-details.phtml:23
+msgid "Total"
+msgstr "Σύνολο"
+
+#: view/folksonomy/admin/tag/show-details.phtml:35
+msgid "Medias"
+msgstr "Πολυμέσα"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:11
+msgid "Delete taggings"
+msgstr "Διαγραφή ετικετοποιήσεων"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:12
+msgid "Are you sure you would like to delete the selected taggings?"
+msgstr "Θέλετε σίγουρα να διαγράψετε τις επιλεγμένες ετικετοποιήσεις;"
+
+#: view/folksonomy/admin/tagging/batch-delete-confirm.phtml:13
+#, php-format
+msgid "Note: This won’t delete tags: check the %stags page%s to manage them."
+msgstr ""
+"Σημείωση: Αυτή η ενέργεια δεν θα διαγράψει ετικέτες: ελέγξτε τη %sσελίδα "
+"ετικετών%s για να τις διαχειριστείτε."
+
+#: view/folksonomy/admin/tagging/browse.phtml:31
+#: view/folksonomy/admin/tagging/browse.phtml:103
+#: view/folksonomy/admin/tagging/show-details.phtml:45
+msgid "Tagger"
+msgstr "Δημιουργός"
+
+#: view/folksonomy/admin/tagging/browse.phtml:35
+#: view/folksonomy/admin/tagging/browse.phtml:104
+msgid "Date tagged"
+msgstr "Ημερομηνία δημιουργίας"
+
+#: view/folksonomy/admin/tagging/browse.phtml:65
+#: view/folksonomy/admin/tagging/browse.phtml:66
+msgid "Approve"
+msgstr "Αποδοχή"
+
+#: view/folksonomy/admin/tagging/browse.phtml:71
+#: view/folksonomy/admin/tagging/browse.phtml:72
+msgid "Reject"
+msgstr "Απόρριψη"
+
+#: view/folksonomy/admin/tagging/browse.phtml:87
+msgid "There are no taggings."
+msgstr "Δεν υπάρχουν ετικετοποιήσεις."
+
+#: view/folksonomy/admin/tagging/browse.phtml:131
+#: view/folksonomy/admin/tagging/browse.phtml:168
+#: view/folksonomy/admin/tagging/show-details.phtml:39
+msgid "Removed"
+msgstr "Αφαιρέθηκε"
+
+#: view/folksonomy/admin/tagging/show-details.phtml:14
+#, php-format
+msgid "Tagging #%d"
+msgstr "Ετικετοποίηση #%d"
+
+#: view/folksonomy/admin/tagging/show-details.phtml:22
+msgid "[Removed]"
+msgstr "[Αφαιρέθηκε]"
+
+#: data/scripts/upgrade.php:67
+msgid ""
+"It’s now possible to limit tag cloud to the current site or with a query."
+msgstr ""
+"Είναι πλέον δυνατό να περιοριστεί το σύννεφο ετικετών στον τρέχοντα ιστότοπο "
+"ή με ένα ερώτημα."
+
+#: data/scripts/upgrade.php:71
+msgid ""
+"The key for the count of tags has been renamed from \"count\" to \"total\". "
+"Check your theme if you modified the template."
+msgstr ""
+"Το κλειδί για τον αριθμό των ετικετών έχει μετονομαστεί από \"count\" σε "
+"\"total\". Ελέγξτε το θέμα εμφάνισης εάν τροποποιήσατε το πρότυπο."
+
+#: src/Form/TaggingForm.php:65
+msgid "Add tags"
+msgstr "Προσθήκη ετικετών"
+
+#: src/Form/TaggingForm.php:77
+msgid "Proposed tag cannot be empty."
+msgstr "Η προτεινόμενη ετικέτα δεν μπορεί να είναι κενή."
+
+#: src/Form/TaggingForm.php:79
+#, php-format
+msgid "Proposed tags cannot be longer than %d characters."
+msgstr ""
+"Οι προτεινόμενες ετικέτες δεν είναι δυνατόν να υπερβαίνουν τους %d "
+"χαρακτήρες."
+
+#: src/Form/TaggingForm.php:111
+msgid "Terms of service"
+msgstr "Όροι χρήσης"
+
+#: src/Form/TaggingForm.php:125
+msgid "You must agree to the terms and conditions."
+msgstr "Πρέπει να συμφωνήσετε με τους όρους και τις προϋποθέσεις."
+
+#: src/Form/TaggingForm.php:137
+msgid "String to check"
+msgstr "Συμβολοσειρά για έλεγχο"
+
+#: src/Form/TaggingForm.php:140
+msgid "Set the string to check"
+msgstr "Ρυθμίστε τη συμβολοσειρά για έλεγχο"
+
+#: src/Form/TaggingForm.php:165
+msgid "Tag it!"
+msgstr "Δημιουργήστε ετικέτα!"
+
+#: src/Form/TagCloudFieldset.php:18
+msgid "Block title"
+msgstr "Τίτλος πεδίου"
+
+#: src/Form/TagCloudFieldset.php:29
+msgid "Browse links are available only for item sets and items."
+msgstr ""
+"Οι σύνδεσμοι περιήγησης είναι διαθέσιμοι μόνο για ομάδες αντικειμένων και "
+"αντικείμενα."
+
+#: src/Form/TagCloudFieldset.php:31 src/Form/ConfigForm.php:29
+msgid "All resources (separately)"
+msgstr "Όλοι οι πόροι (ξεχωριστά)"
+
+#: src/Form/TagCloudFieldset.php:32 src/Form/ConfigForm.php:30
+msgid "All resources (together)"
+msgstr "Όλοι οι πόροι (μαζί)"
+
+#: src/Form/TagCloudFieldset.php:47
+msgid ""
+"Display resources using this search query. The query is limited to items "
+"when resources are selected."
+msgstr ""
+"Εμφάνιση πόρων χρησιμοποιώντας αυτό το ερώτημα αναζήτησης. Το ερώτημα "
+"περιορίζεται σε αντικείμενα όταν επιλέγονται πόροι."
+
+#: src/Form/TagCloudFieldset.php:59 src/Form/ConfigForm.php:44
+msgid "Max classes"
+msgstr "Μέγιστες κατηγορίες"
+
+#: src/Form/TagCloudFieldset.php:71 src/Form/ConfigForm.php:56
+msgid "Display tag numbers"
+msgstr "Εμφάνιση αριθμών ετικετών"
+
+#: src/Form/SearchForm.php:24
+msgid "Search by tag"
+msgstr "Αναζήτηση ανά ετικέτα"
+
+#: src/Form/Element/TagSelect.php:58
+msgid "Select tags"
+msgstr "Επιλογή ετικετών"
+
+#: src/Form/ConfigForm.php:18
+msgid "Tag cloud page"
+msgstr "Σελίδα σύννεφου ετικετών"
+
+#: src/Form/ConfigForm.php:67
+msgid "Public rights"
+msgstr "Δημόσια δικαιώματα"
+
+#: src/Form/ConfigForm.php:75
+msgid "Allow public to tag"
+msgstr "Να επιτρέπεται στο κοινό η προσθήκη ετικετών"
+
+#: src/Form/ConfigForm.php:85
+msgid "Require approbation for public tags"
+msgstr "Απαιτείται έγκριση για ετικέτες που προσθέτει το κοινό"
+
+#: src/Form/ConfigForm.php:95
+msgid "Notify by email for public tagging"
+msgstr "Ειδοποίηση μέσω email για προσθήκη ετικετών από το κοινό"
+
+#: src/Form/ConfigForm.php:106
+msgid "Tagging form"
+msgstr "Φόρμα ετικετοποίησης"
+
+#: src/Form/ConfigForm.php:117
+msgid "Max length of a proposed tag"
+msgstr "Μέγιστο μήκος προτεινόμενης ετικέτας"
+
+#: src/Form/ConfigForm.php:118
+msgid "The maximum for the database is 190 characters."
+msgstr "Το μέγιστο για τη βάση δεδομένων είναι 190 χαρακτήρες."
+
+#: src/Form/ConfigForm.php:128
+msgid "Max length for all proposed tags"
+msgstr "Μέγιστο μήκος για όλες τις προτεινόμενες ετικέτες"
+
+#: src/Form/ConfigForm.php:129
+msgid "Multiple tags can be proposed in one time, separated by comma."
+msgstr ""
+"Μπορούν να προταθούν πολλές ετικέτες ταυτόχρονα, διαχωρισμένες με κόμμα."
+
+#: src/Form/ConfigForm.php:139
+msgid "Message to invite to tag"
+msgstr "Μήνυμα για πρόσκληση σε προσθήκη ετικετών"
+
+#: src/Form/ConfigForm.php:140
+msgid ""
+"The text to click to display the tag form (a simple \"+\" by default, "
+"customizable in the theme)."
+msgstr ""
+"Το κείμενο στο οποίο πρέπει να κάνετε κλικ για να εμφανιστεί η φόρμα "
+"ετικέτας (ένα απλό \"+\" από προεπιλογή, με δυνατότητα προσαρμογής στο θέμα "
+"εμφάνισης)."
+
+#: src/Form/ConfigForm.php:150
+msgid "Legal agreement"
+msgstr "Νομική συμφωνία"
+
+#: src/Form/ConfigForm.php:151
+msgid ""
+"This text will be shown beside the legal checkbox. Let empty if you don’t "
+"want to use a legal agreement."
+msgstr ""
+"Αυτό το κείμενο θα εμφανίζεται δίπλα στο πλαίσιο ελέγχου για τη νομική "
+"συμφωνία. Αφήστε το κενό, εάν δεν θέλετε να χρησιμοποιήσετε μια νομική "
+"συμφωνία."
+
+#: src/Controller/Site/TaggingController.php:81
+msgid "SERVER_ADDR"
+msgstr "SERVER_ADDR"
+
+#: src/Controller/Site/TaggingController.php:82
+#, php-format
+msgid "[%s] New public tags"
+msgstr "[%s] Νέες ετικέτες από το κοινό"
+
+#: src/Controller/Site/TaggingController.php:87
+#, php-format
+msgid "%d tag added to resource #%d (%s): \"%s\"."
+msgstr "%d ετικέτα προστέθηκε στον πόρο #%d (%s): \"%s\"."
+
+#: src/Controller/Site/TaggingController.php:89
+#, php-format
+msgid "%d tags added to resource #%d (%s): \"%s\"."
+msgstr "%d ετικέτες προστέθηκαν στον πόρο #%d (%s): \"%s\"."
+
+#: src/Controller/Site/TaggingController.php:104
+msgid "Unable to send an email after tagging."
+msgstr "Δεν είναι δυνατή η αποστολή email μετά την προσθήκη ετικετών."
+
+#: src/Controller/Site/TaggingController.php:112 config/module.config.php:271
+msgid "You should accept the legal agreement."
+msgstr "Θα πρέπει να αποδεχτείτε τη νομική συμφωνία."
+
+#: src/Controller/Site/TaggingController.php:119
+#: src/Controller/Admin/TagController.php:172
+msgid "No tags submitted."
+msgstr "Δεν υποβλήθηκαν ετικέτες."
+
+#: src/Controller/Site/TaggingController.php:126
+#: src/Controller/Admin/TaggingController.php:229
+msgid "Submitted tags are already set."
+msgstr "Οι υποβληθείσες ετικέτες έχουν ήδη δημιουργηθεί."
+
+#: src/Controller/Site/TaggingController.php:133
+#: src/Controller/Admin/TagController.php:186
+#: src/Controller/Admin/TaggingController.php:236
+msgid "Unauthorized access."
+msgstr "Μη εξουσιοδοτημένη πρόσβαση."
+
+#: src/Controller/Site/TaggingController.php:140
+msgid "Resource not found."
+msgstr "Ο πόρος δεν βρέθηκε."
+
+#: src/Controller/Admin/TagController.php:52
+msgid "Tag successfully deleted."
+msgstr "Η ετικέτα διαγράφηκε επιτυχώς."
+
+#: src/Controller/Admin/TagController.php:104
+msgid "You must select at least one tag to batch delete."
+msgstr "Πρέπει να επιλέξετε τουλάχιστον μία ετικέτα για μαζική διαγραφή."
+
+#: src/Controller/Admin/TagController.php:113
+msgid "Tags successfully deleted."
+msgstr "Οι ετικέτες διαγράφηκαν με επιτυχία."
+
+#: src/Controller/Admin/TagController.php:123
+msgid "Delete of all tags is not supported currently."
+msgstr "Η διαγραφή όλων των ετικετών δεν υποστηρίζεται αυτήν τη στιγμή."
+
+#: src/Controller/Admin/TagController.php:179
+msgid ""
+"This tag is invalid: it is a duplicate or it contains forbidden characters."
+msgstr ""
+"Αυτή η ετικέτα δεν είναι έγκυρη: είναι διπλότυπη ή περιέχει απαγορευμένους "
+"χαρακτήρες."
+
+#: src/Controller/Admin/TagController.php:193
+msgid "Tag not found."
+msgstr "Η ετικέτα δεν βρέθηκε."
+
+#: src/Controller/Admin/TagController.php:200
+#: src/Controller/Admin/TaggingController.php:250
+msgid "An internal error occurred."
+msgstr "Παρουσιάστηκε εσωτερικό σφάλμα."
+
+#: src/Controller/Admin/TaggingController.php:101
+msgid "Tagging successfully deleted."
+msgstr "Η ετικετοποίηση διαγράφηκε με επιτυχία."
+
+#: src/Controller/Admin/TaggingController.php:133
+msgid "You must select at least one tagging to batch delete."
+msgstr "Πρέπει να επιλέξετε τουλάχιστον μία ετικετοποίηση για μαζική διαγραφή."
+
+#: src/Controller/Admin/TaggingController.php:142
+msgid "Taggings successfully deleted."
+msgstr "Οι ετικετοποιήσεις διαγράφηκαν με επιτυχία."
+
+#: src/Controller/Admin/TaggingController.php:152
+msgid "Delete of all taggings is not supported currently."
+msgstr "Η διαγραφή όλων των ετικετοποιήσεων δεν υποστηρίζεται αυτήν τη στιγμή."
+
+#: src/Controller/Admin/TaggingController.php:222
+msgid "No taggings submitted."
+msgstr "Δεν υποβλήθηκαν ετικετοποιήσεις."
+
+#: src/Controller/Admin/TaggingController.php:243
+msgid "Tagging not found."
+msgstr "Η ετικετοποίηση δεν βρέθηκε."
+
+#: src/View/Helper/TagSelect.php:28
+msgid "Select tag…"
+msgstr "Επιλογή ετικέτας..."
+
+#: src/Api/Representation/TaggingRepresentation.php:17
+#: config/module.config.php:267
+msgid "Proposed"
+msgstr "Προτάθηκε"
+
+#: src/Api/Representation/TaggingRepresentation.php:18
+#: config/module.config.php:268
+msgid "Allowed"
+msgstr "Επιτράπηκε"
+
+#: src/Api/Representation/TaggingRepresentation.php:19
+#: config/module.config.php:269
+msgid "Approved"
+msgstr "Εγκρίθηκε"
+
+#: src/Api/Representation/TaggingRepresentation.php:20
+#: config/module.config.php:270
+msgid "Rejected"
+msgstr "Απορρίφθηκε"
+
+#: src/Api/Representation/TaggingRepresentation.php:83
+msgid "Undefined"
+msgstr "Απροσδιόριστο"
+
+#: src/Api/Adapter/TaggingAdapter.php:125
+msgid "The name of the tag must be set."
+msgstr "Πρέπει να οριστεί το όνομα της ετικέτας."
+
+#: src/Api/Adapter/TaggingAdapter.php:130
+msgid "The tagged resource must be set."
+msgstr "Ο πόρος με ετικέτα πρέπει να οριστεί."
+
+#: src/Api/Adapter/TaggingAdapter.php:154
+#, php-format
+msgid "The user #%d has already added the tag \"%s\" on the resource #%d."
+msgstr "Ο χρήστης #%d έχει ήδη προσθέσει την ετικέτα \"%s\" στον πόρο #%d."
+
+#: src/Api/Adapter/TaggingAdapter.php:166
+#, php-format
+msgid "The status \"%s\" is unknown."
+msgstr "Η κατάσταση της \"%s\" είναι άγνωστη."
+
+#: src/Api/Adapter/TagAdapter.php:78
+#, php-format
+msgid "The tag \"%s\" is already taken."
+msgstr "Η ετικέτα \"%s\" έχει ήδη ληφθεί."
+
+#: src/Api/Adapter/TagAdapter.php:97
+#, php-format
+msgid "The tag \"%s\" contains forbidden characters."
+msgstr "Η ετικέτα \"%s\" περιέχει απαγορευμένους χαρακτήρες."
+
+#: src/Api/Adapter/TagAdapter.php:103
+msgid "A tag must have a name."
+msgstr "Μια ετικέτα πρέπει να έχει όνομα."
+
+#: src/Entity/Tagging.php:113
+msgid "Invalid tagging status."
+msgstr "Μη έγκυρη κατάσταση ετικετοποίησης."
+
+#: src/Site/BlockLayout/TagCloud.php:22
+msgid "Tag cloud"
+msgstr "Σύννεφο ετικετών"
+
+#: src/Site/Navigation/Link/BrowseTags.php:12
+msgid "Browse tags"
+msgstr "Περιήγηση στις ετικέτες"
+
+#: config/module.config.php:272
+msgid "Data were added to the resource."
+msgstr "Τα δεδομένα προστέθηκαν στον πόρο."
+
+#: config/module.config.php:273
+msgid "They will be displayed definitely when approved."
+msgstr "Θα εμφανιστούν σίγουρα όταν εγκριθούν."
+
+#: config/module.config.php:274
+msgid "Reload page to see new tags."
+msgstr "Επαναλάβετε τη φόρτωση της σελίδας για να δείτε νέες ετικέτες."
+
+#: config/module.config.php:275
+msgid "Request too long to process."
+msgstr "Πολύ μεγάλο αίτημα για επεξεργασία."
+
+#: config/module.config.php:276
+msgid "The resource or the tag doesn’t exist."
+msgstr "Ο πόρος ή η ετικέτα δεν υπάρχει."
+
+#: config/module.config.php:307
+msgid "Tagging [Tag]"
+msgstr "Ετικετοποίηση [Ετικέτα]"
+
+#: config/module.config.php:313
+msgid "Tagging []"
+msgstr "Ετικετοποίηση []"
