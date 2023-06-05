@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Folksonomy\Form;
 
 use Laminas\Form\Element\Button;
@@ -170,50 +171,35 @@ class TaggingForm extends Form
         ]);
     }
 
-    /**
-     * @param Setting $setting
-     */
-    public function setSettingHelper(Setting $settingHelper): void
+    public function setSettingHelper(Setting $settingHelper): self
     {
         $this->settingHelper = $settingHelper;
+        return $this;
     }
 
-    /**
-     * @return Setting
-     */
-    public function getSettingHelper()
+    public function getSettingHelper(): Setting
     {
         return $this->settingHelper;
     }
 
-    /**
-     * @param Url $urlHelper
-     */
-    public function setUrlHelper(Url $urlHelper): void
+    public function setUrlHelper(Url $urlHelper): self
     {
         $this->urlHelper = $urlHelper;
+        return $this;
     }
 
-    /**
-     * @return Url
-     */
-    public function getUrlHelper()
+    public function getUrlHelper(): Url
     {
         return $this->urlHelper;
     }
 
-    /**
-     * @param FormElementManager $formElementManager
-     */
-    public function setFormElementManager(FormElementManager $formElementManager): void
+    public function setFormElementManager(FormElementManager $formElementManager): self
     {
         $this->formElementManager = $formElementManager;
+        return $this;
     }
 
-    /**
-     * @return FormElementManager
-     */
-    public function getFormElementManager()
+    public function getFormElementManager(): FormElementManager
     {
         return $this->formElementManager;
     }

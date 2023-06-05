@@ -86,7 +86,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the resources associated with this tag.
      *
-     * @return AbstractResourceEntityRepresentation[] Associated by resource ids.
+     * @return \Omeka\Api\Representation\AbstractResourceEntityRepresentation[] Associated by resource ids.
      */
     public function resources(): array
     {
@@ -111,7 +111,7 @@ class TagRepresentation extends AbstractEntityRepresentation
     /**
      * Get the owners associated with this tag.
      *
-     * @return UserRepresentation[] Associated by user ids.
+     * @return \Omeka\Api\Representation\UserRepresentation[] Associated by user ids.
      */
     public function owners(): array
     {
