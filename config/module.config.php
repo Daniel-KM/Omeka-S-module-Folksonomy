@@ -49,6 +49,7 @@ return [
     'resource_page_block_layouts' => [
         'invokables' => [
             'tagging' => Site\ResourcePageBlockLayout\Tagging::class,
+            'tagsList' => Site\ResourcePageBlockLayout\TagsList::class,
         ],
     ],
     'navigation_links' => [
