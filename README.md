@@ -56,6 +56,13 @@ manage only one tagging for all users for a tag for one resource, because Omeka
 is document-oriented.
 
 
+TODO
+----
+
+- [ ] Use a property (dcterms:subject) instead of a specific metadata.
+- [ ] Use Annotation (module [Annotate]).
+
+
 Warning
 -------
 
@@ -112,6 +119,7 @@ the digital library of [Mines ParisTech].
 
 [Folksonomy]: https://gitlab.com/Daniel-KM/Omeka-S-module-Folksonomy
 [Omeka S]: https://omeka.org/s
+[Annotate]: https://gitlab.com/Daniel-KM/Omeka-S-module-Annotate
 [Tagging plugin]: https://gitlab.com/Daniel-KM/Omeka-plugin-Tagging
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [Omeka Classic]: https://omeka.org
